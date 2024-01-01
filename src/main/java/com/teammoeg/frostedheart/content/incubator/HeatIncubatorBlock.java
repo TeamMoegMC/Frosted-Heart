@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -23,6 +23,8 @@ import com.teammoeg.frostedheart.content.steamenergy.ISteamEnergyBlock;
 
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraftforge.fml.RegistryObject;
+
+import net.minecraft.block.AbstractBlock.Properties;
 
 public class HeatIncubatorBlock extends IncubatorBlock implements ISteamEnergyBlock {
 

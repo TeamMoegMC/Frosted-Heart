@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 TeamMoeg
+ * Copyright (c) 2021-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -14,6 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 package com.teammoeg.frostedheart;
@@ -30,10 +31,10 @@ public class FHFoods {
     public static final Food DRIED_WOLFBERRIES = buildStew(1);
 
     private static Food buildStew(int hunger, float saturation) {
-        return (new Food.Builder()).hunger(hunger).saturation(saturation).build();
+        return (new Food.Builder()).nutrition(hunger).saturationMod(saturation).build();
     }
 
     private static Food buildStew(int hunger) {
-        return (new Food.Builder()).hunger(hunger).saturation(0.6F).build();
+        return (new Food.Builder()).nutrition(hunger).saturationMod(0.6F).build();
     }
 }

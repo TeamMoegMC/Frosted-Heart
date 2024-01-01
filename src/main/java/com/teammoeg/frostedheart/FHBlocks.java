@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -71,50 +71,50 @@ public class FHBlocks {
     public static Block halite_ore;
 
     public static Block heat_pipe = new HeatPipeBlock("heat_pipe", Block.Properties
-            .create(Material.ROCK).sound(SoundType.WOOD)
+            .of(Material.STONE).sound(SoundType.WOOD)
             .harvestTool(ToolType.PICKAXE)
-            .hardnessAndResistance(1, 5)
-            .notSolid(), FHBlockItem::new);
+            .strength(1, 5)
+            .noOcclusion(), FHBlockItem::new);
     public static Block debug_heater = new DebugHeaterBlock("debug_heater", Block.Properties
-            .create(Material.ROCK).sound(SoundType.STONE)
-            .setRequiresTool()
+            .of(Material.STONE).sound(SoundType.STONE)
+            .requiresCorrectToolForDrops()
             .harvestTool(ToolType.PICKAXE)
-            .hardnessAndResistance(2, 10)
-            .notSolid(), FHBlockItem::new);
+            .strength(2, 10)
+            .noOcclusion(), FHBlockItem::new);
     public static Block charger = new ChargerBlock("charger", Block.Properties
-            .create(Material.ROCK)
+            .of(Material.STONE)
             .sound(SoundType.METAL)
-            .setRequiresTool()
+            .requiresCorrectToolForDrops()
             .harvestTool(ToolType.PICKAXE)
-            .hardnessAndResistance(2, 10)
-            .notSolid(), FHBlockItem::new);
+            .strength(2, 10)
+            .noOcclusion(), FHBlockItem::new);
     public static Block oilburner = new OilBurnerBlock("oil_burner", Block.Properties
-            .create(Material.ROCK)
+            .of(Material.STONE)
             .sound(SoundType.STONE)
-            .setRequiresTool()
+            .requiresCorrectToolForDrops()
             .harvestTool(ToolType.PICKAXE)
-            .hardnessAndResistance(2, 10)
-            .notSolid(), FHBlockItem::new);
+            .strength(2, 10)
+            .noOcclusion(), FHBlockItem::new);
     public static Block gasvent = new GasVentBlock("gas_vent", Block.Properties
-            .create(Material.IRON)
+            .of(Material.METAL)
             .sound(SoundType.METAL)
-            .setRequiresTool()
+            .requiresCorrectToolForDrops()
             .harvestTool(ToolType.PICKAXE)
-            .hardnessAndResistance(2, 10)
-            .notSolid(), FHBlockItem::new);
+            .strength(2, 10)
+            .noOcclusion(), FHBlockItem::new);
     public static Block drawing_desk = new DrawingDeskBlock("drawing_desk", Block.Properties
-            .create(Material.WOOD)
+            .of(Material.WOOD)
             .sound(SoundType.WOOD)
             .harvestTool(ToolType.AXE)
-            .hardnessAndResistance(2, 6)
-            .notSolid(), FHBlockItem::new);
+            .strength(2, 6)
+            .noOcclusion(), FHBlockItem::new);
     public static Block smoket1 = new SmokeBlockT1("smoke_block_t1", Block.Properties
-            .create(Material.ROCK)
+            .of(Material.STONE)
             .sound(SoundType.STONE)
-            .setRequiresTool()
+            .requiresCorrectToolForDrops()
             .harvestTool(ToolType.PICKAXE)
-            .hardnessAndResistance(2, 10)
-            .notSolid(), FHBlockItem::new);
+            .strength(2, 10)
+            .noOcclusion(), FHBlockItem::new);
     /*public static Block high_strength_concrete=new FHBaseBlock("high_strength_concrete", Block.Properties
             .create(Material.ROCK)
             .sound(SoundType.STONE)
@@ -124,17 +124,17 @@ public class FHBlocks {
             .harvestLevel(3)
             ,FHBlockItem::new);*/
     public static Block mech_calc = new MechCalcBlock("mechanical_calculator", Block.Properties
-            .create(Material.IRON)
+            .of(Material.METAL)
             .sound(SoundType.METAL)
-            .setRequiresTool()
+            .requiresCorrectToolForDrops()
             .harvestTool(ToolType.PICKAXE)
-            .hardnessAndResistance(2, 10)
-            .notSolid(), FHBlockItem::new);
+            .strength(2, 10)
+            .noOcclusion(), FHBlockItem::new);
     public static Block sauna = new SaunaBlock("sauna_vent", Block.Properties
-            .create(Material.ROCK)
+            .of(Material.STONE)
             .sound(SoundType.METAL)
-            .setRequiresTool()
+            .requiresCorrectToolForDrops()
             .harvestTool(ToolType.PICKAXE)
-            .hardnessAndResistance(2, 10)
-            .notSolid(), FHBlockItem::new);
+            .strength(2, 10)
+            .noOcclusion(), FHBlockItem::new);
 }

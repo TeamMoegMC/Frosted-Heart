@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -56,7 +56,7 @@ public class InnerExtension implements ICraftingCategoryExtension {
             ItemNBTHelper.putString(n, "inner_cover", inner.getBuffType().toString());
             armorsout.add(n);
         });
-        ingredients.setInputLists(VanillaTypes.ITEM, Arrays.asList(armors, Arrays.asList(inner.getIngredient().getMatchingStacks())));
+        ingredients.setInputLists(VanillaTypes.ITEM, Arrays.asList(armors, Arrays.asList(inner.getIngredient().getItems())));
 
         ingredients.setOutputLists(VanillaTypes.ITEM, Arrays.asList(armorsout));
     }

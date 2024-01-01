@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -62,12 +62,12 @@ public class StructureUtils {
 
     public static void handlePalette(List<Template.Palette> p) {
 
-        p.forEach(q -> q.func_237157_a_().replaceAll(r -> {
+        p.forEach(q -> q.blocks().replaceAll(r -> {
 
             if (baned.contains(r.state.getBlock())) {
-                return new BlockInfo(r.pos, Blocks.AIR.getDefaultState(), null);
+                return new BlockInfo(r.pos, Blocks.AIR.defaultBlockState(), null);
             } else if (remap.containsKey(r.state.getBlock())) {
-                return new BlockInfo(r.pos, remap.get(r.state.getBlock()).getDefaultState(), r.nbt);
+                return new BlockInfo(r.pos, remap.get(r.state.getBlock()).defaultBlockState(), r.nbt);
             }
             return r;
         }));

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -568,7 +568,7 @@ public class ClimateData implements ICapabilitySerializable<CompoundNBT> {
             updateHourCache(hours);
             this.updateNewFrames();
             // Send to client if hour increases
-            PacketHandler.send(PacketDistributor.DIMENSION.with(serverWorld::getDimensionKey), new FHClimatePacket(this));
+            PacketHandler.send(PacketDistributor.DIMENSION.with(serverWorld::dimension), new FHClimatePacket(this));
         }
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -45,7 +45,7 @@ public class FuelingExtension implements ICraftingCategoryExtension {
 
     @Override
     public void setIngredients(IIngredients ingredients) {
-        ingredients.setInputLists(VanillaTypes.ITEM, Arrays.asList(Arrays.asList(new ItemStack(FHItems.hand_stove)), Arrays.asList(fuel.getIngredient().getMatchingStacks())));
+        ingredients.setInputLists(VanillaTypes.ITEM, Arrays.asList(Arrays.asList(new ItemStack(FHItems.hand_stove)), Arrays.asList(fuel.getIngredient().getItems())));
         ItemStack out = new ItemStack(FHItems.hand_stove);
         CoalHandStove.setFuelAmount(out, fuel.getFuel());
         ingredients.setOutput(VanillaTypes.ITEM, out);

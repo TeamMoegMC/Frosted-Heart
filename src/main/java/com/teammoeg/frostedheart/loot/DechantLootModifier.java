@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -64,7 +64,7 @@ public class DechantLootModifier extends LootModifier {
             return orig;
         if (orig.getItem() == Items.ENCHANTED_BOOK) {
             if (enchs.isEmpty())
-                return EnchantmentHelper.addRandomEnchantment(context.getRandom(), new ItemStack(Items.BOOK), 1, false);
+                return EnchantmentHelper.enchantItem(context.getRandom(), new ItemStack(Items.BOOK), 1, false);
             orig = new ItemStack(Items.ENCHANTED_BOOK);
             EnchantmentHelper.setEnchantments(enchs, orig);
             return orig;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -76,11 +76,11 @@ public class EffectWidget extends Widget {
         TechIcons.SLOT.draw(matrixStack, x - 4, y - 4, 24, 24);
         icon.draw(matrixStack, x, y, w, h);
         if (e.isGranted()) {
-            matrixStack.push();
+            matrixStack.pushPose();
             matrixStack.translate(0, 0, 300);
             GuiHelper.setupDrawing();
             TechIcons.FIN.draw(matrixStack, x, y, w, h);
-            matrixStack.pop();
+            matrixStack.popPose();
         }
     }
 }

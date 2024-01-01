@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 TeamMoeg
+ * Copyright (c) 2021-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -14,6 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 package com.teammoeg.frostedheart.climate;
@@ -36,7 +37,7 @@ public class TemperatureCore {
 		/*long time = System.nanoTime();
 		try {*/
 
-		return new TemperatureSimulator(spe).getBlockTemperature(spe.getPosX(), spe.getPosYEye(), spe.getPosZ());
+		return new TemperatureSimulator(spe).getBlockTemperature(spe.getX(), spe.getEyeY(), spe.getZ());
 
 		/*} finally {
 			long delta = System.nanoTime() - time;

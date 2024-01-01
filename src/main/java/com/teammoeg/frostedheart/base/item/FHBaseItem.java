@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 TeamMoeg
+ * Copyright (c) 2021-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -14,6 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 package com.teammoeg.frostedheart.base.item;
@@ -23,6 +24,8 @@ import com.teammoeg.frostedheart.FHMain;
 
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+
+import net.minecraft.item.Item.Properties;
 
 public class FHBaseItem extends Item {
     Item repair;
@@ -34,7 +37,7 @@ public class FHBaseItem extends Item {
     }
 
     @Override
-    public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
+    public boolean isValidRepairItem(ItemStack toRepair, ItemStack repair) {
         if (repair == null) return false;
         return repair.getItem() == this.repair;
     }

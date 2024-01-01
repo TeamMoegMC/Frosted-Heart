@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -118,10 +118,10 @@ public class ResearchDetailPanel extends Panel {
         if (research == null) {
             return;
         }
-        matrixStack.push();
+        matrixStack.pushPose();
         matrixStack.translate(0, 0, 500);
         super.draw(matrixStack, theme, x, y, w, h);
-        matrixStack.pop();
+        matrixStack.popPose();
     }
 
     public void open(Research r) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -30,7 +30,7 @@ import net.minecraft.world.gen.surfacebuilders.SurfaceBuilderConfig;
 
 public class FHSurfaceBuilder {
     public static final ConfiguredSurfaceBuilder<SurfaceBuilderConfig> VOLCANIC = register("volcanic",
-            SurfaceBuilder.DEFAULT.func_242929_a(new SurfaceBuilderConfig(RankineBlocks.BASALTIC_TUFF.get().getDefaultState(), Blocks.STONE.getDefaultState(), Blocks.GRAVEL.getDefaultState())));
+            SurfaceBuilder.DEFAULT.configured(new SurfaceBuilderConfig(RankineBlocks.BASALTIC_TUFF.get().defaultBlockState(), Blocks.STONE.defaultBlockState(), Blocks.GRAVEL.defaultBlockState())));
 
     private static <SC extends ISurfaceBuilderConfig> ConfiguredSurfaceBuilder<SC> register(String name, ConfiguredSurfaceBuilder<SC> configuredSurfaceBuilder) {
         return WorldGenRegistries.register(WorldGenRegistries.CONFIGURED_SURFACE_BUILDER, name, configuredSurfaceBuilder);

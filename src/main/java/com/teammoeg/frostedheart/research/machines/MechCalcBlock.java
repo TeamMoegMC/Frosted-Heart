@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 TeamMoeg
+ * Copyright (c) 2021-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -14,6 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 package com.teammoeg.frostedheart.research.machines;
@@ -56,13 +57,15 @@ import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.FakePlayer;
 
+import net.minecraft.block.AbstractBlock.Properties;
+
 public class MechCalcBlock extends FHKineticBlock {
-    static final VoxelShaper shape = VoxelShaper.forDirectional(VoxelShapes.or(Block.makeCuboidShape(0, 0, 0, 16, 9, 16), Block.makeCuboidShape(0, 9, 0, 16, 16, 13)), Direction.SOUTH);
+    static final VoxelShaper shape = VoxelShaper.forDirectional(VoxelShapes.or(Block.box(0, 0, 0, 16, 9, 16), Block.box(0, 9, 0, 16, 16, 13)), Direction.SOUTH);
 
     public MechCalcBlock(String name, Properties blockProps,
                          BiFunction<Block, net.minecraft.item.Item.Properties, Item> createItemBlock) {
         super(name, blockProps, createItemBlock);
-        this.setDefaultState(this.stateContainer.getBaseState().with(BlockStateProperties.HORIZONTAL_FACING, Direction.SOUTH));
+        this.registerDefaultState(this.stateDefinition.any().setValue(BlockStateProperties.HORIZONTAL_FACING, Direction.SOUTH));
     }
 
 
@@ -74,9 +77,9 @@ public class MechCalcBlock extends FHKineticBlock {
 
 
     @Override
-    public ActionResultType onBlockActivated(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult hit) {
-        ActionResultType superResult = super.onBlockActivated(state, world, pos, player, hand, hit);
-        if (superResult.isSuccessOrConsume() ||player instanceof FakePlayer)
+    public ActionResultType use(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult hit) {
+        ActionResultType superResult = super.use(state, world, pos, player, hand, hit);
+        if (superResult.consumesAction() ||player instanceof FakePlayer)
             return superResult;
         TileEntity te = Utils.getExistingTileEntity(world, pos);
         if (te instanceof MechCalcTileEntity)
@@ -92,24 +95,24 @@ public class MechCalcBlock extends FHKineticBlock {
 
     @Override
     public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
-        return shape.get(state.get(BlockStateProperties.HORIZONTAL_FACING));
+        return shape.get(state.getValue(BlockStateProperties.HORIZONTAL_FACING));
     }
 
 
     @Override
     public Axis getRotationAxis(BlockState state) {
-        return state.get(BlockStateProperties.HORIZONTAL_FACING).rotateY().getAxis();
+        return state.getValue(BlockStateProperties.HORIZONTAL_FACING).getClockWise().getAxis();
     }
 
 
     @Override
     public boolean hasShaftTowards(IWorldReader arg0, BlockPos arg1, BlockState state, Direction dir) {
-        return state.get(BlockStateProperties.HORIZONTAL_FACING).rotateY().getAxis() == dir.getAxis();
+        return state.getValue(BlockStateProperties.HORIZONTAL_FACING).getClockWise().getAxis() == dir.getAxis();
     }
 
 
     @Override
-    public void onBlockPlacedBy(World worldIn, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
+    public void setPlacedBy(World worldIn, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
         if (stack.hasTag() && stack.getTag().getBoolean("prod")) {
             TileEntity te = Utils.getExistingTileEntity(worldIn, pos);
             if (te instanceof MechCalcTileEntity) {
@@ -117,14 +120,14 @@ public class MechCalcBlock extends FHKineticBlock {
             }
         }
 
-        super.onBlockPlacedBy(worldIn, pos, state, placer, stack);
+        super.setPlacedBy(worldIn, pos, state, placer, stack);
 
     }
 
 
     @Override
-    public void fillItemGroup(ItemGroup group, NonNullList<ItemStack> items) {
-        super.fillItemGroup(group, items);
+    public void fillItemCategory(ItemGroup group, NonNullList<ItemStack> items) {
+        super.fillItemCategory(group, items);
         ItemStack is = new ItemStack(this);
         is.getOrCreateTag().putBoolean("prod", true);
         items.add(is);
@@ -132,9 +135,9 @@ public class MechCalcBlock extends FHKineticBlock {
 
 
     @Override
-    public void addInformation(ItemStack stack, IBlockReader worldIn, List<ITextComponent> tooltip,
+    public void appendHoverText(ItemStack stack, IBlockReader worldIn, List<ITextComponent> tooltip,
                                ITooltipFlag flagIn) {
-        super.addInformation(stack, worldIn, tooltip, flagIn);
+        super.appendHoverText(stack, worldIn, tooltip, flagIn);
         if (stack.hasTag() && stack.getTag().getBoolean("prod")) {
             tooltip.add(GuiUtils.str("For Display Only"));
         }

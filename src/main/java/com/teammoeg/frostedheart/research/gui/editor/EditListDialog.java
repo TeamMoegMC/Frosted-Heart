@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -121,7 +121,7 @@ public class EditListDialog<T> extends EditDialog {
         public ButtonAddValue(Panel panel) {
             super(panel);
             setHeight(12);
-            setTitle(new StringTextComponent("+ ").appendSibling(new TranslationTextComponent("gui.add")));
+            setTitle(new StringTextComponent("+ ").append(new TranslationTextComponent("gui.add")));
         }
 
         @Override
@@ -174,7 +174,7 @@ public class EditListDialog<T> extends EditDialog {
             list = new ArrayList<>(vx);
         else
             list = new ArrayList<>();
-        title = new StringTextComponent(label).mergeStyle(TextFormatting.BOLD);
+        title = new StringTextComponent(label).withStyle(TextFormatting.BOLD);
         this.editor = editor;
         this.def = def;
         this.read = toread;

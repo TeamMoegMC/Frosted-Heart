@@ -1,3 +1,22 @@
+/*
+ * Copyright (c) 2024 TeamMoeg
+ *
+ * This file is part of Frosted Heart.
+ *
+ * Frosted Heart is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3.
+ *
+ * Frosted Heart is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
 package com.teammoeg.frostedheart.trade.policy;
 
 import java.util.List;
@@ -61,7 +80,7 @@ public class TradePolicy  extends IESerializableRecipe{
 	}
 
 	@Override
-	public ItemStack getRecipeOutput() {
+	public ItemStack getResultItem() {
 		return ItemStack.EMPTY;
 	}
 	public Weighted asWeight() {
@@ -112,7 +131,7 @@ public class TradePolicy  extends IESerializableRecipe{
 
         @Nullable
         @Override
-        public TradePolicy read(ResourceLocation recipeId, PacketBuffer buffer) {
+        public TradePolicy fromNetwork(ResourceLocation recipeId, PacketBuffer buffer) {
         	ResourceLocation name=SerializeUtil.readOptional(buffer,PacketBuffer::readResourceLocation).orElse(null);
             List<PolicyGroup> groups=SerializeUtil.readList(buffer,PolicyGroup::read);
             int root=buffer.readVarInt();
@@ -121,7 +140,7 @@ public class TradePolicy  extends IESerializableRecipe{
         }
 
         @Override
-        public void write(PacketBuffer buffer, TradePolicy recipe) {
+        public void toNetwork(PacketBuffer buffer, TradePolicy recipe) {
         	SerializeUtil.writeOptional2(buffer, recipe.name,PacketBuffer::writeResourceLocation);
         	SerializeUtil.writeList(buffer,recipe.groups,PolicyGroup::write);
         	buffer.writeVarInt(recipe.weight);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 TeamMoeg
+ * Copyright (c) 2021-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -14,6 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 package com.teammoeg.frostedheart.events;
@@ -104,25 +105,25 @@ public class ClientRegistryEvents {
         
         // Register translucent render type
 
-        RenderTypeLookup.setRenderLayer(FHBlocks.rye_block, RenderType.getCutout());
-        RenderTypeLookup.setRenderLayer(FHBlocks.white_turnip_block, RenderType.getCutout());
-        RenderTypeLookup.setRenderLayer(FHBlocks.wolfberry_bush_block, RenderType.getCutout());
-        RenderTypeLookup.setRenderLayer(FHMultiblocks.generator, RenderType.getCutout());
-        RenderTypeLookup.setRenderLayer(FHMultiblocks.generator_t2, RenderType.getCutout());
-        RenderTypeLookup.setRenderLayer(FHBlocks.drawing_desk, RenderType.getCutout());
-        RenderTypeLookup.setRenderLayer(FHBlocks.charger, RenderType.getCutout());
-        RenderTypeLookup.setRenderLayer(FHBlocks.mech_calc, RenderType.getCutout());
-        RenderTypeLookup.setRenderLayer(FHMultiblocks.radiator, RenderType.getCutout());
-        RenderTypeLookup.setRenderLayer(FHBlocks.debug_heater, RenderType.getCutout());
-        RenderTypeLookup.setRenderLayer(FHBlocks.relic_chest, RenderType.getCutout());
-        RenderTypeLookup.setRenderLayer(FHBlocks.fluorite_ore, RenderType.getCutout());
-        RenderTypeLookup.setRenderLayer(FHBlocks.halite_ore, RenderType.getCutout());
+        RenderTypeLookup.setRenderLayer(FHBlocks.rye_block, RenderType.cutout());
+        RenderTypeLookup.setRenderLayer(FHBlocks.white_turnip_block, RenderType.cutout());
+        RenderTypeLookup.setRenderLayer(FHBlocks.wolfberry_bush_block, RenderType.cutout());
+        RenderTypeLookup.setRenderLayer(FHMultiblocks.generator, RenderType.cutout());
+        RenderTypeLookup.setRenderLayer(FHMultiblocks.generator_t2, RenderType.cutout());
+        RenderTypeLookup.setRenderLayer(FHBlocks.drawing_desk, RenderType.cutout());
+        RenderTypeLookup.setRenderLayer(FHBlocks.charger, RenderType.cutout());
+        RenderTypeLookup.setRenderLayer(FHBlocks.mech_calc, RenderType.cutout());
+        RenderTypeLookup.setRenderLayer(FHMultiblocks.radiator, RenderType.cutout());
+        RenderTypeLookup.setRenderLayer(FHBlocks.debug_heater, RenderType.cutout());
+        RenderTypeLookup.setRenderLayer(FHBlocks.relic_chest, RenderType.cutout());
+        RenderTypeLookup.setRenderLayer(FHBlocks.fluorite_ore, RenderType.cutout());
+        RenderTypeLookup.setRenderLayer(FHBlocks.halite_ore, RenderType.cutout());
         ClientRegistry.bindTileEntityRenderer(FHTileTypes.GENERATOR_T1.get(), T1GeneratorRenderer::new);
         ClientRegistry.bindTileEntityRenderer(FHTileTypes.GENERATOR_T2.get(), T2GeneratorRenderer::new);
         ClientRegistry.bindTileEntityRenderer(FHTileTypes.HEATPIPE.get(), HeatPipeRenderer::new);
         ClientRegistry.bindTileEntityRenderer(FHTileTypes.MECH_CALC.get(), MechCalcRenderer::new);
         // Register layers
-        Map<String, PlayerRenderer> skinMap = Minecraft.getInstance().getRenderManager().getSkinMap();
+        Map<String, PlayerRenderer> skinMap = Minecraft.getInstance().getEntityRenderDispatcher().getSkinMap();
         PlayerRenderer render = skinMap.get("default");
         render.addLayer(new HeaterVestRenderer<>(render));
         render = skinMap.get("slim");
@@ -132,8 +133,8 @@ public class ClientRegistryEvents {
     }
     @SubscribeEvent
     public static void provideTextures(final TextureStitchEvent.Pre event) {
-        if (AtlasTexture.LOCATION_BLOCKS_TEXTURE.equals(event.getMap().getTextureLocation())) {
-            Minecraft.getInstance().getResourceManager().getAllResourceLocations("textures/item/module", s -> s.endsWith(".png")).stream()
+        if (AtlasTexture.LOCATION_BLOCKS.equals(event.getMap().location())) {
+            Minecraft.getInstance().getResourceManager().listResources("textures/item/module", s -> s.endsWith(".png")).stream()
                     .filter(resourceLocation -> FHMain.MODID.equals(resourceLocation.getNamespace()))
                     // 9 is the length of "textures/" & 4 is the length of ".png"
                    
@@ -149,11 +150,11 @@ public class ClientRegistryEvents {
     registerIEScreen(ResourceLocation containerName, ScreenManager.IScreenFactory<C, S> factory) {
         @SuppressWarnings("unchecked")
         ContainerType<C> type = (ContainerType<C>) GuiHandler.getContainerType(containerName);
-        ScreenManager.registerFactory(type, factory);
+        ScreenManager.register(type, factory);
     }
     public static <C extends Container, S extends BaseScreen> void
     registerFTBScreen(ContainerType<C> type, Function<C, S> factory) {
-        ScreenManager.registerFactory(type,FTBScreenFactory(factory));
+        ScreenManager.register(type,FTBScreenFactory(factory));
     }
     public static <C extends Container, S extends BaseScreen> ScreenManager.IScreenFactory<C,MenuScreenWrapper<C>>
     FTBScreenFactory(Function<C, S> factory) {
@@ -165,7 +166,7 @@ public class ClientRegistryEvents {
     @SuppressWarnings("resource")
     @SubscribeEvent
     public static void registerParticleFactories(ParticleFactoryRegisterEvent event) {
-        Minecraft.getInstance().particles.registerFactory(FHParticleTypes.STEAM.get(), SteamParticle.Factory::new);
+        Minecraft.getInstance().particleEngine.register(FHParticleTypes.STEAM.get(), SteamParticle.Factory::new);
     }
 
     @SubscribeEvent
@@ -191,7 +192,7 @@ public class ClientRegistryEvents {
 
     @SubscribeEvent
     public static void onTextureStitchEvent(TextureStitchEvent.Pre event) {
-        if (event.getMap().getTextureLocation() == LOCATION_BLOCKS_TEXTURE) {
+        if (event.getMap().location() == BLOCK_ATLAS) {
             event.addSprite(LiningFinalizedModel.buffCoatFeetTexture);
             event.addSprite(LiningFinalizedModel.buffCoatLegsTexture);
             event.addSprite(LiningFinalizedModel.buffCoatHelmetTexture);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 TeamMoeg
+ * Copyright (c) 2021-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -14,6 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 package com.teammoeg.frostedheart.research.network;
@@ -48,12 +49,12 @@ public class FHResearchDataUpdatePacket {
     }
 
     public FHResearchDataUpdatePacket(PacketBuffer buffer) {
-        data = SerializeUtil.readOptional(buffer, PacketBuffer::readCompoundTag).orElse(null);
+        data = SerializeUtil.readOptional(buffer, PacketBuffer::readNbt).orElse(null);
         id = buffer.readVarInt();
     }
 
     public void encode(PacketBuffer buffer) {
-        SerializeUtil.writeOptional2(buffer, data, PacketBuffer::writeCompoundTag);
+        SerializeUtil.writeOptional2(buffer, data, PacketBuffer::writeNbt);
         buffer.writeVarInt(id);
     }
 

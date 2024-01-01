@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -51,7 +51,7 @@ public class AddLootModifier extends LootModifier {
     	if(!isAdding) {
 	    	try {
 	    		isAdding=true;
-	    		List<ItemStack> nl=loot.generate(context);
+	    		List<ItemStack> nl=loot.getRandomItems(context);
 	    		generatedLoot.addAll(nl);
 	    	}finally {
 	    		isAdding=false;

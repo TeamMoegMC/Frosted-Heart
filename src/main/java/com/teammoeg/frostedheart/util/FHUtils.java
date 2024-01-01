@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 TeamMoeg
+ * Copyright (c) 2021-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -14,6 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 package com.teammoeg.frostedheart.util;
@@ -70,33 +71,33 @@ public class FHUtils {
         return null;
     }
     public static void applyEffectTo(EffectInstance effectinstance,PlayerEntity playerentity) {
-    	if (effectinstance.getPotion().isInstant()) {
-            effectinstance.getPotion().affectEntity(playerentity, playerentity, playerentity, effectinstance.getAmplifier(), 1.0D);
+    	if (effectinstance.getEffect().isInstantenous()) {
+            effectinstance.getEffect().applyInstantenousEffect(playerentity, playerentity, playerentity, effectinstance.getAmplifier(), 1.0D);
          } else {
-        	 playerentity.addPotionEffect(new EffectInstance(effectinstance));
+        	 playerentity.addEffect(new EffectInstance(effectinstance));
          }
     }
     public static Ingredient createIngredient(ItemStack is) {
         if (is.hasTag()) return new NBTIngredientAccess(is);
-        return Ingredient.fromStacks(is);
+        return Ingredient.of(is);
     }
 
     public static IngredientWithSize createIngredientWithSize(ResourceLocation tag, int count) {
-        return new IngredientWithSize(Ingredient.fromTag(ItemTags.getCollection().get(tag)), count);
+        return new IngredientWithSize(Ingredient.of(ItemTags.getAllTags().getTag(tag)), count);
     }
 
     public static IngredientWithSize createIngredientWithSize(ItemStack is) {
         if (is.hasTag()) return new IngredientWithSize(new NBTIngredientAccess(is), is.getCount());
-        return new IngredientWithSize(Ingredient.fromStacks(is), is.getCount());
+        return new IngredientWithSize(Ingredient.of(is), is.getCount());
     }
 
     public static Ingredient createIngredient(ResourceLocation tag) {
-        return Ingredient.fromTag(ItemTags.getCollection().get(tag));
+        return Ingredient.of(ItemTags.getAllTags().getTag(tag));
     }
 
     public static void giveItem(PlayerEntity pe, ItemStack is) {
-        if (!pe.addItemStackToInventory(is))
-            pe.world.addEntity(new ItemEntity(pe.world, pe.getPosition().getX(), pe.getPosition().getY(), pe.getPosition().getZ(), is));
+        if (!pe.addItem(is))
+            pe.level.addFreshEntity(new ItemEntity(pe.level, pe.blockPosition().getX(), pe.blockPosition().getY(), pe.blockPosition().getZ(), is));
     }
 
     public static void registerSimpleCapability(Class<?> clazz) {
@@ -107,7 +108,7 @@ public class FHUtils {
 
     public static ToIntFunction<BlockState> getLightValueLit(int lightValue) {
         return (state) -> {
-            return state.get(BlockStateProperties.LIT) ? lightValue : 0;
+            return state.getValue(BlockStateProperties.LIT) ? lightValue : 0;
         };
     }
 
@@ -116,7 +117,7 @@ public class FHUtils {
             return false;
         } else if (!world.canSeeSky(pos)) {
             return false;
-        } else if (world.getHeight(Heightmap.Type.MOTION_BLOCKING, pos).getY() > pos.getY()) {
+        } else if (world.getHeightmapPos(Heightmap.Type.MOTION_BLOCKING, pos).getY() > pos.getY()) {
             return false;
         } else {
             return true;
@@ -160,18 +161,18 @@ public class FHUtils {
     }
 
     public static void spawnMob(ServerWorld world, BlockPos blockpos, CompoundNBT nbt, ResourceLocation type) {
-        if (World.isInvalidPosition(blockpos)) {
+        if (World.isInSpawnableBounds(blockpos)) {
             CompoundNBT compoundnbt = nbt.copy();
             compoundnbt.putString("id", type.toString());
-            Entity entity = EntityType.loadEntityAndExecute(compoundnbt, world, (p_218914_1_) -> {
-                p_218914_1_.setLocationAndAngles(blockpos.getX(), blockpos.getY(), blockpos.getZ(), p_218914_1_.rotationYaw, p_218914_1_.rotationPitch);
+            Entity entity = EntityType.loadEntityRecursive(compoundnbt, world, (p_218914_1_) -> {
+                p_218914_1_.moveTo(blockpos.getX(), blockpos.getY(), blockpos.getZ(), p_218914_1_.yRot, p_218914_1_.xRot);
                 return p_218914_1_;
             });
             if (entity != null) {
                 if (entity instanceof MobEntity) {
-                    ((MobEntity) entity).onInitialSpawn(world, world.getDifficultyForLocation(entity.getPosition()), SpawnReason.NATURAL, (ILivingEntityData) null, (CompoundNBT) null);
+                    ((MobEntity) entity).finalizeSpawn(world, world.getCurrentDifficultyAt(entity.blockPosition()), SpawnReason.NATURAL, (ILivingEntityData) null, (CompoundNBT) null);
                 }
-                if (!world.addEntityAndUniquePassengers(entity)) {
+                if (!world.tryAddFreshEntityWithPassengers(entity)) {
                     return;
                 }
             }
@@ -184,7 +185,7 @@ public class FHUtils {
 
         for (int i = 0; i < listnbt.size(); ++i) {
             CompoundNBT compoundnbt = listnbt.getCompound(i);
-            ResourceLocation resourcelocation1 = ResourceLocation.tryCreate(compoundnbt.getString("id"));
+            ResourceLocation resourcelocation1 = ResourceLocation.tryParse(compoundnbt.getString("id"));
             if (resourcelocation1 != null && resourcelocation1.equals(resourcelocation)) {
                 return MathHelper.clamp(compoundnbt.getInt("lvl"), 0, 255);
             }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -37,12 +37,12 @@ public class HeatIncubatorTileEntity extends IncubatorTileEntity implements INet
 
 	@Override
 	public boolean connect(Direction to, int dist) {
-		return network.reciveConnection(world, pos, to,dist);
+		return network.reciveConnection(level, worldPosition, to,dist);
 	}
 
 	@Override
 	public boolean canConnectAt(Direction to) {
-		return to == this.getBlockState().get(IncubatorBlock.HORIZONTAL_FACING);
+		return to == this.getBlockState().getValue(IncubatorBlock.HORIZONTAL_FACING);
 	}
 
 	@Override
@@ -54,7 +54,7 @@ public class HeatIncubatorTileEntity extends IncubatorTileEntity implements INet
 	public void tick() {
 		
 		if(network.tick()) {
-			this.markDirty();
+			this.setChanged();
 			this.markContainingBlockForUpdate(null);
 		}
 		super.tick();

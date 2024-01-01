@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -88,11 +88,11 @@ public abstract class Clue extends AutoIDItem implements Writeable {
 
     public Clue(PacketBuffer pb) {
         super();
-        this.name = pb.readString();
-        this.desc = pb.readString();
-        this.hint = pb.readString();
+        this.name = pb.readUtf();
+        this.desc = pb.readUtf();
+        this.hint = pb.readUtf();
         this.contribution = pb.readFloat();
-        this.nonce = pb.readString();
+        this.nonce = pb.readUtf();
         this.required=pb.readBoolean();
     }
 
@@ -191,11 +191,11 @@ public abstract class Clue extends AutoIDItem implements Writeable {
     @Override
     public void write(PacketBuffer buffer) {
         Clues.writeId(this, buffer);
-        buffer.writeString(name);
-        buffer.writeString(desc);
-        buffer.writeString(hint);
+        buffer.writeUtf(name);
+        buffer.writeUtf(desc);
+        buffer.writeUtf(hint);
         buffer.writeFloat(contribution);
-        buffer.writeString(nonce);
+        buffer.writeUtf(nonce);
         buffer.writeBoolean(required);
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 TeamMoeg
+ * Copyright (c) 2021-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -14,6 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 package com.teammoeg.frostedheart.content.temperature;
@@ -41,39 +42,41 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 
+import net.minecraft.item.Item.Properties;
+
 public class SoilThermometer extends FHBaseItem {
     public SoilThermometer(String name, Properties properties) {
         super(name, properties);
     }
 
     @Override
-    public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand handIn) {
-    	playerIn.sendStatusMessage(GuiUtils.translateMessage("thermometer.testing"),true);
-        playerIn.setActiveHand(handIn);
-        if (playerIn instanceof ServerPlayerEntity&&playerIn.abilities.isCreativeMode) {
-            BlockRayTraceResult brtr = rayTrace(worldIn, playerIn, FluidMode.ANY);
+    public ActionResult<ItemStack> use(World worldIn, PlayerEntity playerIn, Hand handIn) {
+    	playerIn.displayClientMessage(GuiUtils.translateMessage("thermometer.testing"),true);
+        playerIn.startUsingItem(handIn);
+        if (playerIn instanceof ServerPlayerEntity&&playerIn.abilities.instabuild) {
+            BlockRayTraceResult brtr = getPlayerPOVHitResult(worldIn, playerIn, FluidMode.ANY);
             if (brtr.getType() != Type.MISS)
             	FHTemperatureDisplayPacket.send((ServerPlayerEntity)playerIn,
-            			"info.soil_thermometerbody", (int)(ChunkData.getTemperature(playerIn.world, brtr.getPos())*10)/10f);
+            			"info.soil_thermometerbody", (int)(ChunkData.getTemperature(playerIn.level, brtr.getBlockPos())*10)/10f);
         }
-        return new ActionResult<>(ActionResultType.SUCCESS, playerIn.getHeldItem(handIn));
+        return new ActionResult<>(ActionResultType.SUCCESS, playerIn.getItemInHand(handIn));
     }
 
     @Override
-    public ItemStack onItemUseFinish(ItemStack stack, World worldIn, LivingEntity entityLiving) {
-        if (worldIn.isRemote) return stack;
+    public ItemStack finishUsingItem(ItemStack stack, World worldIn, LivingEntity entityLiving) {
+        if (worldIn.isClientSide) return stack;
         PlayerEntity entityplayer = entityLiving instanceof PlayerEntity ? (PlayerEntity) entityLiving : null;
         if (entityplayer instanceof ServerPlayerEntity) {
-            BlockRayTraceResult brtr = rayTrace(worldIn, entityplayer, FluidMode.ANY);
+            BlockRayTraceResult brtr = getPlayerPOVHitResult(worldIn, entityplayer, FluidMode.ANY);
             if (brtr.getType() == Type.MISS) return stack;
             FHTemperatureDisplayPacket.send((ServerPlayerEntity)entityLiving,
-        			"info.soil_thermometerbody", (int)(ChunkData.getTemperature(entityLiving.world, brtr.getPos())*10)/10f);
+        			"info.soil_thermometerbody", (int)(ChunkData.getTemperature(entityLiving.level, brtr.getBlockPos())*10)/10f);
         }
         return stack;
     }
     @Override
-    public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-    	tooltip.add(GuiUtils.translateTooltip("thermometer.usage").mergeStyle(TextFormatting.GRAY));
+    public void appendHoverText(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+    	tooltip.add(GuiUtils.translateTooltip("thermometer.usage").withStyle(TextFormatting.GRAY));
     }
     @Override
     public int getUseDuration(ItemStack stack) {
@@ -84,7 +87,7 @@ public class SoilThermometer extends FHBaseItem {
      * returns the action that specifies what animation to play when the items is being used
      */
     @Override
-    public UseAction getUseAction(ItemStack stack) {
+    public UseAction getUseAnimation(ItemStack stack) {
         return UseAction.SPEAR;
     }
 }

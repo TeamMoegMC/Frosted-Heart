@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -253,11 +253,11 @@ public class Research extends FHRegisteredItem implements Writeable {
      * @param data the packet<br>
      */
     public Research(PacketBuffer data) {
-        id = data.readString();
+        id = data.readUtf();
         //System.out.println("read "+id);
-        name = data.readString();
-        desc = SerializeUtil.readList(data, PacketBuffer::readString);
-        fdesc = SerializeUtil.readList(data, PacketBuffer::readString);
+        name = data.readUtf();
+        desc = SerializeUtil.readList(data, PacketBuffer::readUtf);
+        fdesc = SerializeUtil.readList(data, PacketBuffer::readUtf);
         icon = FHIcons.readIcon(data);
         categoryRL = data.readResourceLocation();
         parentIds=SerializeUtil.readList(data,PacketBuffer::readVarInt);
@@ -293,10 +293,10 @@ public class Research extends FHRegisteredItem implements Writeable {
     @Override
     public void write(PacketBuffer buffer) {
     	SpecialResearch.writeId(this, buffer);
-        buffer.writeString(id);
-        buffer.writeString(name);
-        SerializeUtil.writeList2(buffer, desc, PacketBuffer::writeString);
-        SerializeUtil.writeList2(buffer, fdesc, PacketBuffer::writeString);
+        buffer.writeUtf(id);
+        buffer.writeUtf(name);
+        SerializeUtil.writeList2(buffer, desc, PacketBuffer::writeUtf);
+        SerializeUtil.writeList2(buffer, fdesc, PacketBuffer::writeUtf);
         icon.write(buffer);
         buffer.writeResourceLocation(category.getId());
         SerializeUtil.writeList2(buffer, parents, FHRegistry::writeSupplier);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -40,9 +40,9 @@ public class LiningItemOverrideList extends ItemOverrideList {
     }
 
     @Override
-    public IBakedModel getOverrideModel(IBakedModel originalModel, ItemStack stack, @Nullable ClientWorld world, @Nullable LivingEntity entity) {
+    public IBakedModel resolve(IBakedModel originalModel, ItemStack stack, @Nullable ClientWorld world, @Nullable LivingEntity entity) {
         String s = ItemNBTHelper.getString(stack, "inner_cover");
-        EquipmentSlotType slotType = ((ArmorItem) stack.getItem()).getEquipmentSlot();
+        EquipmentSlotType slotType = ((ArmorItem) stack.getItem()).getSlot();
         if (s.length() > 0 && slotType != null) {
             String liningType = new ResourceLocation(s).getPath();
             String slotName = "feet";

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 TeamMoeg
+ * Copyright (c) 2021-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -14,6 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 package com.teammoeg.frostedheart.content.tools.oredetect;
@@ -43,6 +44,8 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.util.FakePlayer;
 import se.mickelus.tetra.properties.IToolProvider;
 
+import net.minecraft.item.Item.Properties;
+
 public class ProspectorPick extends FHLeveledTool {
     public static ResourceLocation tag = new ResourceLocation("forge:ores");
 
@@ -71,15 +74,15 @@ public class ProspectorPick extends FHLeveledTool {
     public static ActionResultType doProspect(PlayerEntity player,World world,BlockPos blockpos,ItemStack is,Hand h) {
           if (player != null && (!(player instanceof FakePlayer))) {//fake players does not deserve XD
               if (world.getBlockState(blockpos).getBlock().getTags().contains(tag)) {//early exit 'cause ore found
-                  player.sendStatusMessage(new TranslationTextComponent(world.getBlockState(blockpos).getBlock().getTranslationKey()).mergeStyle(TextFormatting.GOLD), false);
+                  player.displayClientMessage(new TranslationTextComponent(world.getBlockState(blockpos).getBlock().getDescriptionId()).withStyle(TextFormatting.GOLD), false);
                   return ActionResultType.SUCCESS;
               }
               int x = blockpos.getX();
               int y = blockpos.getY();
               int z = blockpos.getZ();
-              is.damageItem(1, player, (player2) -> player2.sendBreakAnimation(h));
-              if (!world.isRemote) {
-                  Random rnd = new Random(BlockPos.pack(x, y, z) ^ 0xf64128086dd425ffL);//randomize
+              is.hurtAndBreak(1, player, (player2) -> player2.broadcastBreakEvent(h));
+              if (!world.isClientSide) {
+                  Random rnd = new Random(BlockPos.asLong(x, y, z) ^ 0xf64128086dd425ffL);//randomize
                   //This is predictable, but not any big problem. Cheaters can use x-ray or other things rather then hacking in this.
                   float corr=getCorrectness(is);
                   if (rnd.nextInt((int) (10*corr)) != 0) {//mistaken rate 10%
@@ -95,9 +98,9 @@ public class ProspectorPick extends FHLeveledTool {
                                   int BlockX = x + x2;
                                   int BlockY = y + y2;
                                   int BlockZ = z + z2;
-                                  ore = world.getBlockState(mutable.setPos(BlockX, BlockY, BlockZ)).getBlock();
+                                  ore = world.getBlockState(mutable.set(BlockX, BlockY, BlockZ)).getBlock();
                                   if (ore.getTags().contains(tag)) {
-                                      founded.merge(ore.getTranslationKey(), 1, Integer::sum);
+                                      founded.merge(ore.getDescriptionId(), 1, Integer::sum);
                                       rseed++;
                                   }
                               }
@@ -117,24 +120,24 @@ public class ProspectorPick extends FHLeveledTool {
                           }
                           if (ore_name != null) {
                               if (count < 20)
-                                  player.sendStatusMessage(GuiUtils.translateMessage("vein_size.small").appendSibling(new TranslationTextComponent(ore_name)).mergeStyle(TextFormatting.GOLD), false);
+                                  player.displayClientMessage(GuiUtils.translateMessage("vein_size.small").append(new TranslationTextComponent(ore_name)).withStyle(TextFormatting.GOLD), false);
                               else if (count < 40)
-                                  player.sendStatusMessage(GuiUtils.translateMessage("vein_size.medium").appendSibling(new TranslationTextComponent(ore_name)).mergeStyle(TextFormatting.GOLD), false);
+                                  player.displayClientMessage(GuiUtils.translateMessage("vein_size.medium").append(new TranslationTextComponent(ore_name)).withStyle(TextFormatting.GOLD), false);
                               else {
-                                  player.sendStatusMessage(GuiUtils.translateMessage("vein_size.large").appendSibling(new TranslationTextComponent(ore_name)).mergeStyle(TextFormatting.GOLD), false);
+                                  player.displayClientMessage(GuiUtils.translateMessage("vein_size.large").append(new TranslationTextComponent(ore_name)).withStyle(TextFormatting.GOLD), false);
                               }
                               return ActionResultType.SUCCESS;
                           }
                       }
                   }
-                  player.sendStatusMessage(GuiUtils.translateMessage("vein_size.nothing").mergeStyle(TextFormatting.GOLD), false);
+                  player.displayClientMessage(GuiUtils.translateMessage("vein_size.nothing").withStyle(TextFormatting.GOLD), false);
               }
           }
           return ActionResultType.SUCCESS;
     }
     @SuppressWarnings("resource")
     @Override
-    public ActionResultType onItemUse(ItemUseContext context) {
-    	return doProspect(context.getPlayer(),context.getWorld(),context.getPos(),context.getItem(),context.getHand());
+    public ActionResultType useOn(ItemUseContext context) {
+    	return doProspect(context.getPlayer(),context.getLevel(),context.getClickedPos(),context.getItemInHand(),context.getHand());
     }
 }

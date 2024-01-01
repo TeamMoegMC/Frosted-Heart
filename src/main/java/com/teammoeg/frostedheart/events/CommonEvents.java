@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 TeamMoeg
+ * Copyright (c) 2021-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -14,6 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 package com.teammoeg.frostedheart.events;
@@ -157,7 +158,7 @@ public class CommonEvents {
     public static void onServerTick(TickEvent.WorldTickEvent event) {
         if (event.side == LogicalSide.SERVER && event.phase == Phase.START) {
             World world = event.world;
-            if (!world.isRemote && world instanceof ServerWorld) {
+            if (!world.isClientSide && world instanceof ServerWorld) {
                 ServerWorld serverWorld = (ServerWorld) world;
                 // Update clock source every second, and check hour data if it needs an update
                 if (serverWorld.getGameTime() % 20 == 0) {
@@ -167,16 +168,16 @@ public class CommonEvents {
                     data.trimTempEventStream();
                 }
                 if (world.getDayTime() % 24000 == 40) {
-                	for(PlayerEntity spe:world.getPlayers()) {
+                	for(PlayerEntity spe:world.players()) {
                 		if(spe instanceof ServerPlayerEntity&&!(spe instanceof FakePlayer)) {
 	                		ServerPlayerEntity serverPlayer=(ServerPlayerEntity) spe;
 		    				long energy = EnergyCore.getEnergy(spe);
 		    				if (energy > 10000)
-		    					serverPlayer.sendStatusMessage(GuiUtils.translateMessage("energy.full"), false);
+		    					serverPlayer.displayClientMessage(GuiUtils.translateMessage("energy.full"), false);
 		    				else if (energy >= 5000)
-		    					serverPlayer.sendStatusMessage(GuiUtils.translateMessage("energy.suit"), false);
+		    					serverPlayer.displayClientMessage(GuiUtils.translateMessage("energy.suit"), false);
 		    				else
-		    					serverPlayer.sendStatusMessage(GuiUtils.translateMessage("energy.lack"), false);
+		    					serverPlayer.displayClientMessage(GuiUtils.translateMessage("energy.lack"), false);
                 		}
                 	}
     			}
@@ -188,10 +189,10 @@ public class CommonEvents {
     @SuppressWarnings("resource")
     @SubscribeEvent
     public static void onPlayerKill(LivingDeathEvent event) {
-        Entity ent = event.getSource().getTrueSource();
+        Entity ent = event.getSource().getEntity();
 
         if (ent == null || !(ent instanceof PlayerEntity) || ent instanceof FakePlayer) return;
-        if (ent.getEntityWorld().isRemote) return;
+        if (ent.getCommandSenderWorld().isClientSide) return;
         ServerPlayerEntity p = (ServerPlayerEntity) ent;
 
         ResearchListeners.kill(p, event.getEntityLiving());
@@ -215,7 +216,7 @@ public class CommonEvents {
 
     @SubscribeEvent
     public static void onHeal(LivingHealEvent event) {
-        EffectInstance ei = event.getEntityLiving().getActivePotionEffect(FHEffects.SCURVY);
+        EffectInstance ei = event.getEntityLiving().getEffect(FHEffects.SCURVY);
         if (ei != null)
             event.setAmount(event.getAmount() * (0.2f / (ei.getAmplifier() + 1)));
     }
@@ -235,7 +236,7 @@ public class CommonEvents {
             return;
         }
         if (ResearchListeners.multiblock.has(event.getMultiblock()))
-            if (event.getPlayer().getEntityWorld().isRemote) {
+            if (event.getPlayer().getCommandSenderWorld().isClientSide) {
                 if (!ClientResearchDataAPI.getData().building.has(event.getMultiblock())) {
                     event.setCanceled(true);
                 }
@@ -251,7 +252,7 @@ public class CommonEvents {
     @SubscribeEvent
     public static void playerXPPickUp(PickupXp event) {
         PlayerEntity player = event.getPlayer();
-        for (ItemStack stack : player.getArmorInventoryList()) {
+        for (ItemStack stack : player.getArmorSlots()) {
             if (!stack.isEmpty()) {
                 CompoundNBT cn = stack.getTag();
                 if (cn == null)
@@ -264,16 +265,16 @@ public class CommonEvents {
                 if (crdmg > 0 && FHUtils.getEnchantmentLevel(Enchantments.MENDING, cnbt) > 0) {
                     event.setCanceled(true);
                     ExperienceOrbEntity orb = event.getOrb();
-                    player.xpCooldown = 2;
-                    player.onItemPickup(orb, 1);
+                    player.takeXpDelay = 2;
+                    player.take(orb, 1);
 
-                    int toRepair = Math.min(orb.xpValue * 2, crdmg);
-                    orb.xpValue -= toRepair / 2;
+                    int toRepair = Math.min(orb.value * 2, crdmg);
+                    orb.value -= toRepair / 2;
                     crdmg = crdmg - toRepair;
                     cnbt.putInt("Damage", crdmg);
                     cn.put("inner_cover_tag", cnbt);
-                    if (orb.xpValue > 0) {
-                        player.giveExperiencePoints(orb.xpValue);
+                    if (orb.value > 0) {
+                        player.giveExperiencePoints(orb.value);
                     }
                     orb.remove();
                     return;
@@ -293,22 +294,22 @@ public class CommonEvents {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void onArmorDamage(LivingHurtEvent event) {
-        if (event.getEntityLiving() instanceof PlayerEntity && (event.getSource().isFireDamage() || !event.getSource().isUnblockable())) {
+        if (event.getEntityLiving() instanceof PlayerEntity && (event.getSource().isFire() || !event.getSource().isBypassArmor())) {
             PlayerEntity player = (PlayerEntity) event.getEntityLiving();
             float damage = event.getAmount();
             DamageSource p_234563_1_ = event.getSource();
             if (damage > 0) {
                 damage = damage / 8.0F;
-                if (p_234563_1_.isFireDamage())// fire damage more
+                if (p_234563_1_.isFire())// fire damage more
                     damage *= 2;
                 else if (p_234563_1_.isExplosion())// explode add a lot
                     damage *= 4;
                 int amount = (int) damage;
                 if (amount != damage)
-                    amount += player.getRNG().nextDouble() < (damage - amount) ? 1 : 0;
+                    amount += player.getRandom().nextDouble() < (damage - amount) ? 1 : 0;
                 if (amount <= 0)
                     return;
-                for (ItemStack itemstack : player.getArmorInventoryList()) {
+                for (ItemStack itemstack : player.getArmorSlots()) {
                     if (itemstack.isEmpty())
                         continue;
                     CompoundNBT cn = itemstack.getTag();
@@ -319,8 +320,8 @@ public class CommonEvents {
                         continue;
                     if (cn.getBoolean("inner_bounded")) {
                         int dmg = cn.getInt("inner_damage");
-                        if (dmg < itemstack.getDamage()) {
-                            dmg = itemstack.getDamage();
+                        if (dmg < itemstack.getDamageValue()) {
+                            dmg = itemstack.getDamageValue();
                         }
                         dmg += amount;
                         if (dmg >= itemstack.getMaxDamage()) {
@@ -328,7 +329,7 @@ public class CommonEvents {
                             cn.remove("inner_cover_tag");
                             cn.remove("inner_bounded");
                             cn.remove("inner_damage");
-                            player.sendBreakAnimation(MobEntity.getSlotForItemStack(itemstack));
+                            player.broadcastBreakEvent(MobEntity.getEquipmentSlotForItem(itemstack));
                         } else cn.putInt("inner_damage", dmg);
                         continue;
                     }
@@ -337,7 +338,7 @@ public class CommonEvents {
                     int j = 0;
                     if (i > 0)
                         for (int k = 0; i > 0 && k < amount; ++k) {
-                            if (UnbreakingEnchantment.negateDamage(itemstack, i, player.getRNG())) {
+                            if (UnbreakingEnchantment.shouldIgnoreDurabilityDrop(itemstack, i, player.getRandom())) {
                                 ++j;
                             }
                         }
@@ -352,7 +353,7 @@ public class CommonEvents {
                         cn.remove("inner_cover");
                         cn.remove("inner_cover_tag");
                         cn.remove("inner_bounded");
-                        player.sendBreakAnimation(MobEntity.getSlotForItemStack(itemstack));
+                        player.broadcastBreakEvent(MobEntity.getEquipmentSlotForItem(itemstack));
                     } else {
                         cnbt.putInt("Damage", crdmg);
                         cn.put("inner_cover_tag", cnbt);
@@ -387,20 +388,20 @@ public class CommonEvents {
                 // Generate gravel and clay disks
                 if (category == RIVER || category == BEACH) {
                     for (ConfiguredFeature<?, ?> feature : FHFeatures.FH_DISK)
-                        event.getGeneration().withFeature(GenerationStage.Decoration.UNDERGROUND_ORES, feature);
+                        event.getGeneration().addFeature(GenerationStage.Decoration.UNDERGROUND_ORES, feature);
                 }
                 // Generate rankine ores
                 for (ConfiguredFeature<?, ?> feature : FHFeatures.FH_ORES)
-                    event.getGeneration().withFeature(GenerationStage.Decoration.UNDERGROUND_ORES, feature);
+                    event.getGeneration().addFeature(GenerationStage.Decoration.UNDERGROUND_ORES, feature);
                 // Generate clay and gravel deposit
                 if (category != TAIGA && category != EXTREME_HILLS && category != OCEAN && category != DESERT && category != RIVER) {
-                    event.getGeneration().withFeature(GenerationStage.Decoration.LOCAL_MODIFICATIONS, FHFeatures.clay_deposit);
-                    event.getGeneration().withFeature(GenerationStage.Decoration.LOCAL_MODIFICATIONS, FHFeatures.gravel_deposit);
+                    event.getGeneration().addFeature(GenerationStage.Decoration.LOCAL_MODIFICATIONS, FHFeatures.clay_deposit);
+                    event.getGeneration().addFeature(GenerationStage.Decoration.LOCAL_MODIFICATIONS, FHFeatures.gravel_deposit);
                 }
             }
             //Structures
             if (category == EXTREME_HILLS || category == TAIGA) {
-                event.getGeneration().withStructure(FHStructureFeatures.OBSERVATORY_FEATURE);
+                event.getGeneration().addStructureStart(FHStructureFeatures.OBSERVATORY_FEATURE);
             }
         }
     }
@@ -417,8 +418,8 @@ public class CommonEvents {
     		else if(tt.contains(TetraCompat.proPick))
     			type=3;
     		if(type!=0)
-	    		if(!event.getPlayer().getCooldownTracker().hasCooldown(event.getItemStack().getItem())) {
-		    		event.getPlayer().getCooldownTracker().setCooldown(event.getItemStack().getItem(),10);
+	    		if(!event.getPlayer().getCooldowns().isOnCooldown(event.getItemStack().getItem())) {
+		    		event.getPlayer().getCooldowns().addCooldown(event.getItemStack().getItem(),10);
 		    		if((type==3&&event.getWorld().getRandom().nextBoolean())||(type!=3&&event.getWorld().getRandom().nextInt(3)==0))
 		    			((IModularItem)event.getItemStack().getItem()).tickProgression(event.getPlayer(),event.getItemStack(), 1);
 		    		switch(type) {
@@ -430,10 +431,10 @@ public class CommonEvents {
 		    		event.setCanceled(true);
 	    		}
     	}
-        if (!ResearchListeners.canUseBlock(event.getPlayer(), event.getWorld().getBlockState(event.getHitVec().getPos()).getBlock())) {
+        if (!ResearchListeners.canUseBlock(event.getPlayer(), event.getWorld().getBlockState(event.getHitVec().getBlockPos()).getBlock())) {
             event.setUseBlock(Result.DENY);
             
-            event.getPlayer().sendStatusMessage(GuiUtils.translateMessage("research.cannot_use_block"), true);
+            event.getPlayer().displayClientMessage(GuiUtils.translateMessage("research.cannot_use_block"), true);
         }
         
     }
@@ -455,17 +456,17 @@ public class CommonEvents {
         
         if (growBlock instanceof FHCropBlock) {
             return;
-        } else if (growBlock.matchesBlock(IEBlocks.Misc.hempPlant)) {
+        } else if (growBlock.is(IEBlocks.Misc.hempPlant)) {
             if (temp < WorldClimate.HEMP_GROW_TEMPERATURE) {
                 if (temp<-6&&event.getWorld().getRandom().nextInt(3) == 0) {
-                    event.getWorld().setBlockState(event.getPos(), growBlock.getDefaultState(), 2);
+                    event.getWorld().setBlock(event.getPos(), growBlock.defaultBlockState(), 2);
                 }
                 event.setResult(Event.Result.DENY);
             }else if(temp>WorldClimate.VANILLA_PLANT_GROW_TEMPERATURE_MAX) {
             	if(event.getWorld().getRandom().nextInt(3) == 0) {
             		BlockState cbs=event.getWorld().getBlockState(event.getPos());
-                	if(cbs.matchesBlock(growBlock))
-                		event.getWorld().setBlockState(event.getPos(),Blocks.AIR.getDefaultState(), 2);
+                	if(cbs.is(growBlock))
+                		event.getWorld().setBlock(event.getPos(),Blocks.AIR.defaultBlockState(), 2);
                 }
             	event.setResult(Event.Result.DENY);
             }
@@ -474,15 +475,15 @@ public class CommonEvents {
                 // Set back to default state, might not be necessary
                 if (temp<0&& event.getWorld().getRandom().nextInt(3) == 0) {
                 	BlockState cbs=event.getWorld().getBlockState(event.getPos());
-                	if(cbs.matchesBlock(growBlock)&&cbs!= growBlock.getDefaultState())
-                		event.getWorld().setBlockState(event.getPos(), growBlock.getDefaultState(), 2);
+                	if(cbs.is(growBlock)&&cbs!= growBlock.defaultBlockState())
+                		event.getWorld().setBlock(event.getPos(), growBlock.defaultBlockState(), 2);
                 }
                 event.setResult(Event.Result.DENY);
             }else if(temp>WorldClimate.VANILLA_PLANT_GROW_TEMPERATURE_MAX) {
             	if(event.getWorld().getRandom().nextInt(3) == 0) {
             		BlockState cbs=event.getWorld().getBlockState(event.getPos());
-                	if(cbs.matchesBlock(growBlock))
-                		event.getWorld().setBlockState(event.getPos(),Blocks.AIR.getDefaultState(), 2);
+                	if(cbs.is(growBlock))
+                		event.getWorld().setBlock(event.getPos(),Blocks.AIR.defaultBlockState(), 2);
                 }
             	event.setResult(Event.Result.DENY);
             }
@@ -509,7 +510,7 @@ public class CommonEvents {
                     event.setCanceled(true);
                     FHTemperatureDisplayPacket.sendStatus(player,"crop_no_bonemeal",false, growTemp);
                 }
-            } else if (growBlock.matchesBlock(IEBlocks.Misc.hempPlant)) {
+            } else if (growBlock.is(IEBlocks.Misc.hempPlant)) {
                 if (temp < WorldClimate.HEMP_GROW_TEMPERATURE+WorldClimate.BONEMEAL_TEMPERATURE) {
                     event.setCanceled(true);
                     FHTemperatureDisplayPacket.sendStatus(player,"crop_no_bonemeal",false,
@@ -547,7 +548,7 @@ public class CommonEvents {
                         event.setCanceled(true);
                         FHTemperatureDisplayPacket.sendStatus(player,"crop_not_growable",true, growTemp);
                     }
-                } else if (growBlock.matchesBlock(IEBlocks.Misc.hempPlant)) {
+                } else if (growBlock.is(IEBlocks.Misc.hempPlant)) {
                     if (temp < WorldClimate.HEMP_GROW_TEMPERATURE) {
                         event.setCanceled(true);
                         FHTemperatureDisplayPacket.sendStatus(player,"crop_not_growable",true,
@@ -565,7 +566,7 @@ public class CommonEvents {
     }
     @SubscribeEvent
     public static void onSleep(SleepingTimeCheckEvent event) {
-    	long ttime=event.getEntity().getEntityWorld().getDayTime()%24000;
+    	long ttime=event.getEntity().getCommandSenderWorld().getDayTime()%24000;
     	if(ttime<12000)
     		event.setResult(Result.DENY);
     }
@@ -581,31 +582,31 @@ public class CommonEvents {
         }
         if (!persistent.contains(FHNBT.FIRST_LOGIN_GIVE_MANUAL)) {
             persistent.putBoolean(FHNBT.FIRST_LOGIN_GIVE_MANUAL, false);
-            event.getPlayer().inventory.addItemStackToInventory(
+            event.getPlayer().inventory.add(
                     new ItemStack(ForgeRegistries.ITEMS.getValue(new ResourceLocation("ftbquests", "book"))));
-            event.getPlayer().inventory.armorInventory.set(3, FHNBT.ArmorLiningNBT(new ItemStack(Items.IRON_HELMET)
-                    .setDisplayName(new TranslationTextComponent("itemname.frostedheart.start_head"))));
-            event.getPlayer().inventory.armorInventory.set(2, FHNBT.ArmorLiningNBT(new ItemStack(Items.IRON_CHESTPLATE)
-                    .setDisplayName(new TranslationTextComponent("itemname.frostedheart.start_chest"))));
-            event.getPlayer().inventory.armorInventory.set(1, FHNBT.ArmorLiningNBT(new ItemStack(Items.IRON_LEGGINGS)
-                    .setDisplayName(new TranslationTextComponent("itemname.frostedheart.start_leg"))));
-            event.getPlayer().inventory.armorInventory.set(0, FHNBT.ArmorLiningNBT(new ItemStack(Items.IRON_BOOTS)
-                    .setDisplayName(new TranslationTextComponent("itemname.frostedheart.start_foot"))));
-            if(event.getPlayer().abilities.isCreativeMode) {
+            event.getPlayer().inventory.armor.set(3, FHNBT.ArmorLiningNBT(new ItemStack(Items.IRON_HELMET)
+                    .setHoverName(new TranslationTextComponent("itemname.frostedheart.start_head"))));
+            event.getPlayer().inventory.armor.set(2, FHNBT.ArmorLiningNBT(new ItemStack(Items.IRON_CHESTPLATE)
+                    .setHoverName(new TranslationTextComponent("itemname.frostedheart.start_chest"))));
+            event.getPlayer().inventory.armor.set(1, FHNBT.ArmorLiningNBT(new ItemStack(Items.IRON_LEGGINGS)
+                    .setHoverName(new TranslationTextComponent("itemname.frostedheart.start_leg"))));
+            event.getPlayer().inventory.armor.set(0, FHNBT.ArmorLiningNBT(new ItemStack(Items.IRON_BOOTS)
+                    .setHoverName(new TranslationTextComponent("itemname.frostedheart.start_foot"))));
+            if(event.getPlayer().abilities.instabuild) {
     			event.getPlayer().sendMessage(new TranslationTextComponent("message.frostedheart.creative_help")
-    					.setStyle(Style.EMPTY.applyFormatting(TextFormatting.YELLOW)
-    							.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,GuiUtils.str("Click to use command")))
-    							.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND,"/frostedheart research complete all"))), event.getPlayer().getUniqueID());
+    					.setStyle(Style.EMPTY.applyFormat(TextFormatting.YELLOW)
+    							.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,GuiUtils.str("Click to use command")))
+    							.withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND,"/frostedheart research complete all"))), event.getPlayer().getUUID());
     		}
             
-            event.getPlayer().sendMessage(new TranslationTextComponent("message.frostedheart.temperature_help"), event.getPlayer().getUniqueID());
+            event.getPlayer().sendMessage(new TranslationTextComponent("message.frostedheart.temperature_help"), event.getPlayer().getUUID());
         }
     }
 
     @SubscribeEvent
     public static void syncDataToClient(PlayerEvent.PlayerLoggedInEvent event) {
         if (event.getEntity() instanceof ServerPlayerEntity) {
-            ServerWorld serverWorld = ((ServerPlayerEntity) event.getPlayer()).getServerWorld();
+            ServerWorld serverWorld = ((ServerPlayerEntity) event.getPlayer()).getLevel();
             PacketHandler.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) event.getPlayer()),
                     new FHResearchRegistrtySyncPacket());
 
@@ -627,7 +628,7 @@ public class CommonEvents {
     @SubscribeEvent
     public static void syncDataWhenDimensionChanged(PlayerEvent.PlayerChangedDimensionEvent event) {
         if (event.getEntity() instanceof ServerPlayerEntity) {
-            ServerWorld serverWorld = ((ServerPlayerEntity) event.getPlayer()).getServerWorld();
+            ServerWorld serverWorld = ((ServerPlayerEntity) event.getPlayer()).getLevel();
             
                 PacketHandler.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) event.getPlayer()),
                         new FHClimatePacket(ClimateData.get(serverWorld)));
@@ -642,7 +643,7 @@ public class CommonEvents {
         cnbt.putLong("cenergy", olddata.getLong("cenergy"));
         TemperatureCore.setFHData(ev.getPlayer(), cnbt);
         //FHMain.LOGGER.info("clone");
-        if(!ev.getPlayer().world.isRemote) {
+        if(!ev.getPlayer().level.isClientSide) {
 	        DeathInventoryData orig=DeathInventoryData.get(ev.getOriginal());
 	        DeathInventoryData nw=DeathInventoryData.get(ev.getPlayer());
 	       
@@ -654,20 +655,20 @@ public class CommonEvents {
     @SubscribeEvent
     public static void setKeepInventory(FMLServerStartedEvent event) {
         if (FHConfig.SERVER.alwaysKeepInventory.get()) {
-            for (ServerWorld world : event.getServer().getWorlds()) {
-                world.getGameRules().get(GameRules.KEEP_INVENTORY).set(true, event.getServer());
+            for (ServerWorld world : event.getServer().getAllLevels()) {
+                world.getGameRules().getRule(GameRules.RULE_KEEPINVENTORY).set(true, event.getServer());
             }
         }
     }
 
     @SubscribeEvent
     public static void punishEatingRawMeat(LivingEntityUseItemEvent.Finish event) {
-        if (event.getEntityLiving() != null && !event.getEntityLiving().world.isRemote
+        if (event.getEntityLiving() != null && !event.getEntityLiving().level.isClientSide
                 && event.getEntityLiving() instanceof ServerPlayerEntity
                 && event.getItem().getItem().getTags().contains(FHMain.rl("raw_food"))) {
             ServerPlayerEntity player = (ServerPlayerEntity) event.getEntityLiving();
-            player.addPotionEffect(new EffectInstance(Effects.HUNGER, 400, 1));
-            player.sendStatusMessage(new TranslationTextComponent("message.frostedheart.eaten_poisonous_food"), false);
+            player.addEffect(new EffectInstance(Effects.HUNGER, 400, 1));
+            player.displayClientMessage(new TranslationTextComponent("message.frostedheart.eaten_poisonous_food"), false);
         }
     }
 
@@ -675,10 +676,10 @@ public class CommonEvents {
     @SubscribeEvent
     public static void respawn(PlayerRespawnEvent event) {
         if (event.getPlayer() instanceof ServerPlayerEntity&&!(event.getPlayer() instanceof FakePlayer)) {
-            ServerWorld serverWorld = ((ServerPlayerEntity) event.getPlayer()).getServerWorld();
+            ServerWorld serverWorld = ((ServerPlayerEntity) event.getPlayer()).getLevel();
             DeathInventoryData dit=DeathInventoryData.get(event.getPlayer());
             dit.tryCallClone(event.getPlayer());
-            if(FHConfig.SERVER.keepEquipments.get()&&!event.getPlayer().world.isRemote) {
+            if(FHConfig.SERVER.keepEquipments.get()&&!event.getPlayer().level.isClientSide) {
         		if(dit!=null)
         			dit.alive(event.getPlayer().inventory);
         	}
@@ -702,7 +703,7 @@ public class CommonEvents {
 
     @SubscribeEvent
     public static void finishedEatingFood(LivingEntityUseItemEvent.Finish event) {
-        if (event.getEntityLiving() != null && !event.getEntityLiving().world.isRemote
+        if (event.getEntityLiving() != null && !event.getEntityLiving().level.isClientSide
                 && event.getEntityLiving() instanceof ServerPlayerEntity) {
             ItemStack is = event.getItem();
             Item it = event.getItem().getItem();
@@ -720,9 +721,9 @@ public class CommonEvents {
                 float min = adj.getMinTemp(event.getItem());
                 float heat = adj.getHeat(event.getItem(),TemperatureCore.getEnvTemperature((ServerPlayerEntity) event.getEntityLiving()));
                 if (heat > 1) {
-                    event.getEntityLiving().attackEntityFrom(FHDamageSources.HYPERTHERMIA_INSTANT, (heat) * 2);
+                    event.getEntityLiving().hurt(FHDamageSources.HYPERTHERMIA_INSTANT, (heat) * 2);
                 } else if (heat < -1)
-                    event.getEntityLiving().attackEntityFrom(FHDamageSources.HYPOTHERMIA_INSTANT, (heat) * 2);
+                    event.getEntityLiving().hurt(FHDamageSources.HYPOTHERMIA_INSTANT, (heat) * 2);
                 if (heat > 0) {
                     if (current >= max)
                         return;
@@ -747,7 +748,7 @@ public class CommonEvents {
         if (event.getWorld() instanceof ServerWorld) {
             ServerWorld serverWorld = (ServerWorld) event.getWorld();
             try {
-                serverWorld.getChunkProvider().generator.func_235957_b_().func_236195_a_().keySet()
+                serverWorld.getChunkSource().generator.getSettings().structureConfig().keySet()
                         .remove(Structure.VILLAGE);
             } catch (UnsupportedOperationException e) {
             }
@@ -760,7 +761,7 @@ public class CommonEvents {
         if (event.getWorld() instanceof ServerWorld) {
             ServerWorld serverWorld = (ServerWorld) event.getWorld();
             try {
-                serverWorld.getChunkProvider().generator.func_235957_b_().func_236195_a_().keySet()
+                serverWorld.getChunkSource().generator.getSettings().structureConfig().keySet()
                         .remove(Structure.VILLAGE);
             } catch (UnsupportedOperationException e) {
             }

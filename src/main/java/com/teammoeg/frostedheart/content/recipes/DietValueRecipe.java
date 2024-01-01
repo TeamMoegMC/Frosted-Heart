@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -58,7 +58,7 @@ public class DietValueRecipe extends IESerializableRecipe {
     }
 
     @Override
-    public ItemStack getRecipeOutput() {
+    public ItemStack getResultItem() {
         return ItemStack.EMPTY;
     }
 
@@ -80,12 +80,12 @@ public class DietValueRecipe extends IESerializableRecipe {
     public static class Serializer extends IERecipeSerializer<DietValueRecipe> {
 
         @Override
-        public DietValueRecipe read(ResourceLocation recipeId, PacketBuffer buffer) {
+        public DietValueRecipe fromNetwork(ResourceLocation recipeId, PacketBuffer buffer) {
             return new DietValueRecipe(recipeId, DietGroupCodec.read(buffer), buffer.readRegistryId());
         }
 
         @Override
-        public void write(PacketBuffer buffer, DietValueRecipe recipe) {
+        public void toNetwork(PacketBuffer buffer, DietValueRecipe recipe) {
             DietGroupCodec.write(buffer, recipe.groups);
             buffer.writeRegistryId(recipe.item);
         }

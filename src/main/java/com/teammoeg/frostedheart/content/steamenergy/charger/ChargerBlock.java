@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 TeamMoeg
+ * Copyright (c) 2021-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -14,6 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 package com.teammoeg.frostedheart.content.steamenergy.charger;
@@ -49,13 +50,15 @@ import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 
+import net.minecraft.block.AbstractBlock.Properties;
+
 public class ChargerBlock extends FHBaseBlock implements ISteamEnergyBlock {
     public static final BooleanProperty LIT = BlockStateProperties.LIT;
 
     public ChargerBlock(String name, Properties blockProps,
                         BiFunction<Block, net.minecraft.item.Item.Properties, Item> createItemBlock) {
         super(name, blockProps, createItemBlock);
-        this.setDefaultState(this.stateContainer.getBaseState().with(LIT, Boolean.FALSE).with(BlockStateProperties.FACING, Direction.SOUTH));
+        this.registerDefaultState(this.stateDefinition.any().setValue(LIT, Boolean.FALSE).setValue(BlockStateProperties.FACING, Direction.SOUTH));
     }
 
 
@@ -66,8 +69,8 @@ public class ChargerBlock extends FHBaseBlock implements ISteamEnergyBlock {
     }
 
     @Override
-    protected void fillStateContainer(Builder<Block, BlockState> builder) {
-        super.fillStateContainer(builder);
+    protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
+        super.createBlockStateDefinition(builder);
         builder.add(BlockStateProperties.FACING);
         builder.add(LIT);
     }
@@ -75,7 +78,7 @@ public class ChargerBlock extends FHBaseBlock implements ISteamEnergyBlock {
     @Override
     public void animateTick(BlockState stateIn, World worldIn, BlockPos pos, Random rand) {
         super.animateTick(stateIn, worldIn, pos, rand);
-        if (stateIn.get(LIT)) {
+        if (stateIn.getValue(LIT)) {
             ClientUtils.spawnSteamParticles(worldIn, pos);
         }
     }
@@ -83,19 +86,19 @@ public class ChargerBlock extends FHBaseBlock implements ISteamEnergyBlock {
 
     @Override
     public BlockState getStateForPlacement(BlockItemUseContext context) {
-        if (context.getFace() == Direction.UP || context.getPlayer().isSneaking()) {
-            return this.getDefaultState().with(BlockStateProperties.FACING, context.getNearestLookingDirection());
+        if (context.getClickedFace() == Direction.UP || context.getPlayer().isShiftKeyDown()) {
+            return this.defaultBlockState().setValue(BlockStateProperties.FACING, context.getNearestLookingDirection());
         }
-        return this.getDefaultState().with(BlockStateProperties.FACING, context.getFace().getOpposite());
+        return this.defaultBlockState().setValue(BlockStateProperties.FACING, context.getClickedFace().getOpposite());
     }
 
 
     @Override
-    public ActionResultType onBlockActivated(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult hit) {
-        ActionResultType superResult = super.onBlockActivated(state, world, pos, player, hand, hit);
-        if (superResult.isSuccessOrConsume() || player.isSneaking())
+    public ActionResultType use(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult hit) {
+        ActionResultType superResult = super.use(state, world, pos, player, hand, hit);
+        if (superResult.consumesAction() || player.isShiftKeyDown())
             return superResult;
-        ItemStack item = player.getHeldItem(hand);
+        ItemStack item = player.getItemInHand(hand);
 
         TileEntity te = Utils.getExistingTileEntity(world, pos);
         if (te instanceof ChargerTileEntity) {
@@ -113,7 +116,7 @@ public class ChargerBlock extends FHBaseBlock implements ISteamEnergyBlock {
 
     @Override
     public boolean canConnectFrom(IWorld world, BlockPos pos, BlockState state, Direction dir) {
-        Direction bd = state.get(BlockStateProperties.FACING);
+        Direction bd = state.getValue(BlockStateProperties.FACING);
         return dir == bd.getOpposite() || (bd != Direction.DOWN && dir == Direction.UP) || (bd == Direction.UP && dir == Direction.SOUTH) || (bd == Direction.DOWN && dir == Direction.NORTH);
     }
 

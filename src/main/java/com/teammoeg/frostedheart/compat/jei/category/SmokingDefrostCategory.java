@@ -1,19 +1,20 @@
 /*
- * Copyright (c) 2021 TeamMoeg
+ * Copyright (c) 2021-2024 TeamMoeg
  *
- * This file is part of Immersive Industry.
+ * This file is part of Frosted Heart.
  *
- * Immersive Industry is free software: you can redistribute it and/or modify
+ * Frosted Heart is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3.
  *
- * Immersive Industry is distributed in the hope that it will be useful,
+ * Frosted Heart is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with Immersive Industry. If not, see <https://www.gnu.org/licenses/>.
+ * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 package com.teammoeg.frostedheart.compat.jei.category;
@@ -99,7 +100,7 @@ public class SmokingDefrostCategory implements IRecipeCategory<SmokingDefrostRec
     }
 
     protected IDrawableAnimated getArrow(SmokingDefrostRecipe recipe) {
-        int cookTime = recipe.getCookTime();
+        int cookTime = recipe.getCookingTime();
         if (cookTime <= 0) {
             cookTime = 100;
         }
@@ -107,14 +108,14 @@ public class SmokingDefrostCategory implements IRecipeCategory<SmokingDefrostRec
     }
 
     protected void drawCookTime(SmokingDefrostRecipe recipe, MatrixStack matrixStack, int y) {
-        int cookTime = recipe.getCookTime();
+        int cookTime = recipe.getCookingTime();
         if (cookTime > 0) {
             int cookTimeSeconds = cookTime / 20;
             TranslationTextComponent timeString = new TranslationTextComponent("gui.jei.category.smelting.time.seconds", cookTimeSeconds);
             Minecraft minecraft = Minecraft.getInstance();
-            FontRenderer fontRenderer = minecraft.fontRenderer;
-            int stringWidth = fontRenderer.getStringPropertyWidth(timeString);
-            fontRenderer.drawText(matrixStack, timeString, BACKGROUND.getWidth() - stringWidth, y, 0xFF808080);
+            FontRenderer fontRenderer = minecraft.font;
+            int stringWidth = fontRenderer.width(timeString);
+            fontRenderer.draw(matrixStack, timeString, BACKGROUND.getWidth() - stringWidth, y, 0xFF808080);
         }
     }
 
@@ -130,7 +131,7 @@ public class SmokingDefrostCategory implements IRecipeCategory<SmokingDefrostRec
 
     @Override
     public void setIngredients(SmokingDefrostRecipe recipe, IIngredients ingredients) {
-        ingredients.setInputLists(VanillaTypes.ITEM, Arrays.asList(Arrays.asList(recipe.getIngredient().getMatchingStacks())));
+        ingredients.setInputLists(VanillaTypes.ITEM, Arrays.asList(Arrays.asList(recipe.getIngredient().getItems())));
         ingredients.setOutputLists(VanillaTypes.ITEM, Arrays.asList(Arrays.asList(recipe.getIss())));
     }
 

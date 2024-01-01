@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 TeamMoeg
+ * Copyright (c) 2021-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -14,6 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 package com.teammoeg.frostedheart.content.agriculture;
@@ -35,6 +36,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 
+import net.minecraft.block.AbstractBlock.Properties;
+
 public class FHCropBlock extends CropsBlock {
     public final String name;
     private int growTemperature;
@@ -46,7 +49,7 @@ public class FHCropBlock extends CropsBlock {
         FHContent.registeredFHBlocks.add(this);
         ResourceLocation registryName = createRegistryName();
         setRegistryName(registryName);
-        Item item = createItemBlock.apply(this, new Item.Properties().group(FHMain.itemGroup));
+        Item item = createItemBlock.apply(this, new Item.Properties().tab(FHMain.itemGroup));
         if (item != null) {
             item.setRegistryName(registryName);
             FHContent.registeredFHItems.add(item);
@@ -76,21 +79,21 @@ public class FHCropBlock extends CropsBlock {
     public void randomTick(BlockState state, ServerWorld worldIn, BlockPos pos, Random random) {
         if (!worldIn.isAreaLoaded(pos, 1))
             return; // Forge: prevent loading unloaded chunks when checking neighbor's light
-        if (worldIn.getLightSubtracted(pos, 0) >= 9) {
+        if (worldIn.getRawBrightness(pos, 0) >= 9) {
             int i = this.getAge(state);
             float temp = ChunkData.getTemperature(worldIn, pos);
             if (temp < growTemperature) {
                 if (temp < growTemperature-10&&worldIn.getRandom().nextInt(3) == 0) {
-                    worldIn.setBlockState(pos, this.getDefaultState(), 2);
+                    worldIn.setBlock(pos, this.defaultBlockState(), 2);
                 }
             }else if(temp>WorldClimate.VANILLA_PLANT_GROW_TEMPERATURE_MAX) {
             	if (worldIn.getRandom().nextInt(3) == 0) {
-                    worldIn.setBlockState(pos, this.getDefaultState(), 2);
+                    worldIn.setBlock(pos, this.defaultBlockState(), 2);
                 }
             }else  if (i < this.getMaxAge()) {
-                float f = getGrowthChance(this, worldIn, pos);
+                float f = getGrowthSpeed(this, worldIn, pos);
                 if (net.minecraftforge.common.ForgeHooks.onCropsGrowPre(worldIn, pos, state, random.nextInt((int) (25.0F / f) + 1) == 0)) {
-                    worldIn.setBlockState(pos, this.withAge(i + 1), 2);
+                    worldIn.setBlock(pos, this.getStateForAge(i + 1), 2);
                     net.minecraftforge.common.ForgeHooks.onCropsGrowPost(worldIn, pos, state);
                 }
             }
@@ -98,7 +101,7 @@ public class FHCropBlock extends CropsBlock {
     }
 
     @Override
-    public boolean canUseBonemeal(World worldIn, Random rand, BlockPos pos, BlockState state) {
+    public boolean isBonemealSuccess(World worldIn, Random rand, BlockPos pos, BlockState state) {
         float temp = ChunkData.getTemperature(worldIn, pos);
         return temp >= growTemperature;
     }

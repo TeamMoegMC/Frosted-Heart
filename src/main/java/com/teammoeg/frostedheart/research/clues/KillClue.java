@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -66,7 +66,7 @@ public class KillClue extends ListenerClue {
     public ITextComponent getDescription() {
         ITextComponent itc = super.getDescription();
         if (itc != null || type == null) return itc;
-        return type.getName();
+        return type.getDescription();
     }
 
     @Override

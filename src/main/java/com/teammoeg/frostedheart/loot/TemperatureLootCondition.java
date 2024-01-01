@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -66,17 +66,17 @@ public class TemperatureLootCondition implements ILootCondition {
     @SuppressWarnings("resource")
     @Override
     public boolean test(LootContext t) {
-        if (t.has(LootParameters.ORIGIN)) {
-            Vector3d v = t.get(LootParameters.ORIGIN);
+        if (t.hasParam(LootParameters.ORIGIN)) {
+            Vector3d v = t.getParamOrNull(LootParameters.ORIGIN);
             BlockPos bp = new BlockPos(v.x, v.y, v.z);
-            World w = t.getWorld();
+            World w = t.getLevel();
             return comparator.test(ChunkData.getTemperature(w, bp), temp);
         }
         return false;
     }
 
     @Override
-    public LootConditionType getConditionType() {
+    public LootConditionType getType() {
         return TYPE;
     }
 

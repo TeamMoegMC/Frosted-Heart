@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 TeamMoeg
+ * Copyright (c) 2021-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -14,6 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 package com.teammoeg.frostedheart.compat.jei;
@@ -121,7 +122,7 @@ public class JEICompat implements IModPlugin {
 
 	@Override
 	public void registerRecipes(IRecipeRegistration registration) {
-		ClientWorld world = Minecraft.getInstance().world;
+		ClientWorld world = Minecraft.getInstance().level;
 		checkNotNull(world, "minecraft world");
 		RecipeManager recipeManager = world.getRecipeManager();
 		CuttingCategory.matching = ForgeRegistries.ITEMS.getValues().stream()
@@ -130,7 +131,7 @@ public class JEICompat implements IModPlugin {
 		registration.addRecipes(new ArrayList<>(GeneratorRecipe.recipeList.values()), GeneratorFuelCategory.UID);
 		registration.addRecipes(new ArrayList<>(GeneratorSteamRecipe.recipeList.values()), GeneratorSteamCategory.UID);
 		registration.addRecipes(new ArrayList<>(ChargerRecipe.recipeList.values()), ChargerCategory.UID);
-		registration.addRecipes(recipeManager.getRecipesForType(IRecipeType.SMOKING), ChargerCookingCategory.UID);
+		registration.addRecipes(recipeManager.getAllRecipesFor(IRecipeType.SMOKING), ChargerCookingCategory.UID);
 		registration.addRecipes(new ArrayList<>(CampfireDefrostRecipe.recipeList.values()),
 				CampfireDefrostCategory.UID);
 		registration.addRecipes(new ArrayList<>(SmokingDefrostRecipe.recipeList.values()), SmokingDefrostCategory.UID);
@@ -214,7 +215,7 @@ public class JEICompat implements IModPlugin {
 		cachedInfoAdd = false;
 		Set<Item> items = new HashSet<>();
 		for (IRecipe<?> i : ResearchListeners.recipe) {
-			ItemStack out = i.getRecipeOutput();
+			ItemStack out = i.getResultItem();
 			if (out != null && !out.isEmpty()) {
 				items.add(out.getItem());
 			}
@@ -243,7 +244,7 @@ public class JEICompat implements IModPlugin {
 	}
 	public static void scheduleSyncJEI() {
 		//cachedInfoAdd=true;
-		Minecraft.getInstance().runImmediately(()->syncJEI());
+		Minecraft.getInstance().executeBlocking(()->syncJEI());
 	}
 	public static void syncJEI() {
 		if (man == null)
@@ -269,7 +270,7 @@ public class JEICompat implements IModPlugin {
 				all.addAll(hs);
 			}
 			//System.out.println(i.getType().toString()+":"+String.join(",",all.stream().map(Object::toString).collect(Collectors.toList())));
-			ItemStack irs=i.getRecipeOutput();
+			ItemStack irs=i.getResultItem();
 			IRecipe<?> ovrd=overrides.get(i.getId());
 			if (!TeamResearchData.getClientInstance().crafting.has(i)) {
 				for (ResourceLocation rl : all) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -262,7 +262,7 @@ public class FHRegistry<T extends FHRegisteredItem> {
         ArrayList<T> temp = new ArrayList<>(items);
         temp.removeIf(Objects::isNull);
         
-        load.stream().map(INBT::getString).forEach(e -> rnamesl.add(e));
+        load.stream().map(INBT::getAsString).forEach(e -> rnamesl.add(e));
         for (int i = 0; i < rnamesl.size(); i++) {
             rnames.put(rnamesl.get(i), i);
         }

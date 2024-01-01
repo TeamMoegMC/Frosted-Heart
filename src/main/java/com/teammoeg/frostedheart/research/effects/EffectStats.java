@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -64,7 +64,7 @@ public class EffectStats extends Effect {
 
     public EffectStats(PacketBuffer pb) {
         super(pb);
-        vars = pb.readString();
+        vars = pb.readUtf();
         val = pb.readDouble();
         isPercentage = pb.readBoolean();
     }
@@ -115,7 +115,7 @@ public class EffectStats extends Effect {
     @Override
     public void write(PacketBuffer buffer) {
         super.write(buffer);
-        buffer.writeString(vars);
+        buffer.writeUtf(vars);
         buffer.writeDouble(val);
         buffer.writeBoolean(isPercentage);
     }

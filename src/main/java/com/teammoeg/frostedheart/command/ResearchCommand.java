@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -55,70 +55,70 @@ public class ResearchCommand {
             
                     Research rs = FHResearch.getResearch(rsn).get();
                     if (rs == null) {
-                        ct.getSource().sendErrorMessage(new StringTextComponent("Research not found").mergeStyle(TextFormatting.RED));
+                        ct.getSource().sendFailure(new StringTextComponent("Research not found").withStyle(TextFormatting.RED));
                         return Command.SINGLE_SUCCESS;
                     }
-                    ResearchData rd = ResearchDataAPI.getData(ct.getSource().asPlayer()).getData(rs);
+                    ResearchData rd = ResearchDataAPI.getData(ct.getSource().getPlayerOrException()).getData(rs);
                     rd.setFinished(true);
                     rd.announceCompletion();
                     
-                    ct.getSource().sendFeedback(new StringTextComponent("Succeed!").mergeStyle(TextFormatting.GREEN), false);
+                    ct.getSource().sendSuccess(new StringTextComponent("Succeed!").withStyle(TextFormatting.GREEN), false);
                     return Command.SINGLE_SUCCESS;
                 })).then(Commands.literal("all").executes(ct->{
-                	TeamResearchData trd = ResearchDataAPI.getData(ct.getSource().asPlayer());
+                	TeamResearchData trd = ResearchDataAPI.getData(ct.getSource().getPlayerOrException());
                     for (Research r : FHResearch.getAllResearch()) {
                     	if(r.isInCompletable())continue;
                         ResearchData rd = trd.getData(r);
                         rd.setFinished(true);
                         rd.announceCompletion();
                     }
-                    ct.getSource().sendFeedback(new StringTextComponent("Succeed!").mergeStyle(TextFormatting.GREEN), false);
+                    ct.getSource().sendSuccess(new StringTextComponent("Succeed!").withStyle(TextFormatting.GREEN), false);
                     return Command.SINGLE_SUCCESS;
                 })))
                 .then(Commands.literal("edit").then(Commands.argument("enable", BoolArgumentType.bool()).executes(ct -> {
                     FHResearch.editor = ct.getArgument("enable", Boolean.class);
-                    ct.getSource().sendFeedback(new StringTextComponent("Editing mode set " + String.valueOf(FHResearch.editor)).mergeStyle(TextFormatting.GREEN), false);
+                    ct.getSource().sendSuccess(new StringTextComponent("Editing mode set " + String.valueOf(FHResearch.editor)).withStyle(TextFormatting.GREEN), false);
                     return Command.SINGLE_SUCCESS;
                 })))
                 .then(Commands.literal("default").executes(ct -> {
                     return Command.SINGLE_SUCCESS;
                 }))
                 .then(Commands.literal("energy").executes(ct -> {
-                    EnergyCore.reportEnergy(ct.getSource().asPlayer());
+                    EnergyCore.reportEnergy(ct.getSource().getPlayerOrException());
                     return Command.SINGLE_SUCCESS;
                 }).then(Commands.literal("add").then(Commands.argument("amount",IntegerArgumentType.integer(0)).executes(ct -> {
-                    EnergyCore.addExtraEnergy(ct.getSource().asPlayer(),ct.getArgument("amount",Integer.class));
+                    EnergyCore.addExtraEnergy(ct.getSource().getPlayerOrException(),ct.getArgument("amount",Integer.class));
                     return Command.SINGLE_SUCCESS;
                 }))))
                 
                 .then(Commands.literal("attribute").then(Commands.argument("name",StringArgumentType.string()).suggests((ct,s)->{
-                	CompoundNBT cnbt=ResearchDataAPI.getVariants(ct.getSource().asPlayer());
-                	cnbt.keySet().forEach(st->s.suggest(st));
+                	CompoundNBT cnbt=ResearchDataAPI.getVariants(ct.getSource().getPlayerOrException());
+                	cnbt.getAllKeys().forEach(st->s.suggest(st));
                     return s.buildFuture();
                 	
                 }).executes(ct -> {
-                	CompoundNBT cnbt=ResearchDataAPI.getVariants(ct.getSource().asPlayer());
+                	CompoundNBT cnbt=ResearchDataAPI.getVariants(ct.getSource().getPlayerOrException());
                 	String rsn = ct.getArgument("name", String.class).toString();
-                		ct.getSource().sendFeedback(GuiUtils.str(String.valueOf(cnbt.get(rsn))), false);
+                		ct.getSource().sendSuccess(GuiUtils.str(String.valueOf(cnbt.get(rsn))), false);
                     return Command.SINGLE_SUCCESS;
                 })).then(Commands.literal("all").executes(ct->{
                 	
-                	CompoundNBT cnbt=ResearchDataAPI.getVariants(ct.getSource().asPlayer());
-                	ct.getSource().sendFeedback(GuiUtils.str(cnbt.toString()), false);
+                	CompoundNBT cnbt=ResearchDataAPI.getVariants(ct.getSource().getPlayerOrException());
+                	ct.getSource().sendSuccess(GuiUtils.str(cnbt.toString()), false);
                     return Command.SINGLE_SUCCESS;
                 	
                 }))
                 		
                 		.then(Commands.literal("set").then(Commands.argument("name",StringArgumentType.string()).suggests((ct,s)->{
-                	CompoundNBT cnbt=ResearchDataAPI.getVariants(ct.getSource().asPlayer());
-                	cnbt.keySet().forEach(st->s.suggest(st));
+                	CompoundNBT cnbt=ResearchDataAPI.getVariants(ct.getSource().getPlayerOrException());
+                	cnbt.getAllKeys().forEach(st->s.suggest(st));
                 	
                     if("all".startsWith(s.getRemaining()))
                     	s.suggest("all");
                     return s.buildFuture();
                 	
-                }).then(Commands.argument("value",NBTTagArgument.func_218085_a()).executes(ct->{
-                	CompoundNBT cnbt=ResearchDataAPI.getVariants(ct.getSource().asPlayer());
+                }).then(Commands.argument("value",NBTTagArgument.nbtTag()).executes(ct->{
+                	CompoundNBT cnbt=ResearchDataAPI.getVariants(ct.getSource().getPlayerOrException());
                 	String rsn = ct.getArgument("name", String.class).toString();
                 	INBT nbt=ct.getArgument("value", INBT.class);
                 	cnbt.put(rsn, nbt);
@@ -131,15 +131,15 @@ public class ResearchCommand {
                     return s.buildFuture();
                 }).executes(ct -> {
                 	String rsn = ct.getArgument("name", String.class).toString();
-                    ResearchDataAPI.getData(ct.getSource().asPlayer()).resetData(FHResearch.getResearch(rsn).get(),true);
+                    ResearchDataAPI.getData(ct.getSource().getPlayerOrException()).resetData(FHResearch.getResearch(rsn).get(),true);
                     return Command.SINGLE_SUCCESS;
                 })).then(Commands.literal("all").executes(ct->{
-                    TeamResearchData trd = ResearchDataAPI.getData(ct.getSource().asPlayer());
+                    TeamResearchData trd = ResearchDataAPI.getData(ct.getSource().getPlayerOrException());
                     for (Research r : FHResearch.getAllResearch()) {
                         trd.resetData(r,true);
                     }
                     return Command.SINGLE_SUCCESS;
                 })));
-        dispatcher.register(Commands.literal(FHMain.MODID).requires(s -> s.hasPermissionLevel(2)).then(add));
+        dispatcher.register(Commands.literal(FHMain.MODID).requires(s -> s.hasPermission(2)).then(add));
     }
 }

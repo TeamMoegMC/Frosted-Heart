@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -117,8 +117,8 @@ public class ItemClue extends Clue {
             return itc;
         if (stack.hasNoMatchingItems())
             return null;
-        return stack.getMatchingStacks()[0].getDisplayName().copyRaw()
-                .appendSibling(new StringTextComponent(" x" + stack.getCount()));
+        return stack.getMatchingStacks()[0].getHoverName().plainCopy()
+                .append(new StringTextComponent(" x" + stack.getCount()));
     }
 	@Override
 	public String getBrief() {

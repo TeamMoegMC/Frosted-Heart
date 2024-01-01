@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 TeamMoeg
+ * Copyright (c) 2021-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -14,6 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 package com.teammoeg.frostedheart.content.temperature.heatervest;
@@ -55,7 +56,7 @@ public class HeaterVestRenderer<E extends LivingEntity, M extends BipedModel<E>>
     @Override
     @ParametersAreNonnullByDefault
     public void render(MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn, E living, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
-        ItemStack chest = living.getItemStackFromSlot(EquipmentSlotType.CHEST);
+        ItemStack chest = living.getItemBySlot(EquipmentSlotType.CHEST);
         if (!chest.isEmpty() && (chest.getItem() == FHItems.heater_vest || ItemNBTHelper.hasKey(chest, FHNBT.NBT_HEATER_VEST))) {
             ItemStack heaterVest = chest.getItem() == FHItems.heater_vest ? chest : ItemNBTHelper.getItemStack(chest, FHNBT.NBT_HEATER_VEST);
             addWornHeaterVest(living, heaterVest);
@@ -65,30 +66,30 @@ public class HeaterVestRenderer<E extends LivingEntity, M extends BipedModel<E>>
                 addWornHeaterVest(living, heaterVest);
         }
 
-        if (HEATER_VEST_PLAYERS.containsKey(living.getUniqueID())) {
-            Pair<ItemStack, Integer> entry = HEATER_VEST_PLAYERS.get(living.getUniqueID());
+        if (HEATER_VEST_PLAYERS.containsKey(living.getUUID())) {
+            Pair<ItemStack, Integer> entry = HEATER_VEST_PLAYERS.get(living.getUUID());
             renderHeaterVest(entry.getLeft(), matrixStackIn, bufferIn, packedLightIn, living, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
             int time = entry.getValue() - 1;
             if (time <= 0)
-                HEATER_VEST_PLAYERS.remove(living.getUniqueID());
+                HEATER_VEST_PLAYERS.remove(living.getUUID());
             else
-                HEATER_VEST_PLAYERS.put(living.getUniqueID(), Pair.of(entry.getLeft(), time));
+                HEATER_VEST_PLAYERS.put(living.getUUID(), Pair.of(entry.getLeft(), time));
         }
     }
 
     public static void addWornHeaterVest(LivingEntity living, ItemStack heaterVest) {
-        HEATER_VEST_PLAYERS.put(living.getUniqueID(), Pair.of(heaterVest, 5));
+        HEATER_VEST_PLAYERS.put(living.getUUID(), Pair.of(heaterVest, 5));
     }
 
     private void renderHeaterVest(ItemStack heaterVest, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn, E living, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
         if (!heaterVest.isEmpty()) {
             BipedModel<E> model = FHItems.heater_vest.getArmorModel(living, heaterVest, EquipmentSlotType.CHEST, null);
             if (model != null) {
-                model.setRotationAngles(living, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
-                RenderType type = model.getRenderType(
+                model.setupAnim(living, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
+                RenderType type = model.renderType(
                         new ResourceLocation(FHItems.heater_vest.getArmorTexture(heaterVest, living, EquipmentSlotType.CHEST, null))
                 );
-                model.render(matrixStackIn, bufferIn.getBuffer(type), packedLightIn, OverlayTexture.NO_OVERLAY, 1F, 1F, 1F, 1F);
+                model.renderToBuffer(matrixStackIn, bufferIn.getBuffer(type), packedLightIn, OverlayTexture.NO_OVERLAY, 1F, 1F, 1F, 1F);
             }
         }
     }

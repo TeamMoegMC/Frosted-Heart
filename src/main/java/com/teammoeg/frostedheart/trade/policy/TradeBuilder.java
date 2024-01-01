@@ -1,3 +1,22 @@
+/*
+ * Copyright (c) 2024 TeamMoeg
+ *
+ * This file is part of Frosted Heart.
+ *
+ * Frosted Heart is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3.
+ *
+ * Frosted Heart is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
 package com.teammoeg.frostedheart.trade.policy;
 
 import java.util.ArrayList;
@@ -375,7 +394,7 @@ public class TradeBuilder implements IFinishedRecipe{
 		 * @return returns buy
 		 */
 		public GroupBuilder buy(int maxstore,float recover,int price,ItemStack item) {
-			return this.buy(item.getItem().getRegistryName().toString(),maxstore, recover, price,Ingredient.fromStacks(item));
+			return this.buy(item.getItem().getRegistryName().toString(),maxstore, recover, price,Ingredient.of(item));
 		}
 		
 		/**
@@ -388,7 +407,7 @@ public class TradeBuilder implements IFinishedRecipe{
 		 * @return returns buy
 		 */
 		public GroupBuilder buy(int maxstore,float recover,int price,Item item) {
-			return this.buy(item.getRegistryName().toString(),maxstore, recover, price,Ingredient.fromItems(item));
+			return this.buy(item.getRegistryName().toString(),maxstore, recover, price,Ingredient.of(item));
 		}
 		
 		/**
@@ -616,27 +635,27 @@ public class TradeBuilder implements IFinishedRecipe{
 	}
 	
 	@Override
-	public ResourceLocation getAdvancementID() {
+	public ResourceLocation getAdvancementId() {
 		return null;
 	}
 	
 	@Override
-	public JsonObject getAdvancementJson() {
+	public JsonObject serializeAdvancement() {
 		return null;
 	}
 	
 	@Override
-	public ResourceLocation getID() {
+	public ResourceLocation getId() {
 		return id;
 	}
 	
 	@Override
-	public IRecipeSerializer<?> getSerializer() {
+	public IRecipeSerializer<?> getType() {
 		return TradePolicy.SERIALIZER.get();
 	}
 	
 	@Override
-	public void serialize(JsonObject arg0) {
+	public void serializeRecipeData(JsonObject arg0) {
 		if(name!=null)
 			arg0.addProperty("name",name.toString());
 		arg0.add("policies",SerializeUtil.toJsonList(groups,PolicyGroup::serialize));

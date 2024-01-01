@@ -1,19 +1,20 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
- * This file is part of Thermopolium.
+ * This file is part of Frosted Heart.
  *
- * Thermopolium is free software: you can redistribute it and/or modify
+ * Frosted Heart is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3.
  *
- * Thermopolium is distributed in the hope that it will be useful,
+ * Frosted Heart is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with Thermopolium. If not, see <https://www.gnu.org/licenses/>.
+ * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 package com.teammoeg.frostedheart.util;
@@ -85,7 +86,7 @@ public class SerializeUtil {
     		return this;
     	}
     	public CompoundBuilder put(String key,UUID val) {
-    		nbt.putUniqueId(key, val);
+    		nbt.putUUID(key, val);
     		return this;
     	}
     	public CompoundNBT build() {
@@ -206,10 +207,10 @@ public class SerializeUtil {
         });
     }
     public static <V> void writeStringMap(PacketBuffer buffer,Map<String,V> elms, BiConsumer<V, PacketBuffer> valuewriter) {
-        writeMap(buffer,elms,(p,b)->b.writeString(p),valuewriter);
+        writeMap(buffer,elms,(p,b)->b.writeUtf(p),valuewriter);
     }
     public static <V> Map<String,V> readStringMap(PacketBuffer buffer,Map<String,V> map,Function<PacketBuffer, V> valuereader) {
-        return readMap(buffer,map,PacketBuffer::readString,valuereader);
+        return readMap(buffer,map,PacketBuffer::readUtf,valuereader);
     }
     public static <K,V> Map<K,V> readMap(PacketBuffer buffer,Map<K,V> map, Function<PacketBuffer, K> keyreader,Function<PacketBuffer, V> valuereader) {
     	map.clear(); 
@@ -280,7 +281,7 @@ public class SerializeUtil {
                 ret.setCount(jo.get("count").getAsInt());
             if (jo.has("nbt"))
                 try {
-                    ret.setTag(JsonToNBT.getTagFromJson(jo.get("nbt").getAsString()));
+                    ret.setTag(JsonToNBT.parseTag(jo.get("nbt").getAsString()));
                 } catch (CommandSyntaxException e) {
                     FHMain.LOGGER.warn(e.getMessage());
                 }

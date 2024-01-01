@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -77,7 +77,7 @@ public abstract class UnlockList<T> implements Iterable<T> {
 
     public void load(ListNBT nbt) {
         for (INBT in : nbt) {
-            s.add(getObject(in.getString()));
+            s.add(getObject(in.getAsString()));
         }
     }
 

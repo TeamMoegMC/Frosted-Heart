@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 TeamMoeg
+ * Copyright (c) 2021-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -14,6 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 package com.teammoeg.frostedheart.base.block;
@@ -30,12 +31,14 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockReader;
 
+import net.minecraft.block.AbstractBlock.Properties;
+
 public class FHBaseBlock extends Block {
     public final String name;
     protected int lightOpacity;
 
     public FHBaseBlock(String name, Properties blockProps, BiFunction<Block, Item.Properties, Item> createItemBlock) {
-        super(blockProps.variableOpacity());
+        super(blockProps.dynamicShape());
         this.name = name;
         lightOpacity = 15;
 
@@ -43,7 +46,7 @@ public class FHBaseBlock extends Block {
         setRegistryName(registryName);
 
         FHContent.registeredFHBlocks.add(this);
-        Item item = createItemBlock.apply(this, new Item.Properties().group(FHMain.itemGroup));
+        Item item = createItemBlock.apply(this, new Item.Properties().tab(FHMain.itemGroup));
         if (item != null) {
             item.setRegistryName(registryName);
             FHContent.registeredFHItems.add(item);
@@ -60,8 +63,8 @@ public class FHBaseBlock extends Block {
     }
 
     @Override
-    public int getOpacity(BlockState state, IBlockReader worldIn, BlockPos pos) {
-        if (state.isOpaqueCube(worldIn, pos))
+    public int getLightBlock(BlockState state, IBlockReader worldIn, BlockPos pos) {
+        if (state.isSolidRender(worldIn, pos))
             return lightOpacity;
         else
             return state.propagatesSkylightDown(worldIn, pos) ? 0 : 1;

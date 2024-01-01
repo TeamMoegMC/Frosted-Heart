@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 TeamMoeg
+ * Copyright (c) 2021-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -14,6 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 package com.teammoeg.frostedheart.climate.data;
@@ -36,14 +37,14 @@ public class ArmorTempData extends JsonDataHolder implements IWarmKeepingEquipme
     public float getFactor(ServerPlayerEntity pe, ItemStack stack) {
         float base = this.getFloatOrDefault("factor", 0F);
         if (pe == null) return base;
-        if (pe.isBurning())
+        if (pe.isOnFire())
             base += this.getFloatOrDefault("fire", 0F);
         if (pe.isInWater())//does not apply twice
             base += this.getFloatOrDefault("water", 0F);
-        else if (pe.isPotionActive(FHEffects.WET)) {
+        else if (pe.hasEffect(FHEffects.WET)) {
             base += this.getFloatOrDefault("wet", 0F);
         }
-        if (FHUtils.isRainingAt(pe.getPosition(), pe.world)) {
+        if (FHUtils.isRainingAt(pe.blockPosition(), pe.level)) {
 //            if (pe.getServerWorld().getBiome(pe.getPosition()).getPrecipitation() == Biome.RainType.SNOW)
             base += this.getFloatOrDefault("snow", 0F);
 //            else

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 TeamMoeg
+ * Copyright (c) 2021-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -14,6 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 package com.teammoeg.frostedheart.content.temperature;
@@ -38,6 +39,8 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 
+import net.minecraft.item.Item.Properties;
+
 public class ThermometerItem extends FHBaseItem {
 
 
@@ -50,8 +53,8 @@ public class ThermometerItem extends FHBaseItem {
      * the Item before the action is complete.
      */
     @Override
-    public ItemStack onItemUseFinish(ItemStack stack, World worldIn, LivingEntity entityLiving) {
-        if (worldIn.isRemote) return stack;
+    public ItemStack finishUsingItem(ItemStack stack, World worldIn, LivingEntity entityLiving) {
+        if (worldIn.isClientSide) return stack;
         if (entityLiving instanceof ServerPlayerEntity) {
         	FHTemperatureDisplayPacket.send((ServerPlayerEntity)entityLiving,"info.thermometerbody",getTemperature((ServerPlayerEntity)entityLiving) / 10f + 37f);
         }
@@ -60,9 +63,9 @@ public class ThermometerItem extends FHBaseItem {
     }
 
     @Override
-    public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-    	tooltip.add(GuiUtils.translateTooltip("thermometer.usage").mergeStyle(TextFormatting.GRAY));
-        tooltip.add(GuiUtils.translateTooltip("meme.thermometerbody").mergeStyle(TextFormatting.GRAY));
+    public void appendHoverText(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+    	tooltip.add(GuiUtils.translateTooltip("thermometer.usage").withStyle(TextFormatting.GRAY));
+        tooltip.add(GuiUtils.translateTooltip("meme.thermometerbody").withStyle(TextFormatting.GRAY));
     }
 
     public int getTemperature(ServerPlayerEntity p) {
@@ -70,13 +73,13 @@ public class ThermometerItem extends FHBaseItem {
     }
 
     @Override
-    public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand handIn) {
-    	playerIn.sendStatusMessage(GuiUtils.translateMessage("thermometer.testing"),true);
-        playerIn.setActiveHand(handIn);
-        if (playerIn instanceof ServerPlayerEntity&&playerIn.abilities.isCreativeMode) {
+    public ActionResult<ItemStack> use(World worldIn, PlayerEntity playerIn, Hand handIn) {
+    	playerIn.displayClientMessage(GuiUtils.translateMessage("thermometer.testing"),true);
+        playerIn.startUsingItem(handIn);
+        if (playerIn instanceof ServerPlayerEntity&&playerIn.abilities.instabuild) {
         	FHTemperatureDisplayPacket.send((ServerPlayerEntity)playerIn,"info.thermometerbody",getTemperature((ServerPlayerEntity) playerIn) / 10f + 37f);
         }
-        return new ActionResult<>(ActionResultType.SUCCESS, playerIn.getHeldItem(handIn));
+        return new ActionResult<>(ActionResultType.SUCCESS, playerIn.getItemInHand(handIn));
     }
 
     /**
@@ -91,7 +94,7 @@ public class ThermometerItem extends FHBaseItem {
      * returns the action that specifies what animation to play when the items is being used
      */
     @Override
-    public UseAction getUseAction(ItemStack stack) {
+    public UseAction getUseAnimation(ItemStack stack) {
         return UseAction.DRINK;
     }
 

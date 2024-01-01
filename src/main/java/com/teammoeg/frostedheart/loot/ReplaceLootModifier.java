@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -51,7 +51,7 @@ public class ReplaceLootModifier extends LootModifier {
 
         JsonObject toJson() {
             JsonObject jo = new JsonObject();
-            jo.add("from", from.serialize());
+            jo.add("from", from.toJson());
             jo.addProperty("to", to.getRegistryName().toString());
             return jo;
         }
@@ -87,7 +87,7 @@ public class ReplaceLootModifier extends LootModifier {
             List<ReplacePair> changes = new ArrayList<>();
             for (JsonElement je : ja) {
                 if (je.isJsonObject()) {
-                    changes.add(new ReplacePair(Ingredient.deserialize(je.getAsJsonObject().get("from")), ForgeRegistries.ITEMS.getValue(new ResourceLocation(je.getAsJsonObject().get("to").getAsString()))));
+                    changes.add(new ReplacePair(Ingredient.fromJson(je.getAsJsonObject().get("from")), ForgeRegistries.ITEMS.getValue(new ResourceLocation(je.getAsJsonObject().get("to").getAsString()))));
                 }
             }
             return new ReplaceLootModifier(conditions, changes);

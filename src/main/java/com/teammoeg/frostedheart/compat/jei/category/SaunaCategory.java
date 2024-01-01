@@ -1,19 +1,20 @@
 /*
- * Copyright (c) 2021 TeamMoeg
+ * Copyright (c) 2021-2024 TeamMoeg
  *
- * This file is part of Immersive Industry.
+ * This file is part of Frosted Heart.
  *
- * Immersive Industry is free software: you can redistribute it and/or modify
+ * Frosted Heart is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3.
  *
- * Immersive Industry is distributed in the hope that it will be useful,
+ * Frosted Heart is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with Immersive Industry. If not, see <https://www.gnu.org/licenses/>.
+ * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 package com.teammoeg.frostedheart.compat.jei.category;
@@ -48,7 +49,7 @@ public class SaunaCategory implements IRecipeCategory<SaunaRecipe> {
     public static ResourceLocation UID = new ResourceLocation(FHMain.MODID, "sauna");
     private IDrawable BACKGROUND;
     private IDrawable ICON;
-    private StaticBlock sauna = new StaticBlock(FHBlocks.sauna.getDefaultState().with(BlockStateProperties.FACING, Direction.EAST));
+    private StaticBlock sauna = new StaticBlock(FHBlocks.sauna.defaultBlockState().setValue(BlockStateProperties.FACING, Direction.EAST));
 
     public SaunaCategory(IGuiHelper guiHelper) {
         this.ICON = guiHelper.createDrawableIngredient(new ItemStack(FHBlocks.sauna));
@@ -94,7 +95,7 @@ public class SaunaCategory implements IRecipeCategory<SaunaRecipe> {
 
     @Override
     public void setIngredients(SaunaRecipe recipe, IIngredients ingredients) {
-        ingredients.setInputLists(VanillaTypes.ITEM, Arrays.asList(Arrays.asList(recipe.input.getMatchingStacks())));
+        ingredients.setInputLists(VanillaTypes.ITEM, Arrays.asList(Arrays.asList(recipe.input.getItems())));
     }
 
 

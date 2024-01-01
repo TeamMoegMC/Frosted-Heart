@@ -1,19 +1,20 @@
 /*
- * Copyright (c) 2021 TeamMoeg
+ * Copyright (c) 2021-2024 TeamMoeg
  *
- * This file is part of Immersive Industry.
+ * This file is part of Frosted Heart.
  *
- * Immersive Industry is free software: you can redistribute it and/or modify
+ * Frosted Heart is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3.
  *
- * Immersive Industry is distributed in the hope that it will be useful,
+ * Frosted Heart is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with Immersive Industry. If not, see <https://www.gnu.org/licenses/>.
+ * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 package com.teammoeg.frostedheart.compat.jei.category;
@@ -95,8 +96,8 @@ public class IncubatorCategory implements IRecipeCategory<IncubateRecipe> {
         	burnTime= String.valueOf(recipe.time) + " s";
         else
         	burnTime= String.valueOf(recipe.time/60) + " m";
-        int width=ClientUtils.mc().fontRenderer.getStringWidth(burnTime);
-        ClientUtils.mc().fontRenderer.drawString(transform, burnTime, 162-width, 62, 0xFFFFFF);
+        int width=ClientUtils.mc().font.width(burnTime);
+        ClientUtils.mc().font.draw(transform, burnTime, 162-width, 62, 0xFFFFFF);
     }
 
     public boolean isMouseIn(double mouseX, double mouseY, int x, int y, int w, int h) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 TeamMoeg
+ * Copyright (c) 2021-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -14,6 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 package com.teammoeg.frostedheart.content.generator;
@@ -72,7 +73,7 @@ public class GeneratorSteamRecipe extends IESerializableRecipe {
     }
 
     @Override
-    public ItemStack getRecipeOutput() {
+    public ItemStack getResultItem() {
         return super.outputDummy;
     }
     public static class Serializer extends IERecipeSerializer<GeneratorSteamRecipe> {
@@ -83,16 +84,16 @@ public class GeneratorSteamRecipe extends IESerializableRecipe {
 
         @Override
         public GeneratorSteamRecipe readFromJson(ResourceLocation recipeId, JsonObject json) {
-            FluidTagInput input = FluidTagInput.deserialize(JSONUtils.getJsonObject(json, "input"));
-            float power = JSONUtils.getFloat(json, "energy");
-            float tempMod = JSONUtils.getFloat(json, "temp_multiplier");
-            float rangeMod = JSONUtils.getFloat(json, "range_multiplier");
+            FluidTagInput input = FluidTagInput.deserialize(JSONUtils.getAsJsonObject(json, "input"));
+            float power = JSONUtils.getAsFloat(json, "energy");
+            float tempMod = JSONUtils.getAsFloat(json, "temp_multiplier");
+            float rangeMod = JSONUtils.getAsFloat(json, "range_multiplier");
             return new GeneratorSteamRecipe(recipeId, input, power, tempMod, rangeMod);
         }
 
         @Nullable
         @Override
-        public GeneratorSteamRecipe read(ResourceLocation recipeId, PacketBuffer buffer) {
+        public GeneratorSteamRecipe fromNetwork(ResourceLocation recipeId, PacketBuffer buffer) {
             FluidTagInput input = FluidTagInput.read(buffer);
             float power = buffer.readFloat();
             float tempMod = buffer.readFloat();
@@ -101,7 +102,7 @@ public class GeneratorSteamRecipe extends IESerializableRecipe {
         }
 
         @Override
-        public void write(PacketBuffer buffer, GeneratorSteamRecipe recipe) {
+        public void toNetwork(PacketBuffer buffer, GeneratorSteamRecipe recipe) {
             recipe.input.write(buffer);
             buffer.writeFloat(recipe.power);
             buffer.writeFloat(recipe.tempMod);

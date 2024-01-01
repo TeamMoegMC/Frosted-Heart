@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -53,7 +53,7 @@ import net.minecraftforge.fml.common.Mod;
 public class PlayerEvents {
 	@SuppressWarnings("resource")
 	public static void onRC(PlayerInteractEvent.RightClickItem rci) {
-		if (!rci.getWorld().isRemote
+		if (!rci.getWorld().isClientSide
 				&& rci.getItemStack().getItem().getRegistryName().getNamespace().equals("projecte")) {
 			rci.setCancellationResult(ActionResultType.SUCCESS);
 			rci.setCanceled(true);
@@ -63,21 +63,21 @@ public class PlayerEvents {
 			ServerWorld serverWorld = (ServerWorld) world;
 			ServerPlayerEntity serverPlayerEntity = (ServerPlayerEntity) player;
 
-			serverPlayerEntity.addPotionEffect(
-					new EffectInstance(Effects.BLINDNESS, (int) (100 * (world.rand.nextDouble() + 0.5)), 3));
-			serverPlayerEntity.addPotionEffect(
-					new EffectInstance(Effects.NAUSEA, (int) (1000 * (world.rand.nextDouble() + 0.5)), 5));
+			serverPlayerEntity.addEffect(
+					new EffectInstance(Effects.BLINDNESS, (int) (100 * (world.random.nextDouble() + 0.5)), 3));
+			serverPlayerEntity.addEffect(
+					new EffectInstance(Effects.CONFUSION, (int) (1000 * (world.random.nextDouble() + 0.5)), 5));
 
-			serverPlayerEntity.connection.sendPacket(
+			serverPlayerEntity.connection.send(
 					new STitlePacket(STitlePacket.Type.TITLE, GuiUtils.translateMessage("too_cold_to_transmute")));
-			serverPlayerEntity.connection.sendPacket(
+			serverPlayerEntity.connection.send(
 					new STitlePacket(STitlePacket.Type.SUBTITLE, GuiUtils.translateMessage("magical_backslash")));
 
-			double posX = pos.getX() + (world.rand.nextDouble() - world.rand.nextDouble()) * 4.5D;
-			double posY = pos.getY() + world.rand.nextInt(3) - 1;
-			double posZ = pos.getZ() + (world.rand.nextDouble() - world.rand.nextDouble()) * 4.5D;
-			if (world.hasNoCollisions(EntityType.WITCH.getBoundingBoxWithSizeApplied(posX, posY, posZ))
-					&& EntitySpawnPlacementRegistry.canSpawnEntity(EntityType.WITCH, serverWorld, SpawnReason.NATURAL,
+			double posX = pos.getX() + (world.random.nextDouble() - world.random.nextDouble()) * 4.5D;
+			double posY = pos.getY() + world.random.nextInt(3) - 1;
+			double posZ = pos.getZ() + (world.random.nextDouble() - world.random.nextDouble()) * 4.5D;
+			if (world.noCollision(EntityType.WITCH.getAABB(posX, posY, posZ))
+					&& EntitySpawnPlacementRegistry.checkSpawnRules(EntityType.WITCH, serverWorld, SpawnReason.NATURAL,
 							new BlockPos(posX, posY, posZ), world.getRandom())) {
 				FHUtils.spawnMob(serverWorld, new BlockPos(posX, posY, posZ), new CompoundNBT(),
 						new ResourceLocation("minecraft", "witch"));
@@ -91,36 +91,36 @@ public class PlayerEvents {
 		if (event.phase == TickEvent.Phase.END && event.player instanceof ServerPlayerEntity) {
 			ServerPlayerEntity serverPlayer = (ServerPlayerEntity) event.player;
 			boolean configAllows = FHConfig.COMMON.enablesTemperatureForecast.get();
-			boolean hasRadar = serverPlayer.inventory.hasItemStack(new ItemStack(FHItems.weatherRadar));
-			boolean hasHelmet = serverPlayer.inventory.armorInventory.get(3)
-					.isItemEqualIgnoreDurability(new ItemStack(FHItems.weatherHelmet));
+			boolean hasRadar = serverPlayer.inventory.contains(new ItemStack(FHItems.weatherRadar));
+			boolean hasHelmet = serverPlayer.inventory.armor.get(3)
+					.sameItemStackIgnoreDurability(new ItemStack(FHItems.weatherHelmet));
 			if (configAllows && (hasRadar || hasHelmet)) {
 				// Blizzard warning
-				float thisHour = ClimateData.getTemp(serverPlayer.world);
-				float nextHour = ClimateData.getFutureTemp(serverPlayer.world, 1);
+				float thisHour = ClimateData.getTemp(serverPlayer.level);
+				float nextHour = ClimateData.getFutureTemp(serverPlayer.level, 1);
 				if (thisHour >= WorldClimate.BLIZZARD_TEMPERATURE) { // not in blizzard yet
 					if (nextHour < WorldClimate.BLIZZARD_TEMPERATURE) {
-						serverPlayer.sendStatusMessage(GuiUtils.translateMessage("forecast.blizzard_warning")
-								.mergeStyle(TextFormatting.DARK_RED).mergeStyle(TextFormatting.BOLD), true);
+						serverPlayer.displayClientMessage(GuiUtils.translateMessage("forecast.blizzard_warning")
+								.withStyle(TextFormatting.DARK_RED).withStyle(TextFormatting.BOLD), true);
 						// serverPlayer.connection.sendPacket(new STitlePacket(STitlePacket.Type.TITLE,
 						// GuiUtils.translateMessage("forecast.blizzard_warning")));
 					}
 				} else { // in blizzard now
 					if (nextHour >= WorldClimate.BLIZZARD_TEMPERATURE) {
-						serverPlayer.sendStatusMessage(GuiUtils.translateMessage("forecast.blizzard_retreating")
-								.mergeStyle(TextFormatting.GREEN).mergeStyle(TextFormatting.BOLD), true);
+						serverPlayer.displayClientMessage(GuiUtils.translateMessage("forecast.blizzard_retreating")
+								.withStyle(TextFormatting.GREEN).withStyle(TextFormatting.BOLD), true);
 						// serverPlayer.connection.sendPacket(new STitlePacket(STitlePacket.Type.TITLE,
 						// GuiUtils.translateMessage("forecast.blizzard_retreating")));
 					}
 				}
 
 				// Morning forecast wakeup time
-				if (serverPlayer.world.getDayTime() % 24000 == 40) {
-					float morningTemp = Math.round(ClimateData.getTemp(serverPlayer.world) * 10) / 10.0F;
-					float noonTemp = Math.round(ClimateData.getFutureTemp(serverPlayer.world, 0, 6) * 10) / 10.0F;
-					float nightTemp = Math.round(ClimateData.getFutureTemp(serverPlayer.world, 0, 12) * 10) / 10.0F;
-					float midnightTemp = Math.round(ClimateData.getFutureTemp(serverPlayer.world, 0, 18) * 10) / 10.0F;
-					float tomorrowMorningTemp = Math.round(ClimateData.getFutureTemp(serverPlayer.world, 1, 0) * 10)
+				if (serverPlayer.level.getDayTime() % 24000 == 40) {
+					float morningTemp = Math.round(ClimateData.getTemp(serverPlayer.level) * 10) / 10.0F;
+					float noonTemp = Math.round(ClimateData.getFutureTemp(serverPlayer.level, 0, 6) * 10) / 10.0F;
+					float nightTemp = Math.round(ClimateData.getFutureTemp(serverPlayer.level, 0, 12) * 10) / 10.0F;
+					float midnightTemp = Math.round(ClimateData.getFutureTemp(serverPlayer.level, 0, 18) * 10) / 10.0F;
+					float tomorrowMorningTemp = Math.round(ClimateData.getFutureTemp(serverPlayer.level, 1, 0) * 10)
 							/ 10.0F;
 					FHTemperatureDisplayPacket.sendStatus(serverPlayer,"forecast.morning",false,morningTemp, noonTemp,
 							nightTemp, midnightTemp, tomorrowMorningTemp);
@@ -134,22 +134,22 @@ public class PlayerEvents {
 							|| midnightTemp < WorldClimate.BLIZZARD_TEMPERATURE
 							|| tomorrowMorningTemp < WorldClimate.BLIZZARD_TEMPERATURE;
 					if (blizzard)
-						serverPlayer.sendStatusMessage(GuiUtils.translateMessage("forecast.blizzard_today"), false);
+						serverPlayer.displayClientMessage(GuiUtils.translateMessage("forecast.blizzard_today"), false);
 					else if (snow)
-						serverPlayer.sendStatusMessage(GuiUtils.translateMessage("forecast.snow_today"), false);
+						serverPlayer.displayClientMessage(GuiUtils.translateMessage("forecast.snow_today"), false);
 					else
-						serverPlayer.sendStatusMessage(GuiUtils.translateMessage("forecast.clear_today"), false);
+						serverPlayer.displayClientMessage(GuiUtils.translateMessage("forecast.clear_today"), false);
 				}
 
 				// Night forecast bedtime
-				if (serverPlayer.world.getDayTime() % 24000 == 12542) {
-					float nightTemp = Math.round(ClimateData.getTemp(serverPlayer.world) * 10) / 10.0F;
-					float midnightTemp = Math.round(ClimateData.getFutureTemp(serverPlayer.world, 0, 6) * 10) / 10.0F;
-					float tomorrowMorningTemp = Math.round(ClimateData.getFutureTemp(serverPlayer.world, 0, 12) * 10)
+				if (serverPlayer.level.getDayTime() % 24000 == 12542) {
+					float nightTemp = Math.round(ClimateData.getTemp(serverPlayer.level) * 10) / 10.0F;
+					float midnightTemp = Math.round(ClimateData.getFutureTemp(serverPlayer.level, 0, 6) * 10) / 10.0F;
+					float tomorrowMorningTemp = Math.round(ClimateData.getFutureTemp(serverPlayer.level, 0, 12) * 10)
 							/ 10.0F;
-					float tomorrowNoonTemp = Math.round(ClimateData.getFutureTemp(serverPlayer.world, 0, 18) * 10)
+					float tomorrowNoonTemp = Math.round(ClimateData.getFutureTemp(serverPlayer.level, 0, 18) * 10)
 							/ 10.0F;
-					float tomorrowNightTemp = Math.round(ClimateData.getFutureTemp(serverPlayer.world, 1, 0) * 10)
+					float tomorrowNightTemp = Math.round(ClimateData.getFutureTemp(serverPlayer.level, 1, 0) * 10)
 							/ 10.0F;
 					FHTemperatureDisplayPacket.sendStatus(serverPlayer,"forecast.night", false, nightTemp, midnightTemp,
 							tomorrowMorningTemp, tomorrowNoonTemp, tomorrowNightTemp);
@@ -164,11 +164,11 @@ public class PlayerEvents {
 							|| tomorrowNoonTemp < WorldClimate.BLIZZARD_TEMPERATURE
 							|| tomorrowNightTemp < WorldClimate.BLIZZARD_TEMPERATURE;
 					if (blizzard)
-						serverPlayer.sendStatusMessage(GuiUtils.translateMessage("forecast.blizzard_tomorrow"), false);
+						serverPlayer.displayClientMessage(GuiUtils.translateMessage("forecast.blizzard_tomorrow"), false);
 					else if (snow)
-						serverPlayer.sendStatusMessage(GuiUtils.translateMessage("forecast.snow_tomorrow"), false);
+						serverPlayer.displayClientMessage(GuiUtils.translateMessage("forecast.snow_tomorrow"), false);
 					else
-						serverPlayer.sendStatusMessage(GuiUtils.translateMessage("forecast.clear_tomorrow"), false);
+						serverPlayer.displayClientMessage(GuiUtils.translateMessage("forecast.clear_tomorrow"), false);
 				}
 			}
 		}

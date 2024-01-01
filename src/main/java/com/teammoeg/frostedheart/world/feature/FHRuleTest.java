@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 TeamMoeg
+ * Copyright (c) 2021-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -14,6 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 package com.teammoeg.frostedheart.world.feature;
@@ -53,6 +54,6 @@ public class FHRuleTest extends RuleTest {
 
     @Override
     protected IRuleTestType<?> getType() {
-        return IRuleTestType.ALWAYS_TRUE;
+        return IRuleTestType.ALWAYS_TRUE_TEST;
     }
 }

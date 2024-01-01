@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -83,13 +83,13 @@ public class LiningFinalizedModel implements IBakedModel {
     }
 
     private TextureAtlasSprite getItemSprite(ResourceLocation modelLocation) {
-        AtlasTexture blocksStitchedTextures = ModelLoader.instance().getSpriteMap().getAtlasTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
+        AtlasTexture blocksStitchedTextures = ModelLoader.instance().getSpriteMap().getAtlas(AtlasTexture.LOCATION_BLOCKS);
         return blocksStitchedTextures.getSprite(modelLocation);
     }
 
     @Override
-    public boolean isAmbientOcclusion() {
-        return parentModel.isAmbientOcclusion();
+    public boolean useAmbientOcclusion() {
+        return parentModel.useAmbientOcclusion();
     }
 
     @Override
@@ -98,23 +98,23 @@ public class LiningFinalizedModel implements IBakedModel {
     }
 
     @Override
-    public boolean isSideLit() {
+    public boolean usesBlockLight() {
         return false;
     }
 
     @Override
-    public boolean isBuiltInRenderer() {
-        return parentModel.isBuiltInRenderer();
+    public boolean isCustomRenderer() {
+        return parentModel.isCustomRenderer();
     }
 
     @Override
-    public TextureAtlasSprite getParticleTexture() {
-        return parentModel.getParticleTexture();
+    public TextureAtlasSprite getParticleIcon() {
+        return parentModel.getParticleIcon();
     }
 
     @Override
-    public ItemCameraTransforms getItemCameraTransforms() {
-        return parentModel.getItemCameraTransforms();
+    public ItemCameraTransforms getTransforms() {
+        return parentModel.getTransforms();
     }
 
     @Override
@@ -216,7 +216,7 @@ public class LiningFinalizedModel implements IBakedModel {
         // give our item maximum lighting
         final int BLOCK_LIGHT = 15;
         final int SKY_LIGHT = 15;
-        int lightMapValue = LightTexture.packLight(BLOCK_LIGHT, SKY_LIGHT);
+        int lightMapValue = LightTexture.pack(BLOCK_LIGHT, SKY_LIGHT);
 
         final int minU = 0;
         final int maxU = 16;
@@ -257,8 +257,8 @@ public class LiningFinalizedModel implements IBakedModel {
                 Float.floatToRawIntBits(y),
                 Float.floatToRawIntBits(z),
                 color,
-                Float.floatToRawIntBits(texture.getInterpolatedU(u)),
-                Float.floatToRawIntBits(texture.getInterpolatedV(v)),
+                Float.floatToRawIntBits(texture.getU(u)),
+                Float.floatToRawIntBits(texture.getV(v)),
                 lightmapvalue,
                 normal
         };

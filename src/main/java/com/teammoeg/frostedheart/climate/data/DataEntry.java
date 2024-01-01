@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 TeamMoeg
+ * Copyright (c) 2021-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -14,6 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 package com.teammoeg.frostedheart.climate.data;
@@ -34,11 +35,11 @@ public class DataEntry {
 
     public DataEntry(PacketBuffer buffer) {
         this.type = FHDataType.values()[buffer.readVarInt()];
-        this.data = buffer.readString();
+        this.data = buffer.readUtf();
     }
 
     public void encode(PacketBuffer buffer) {
         buffer.writeVarInt(type.ordinal());
-        buffer.writeString(data);
+        buffer.writeUtf(data);
     }
 }

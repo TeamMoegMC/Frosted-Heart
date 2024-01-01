@@ -1,22 +1,20 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
- * This file is part of Caupona.
+ * This file is part of Frosted Heart.
  *
- * Caupona is free software: you can redistribute it and/or modify
+ * Frosted Heart is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3.
  *
- * Caupona is distributed in the hope that it will be useful,
+ * Frosted Heart is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * Specially, we allow this software to be used alongside with closed source software Minecraft(R) and Forge or other modloader.
- * Any mods or plugins can also use apis provided by forge or com.teammoeg.caupona.api without using GPL or open source.
- *
  * You should have received a copy of the GNU General Public License
- * along with Caupona. If not, see <https://www.gnu.org/licenses/>.
+ * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 package com.teammoeg.frostedheart.data;
@@ -39,6 +37,8 @@ import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.registries.ForgeRegistries;
 
+import net.minecraft.data.TagsProvider.Builder;
+
 public class FHItemTagProvider extends TagsProvider<Item> {
 
 	public FHItemTagProvider(DataGenerator dataGenerator, ExistingFileHelper existingFileHelper) {
@@ -47,7 +47,7 @@ public class FHItemTagProvider extends TagsProvider<Item> {
 
 
 	@Override
-	protected void registerTags() {
+	protected void addTags() {
 		tag("colored_thermos").add(FHItems.allthermos.toArray(new Item[0]));
 		
 		tag("colored_advanced_thermos").add(FHItems.alladvthermos.toArray(new Item[0]));
@@ -62,11 +62,11 @@ public class FHItemTagProvider extends TagsProvider<Item> {
 
 
 	private Builder<Item> tag(String s) {
-		return this.getOrCreateBuilder(ItemTags.createOptional(mrl(s)));
+		return this.tag(ItemTags.createOptional(mrl(s)));
 	}
 
 	private Builder<Item> tag(ResourceLocation s) {
-		return this.getOrCreateBuilder(ItemTags.createOptional(s));
+		return this.tag(ItemTags.createOptional(s));
 	}
 
 	private ResourceLocation rl(RegistryObject<Item> it) {
@@ -108,7 +108,7 @@ public class FHItemTagProvider extends TagsProvider<Item> {
 
 
 	@Override
-	protected Path makePath(ResourceLocation id) {
+	protected Path getPath(ResourceLocation id) {
 		return this.generator.getOutputFolder()
 				.resolve("data/" + id.getNamespace() + "/tags/items/" + id.getPath() + ".json");
 	}

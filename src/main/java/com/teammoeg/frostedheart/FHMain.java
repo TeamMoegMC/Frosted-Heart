@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 TeamMoeg
+ * Copyright (c) 2021-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -14,6 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 package com.teammoeg.frostedheart;
@@ -46,8 +47,8 @@ import com.teammoeg.frostedheart.crash.ClimateCrash;
 import com.teammoeg.frostedheart.events.ClientRegistryEvents;
 import com.teammoeg.frostedheart.events.FTBTeamsEvents;
 import com.teammoeg.frostedheart.events.PlayerEvents;
-import com.teammoeg.frostedheart.mixin.minecraft.FlowerPotMixin;
-import com.teammoeg.frostedheart.mixin.minecraft.FoodAccess;
+//import com.teammoeg.frostedheart.mixin.minecraft.FlowerPotMixin;
+//import com.teammoeg.frostedheart.mixin.minecraft.FoodAccess;
 import com.teammoeg.frostedheart.network.PacketHandler;
 import com.teammoeg.frostedheart.recipe.FHRecipeReloadListener;
 import com.teammoeg.frostedheart.research.data.FHResearchDataManager;
@@ -109,7 +110,7 @@ public class FHMain {
 	public static final ItemGroup itemGroup = new ItemGroup(MODID) {
 		@Override
 		@Nonnull
-		public ItemStack createIcon() {
+		public ItemStack makeIcon() {
 			return new ItemStack(FHBlocks.generator_core_t1.asItem());
 		}
 	};
@@ -169,13 +170,13 @@ public class FHMain {
 	}
 
 	public void modification(FMLLoadCompleteEvent event) {
-		for(Item i:ForgeRegistries.ITEMS.getValues()) {
-			if(i.isFood()) {
-				if(i.getRegistryName().getNamespace().equals("crockpot")) {
-					((FoodAccess)i.getFood()).getEffectsSuppliers().removeIf(t->t.getFirst().get().getPotion().isBeneficial());
-				}
-			}
-		}
+//		for(Item i:ForgeRegistries.ITEMS.getValues()) {
+//			if(i.isFood()) {
+//				if(i.getRegistryName().getNamespace().equals("crockpot")) {
+//					((FoodAccess)i.getFood()).getEffectsSuppliers().removeIf(t->t.getFirst().get().getPotion().isBeneficial());
+//				}
+//			}
+//		}
 	}
 
 	@SuppressWarnings("unused")
@@ -207,7 +208,7 @@ public class FHMain {
 		FHFeatures.initFeatures();
 		TemperatureSimulator.init();
 		// modify default value
-		GameRules.GAME_RULES.put(GameRules.SPAWN_RADIUS, IntegerValue.create(0));
+		GameRules.GAME_RULE_TYPES.put(GameRules.RULE_SPAWN_RADIUS, IntegerValue.create(0));
 
 	}
 

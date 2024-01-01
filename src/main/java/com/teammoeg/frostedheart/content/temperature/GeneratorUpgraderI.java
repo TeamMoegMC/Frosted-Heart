@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 TeamMoeg
+ * Copyright (c) 2021-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -14,6 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 package com.teammoeg.frostedheart.content.temperature;
@@ -46,6 +47,8 @@ import net.minecraft.util.math.RayTraceContext.FluidMode;
 import net.minecraft.util.math.RayTraceResult.Type;
 import net.minecraft.world.World;
 
+import net.minecraft.item.Item.Properties;
+
 public class GeneratorUpgraderI extends FHBaseItem {
 	IETemplateMultiblock ietm=FHMultiblocks.GENERATOR_T2;
     public GeneratorUpgraderI(String name, Properties properties) {
@@ -53,35 +56,35 @@ public class GeneratorUpgraderI extends FHBaseItem {
     }
 
     @Override
-    public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand handIn) {
-        playerIn.setActiveHand(handIn);
-        if (playerIn instanceof ServerPlayerEntity&&playerIn.abilities.isCreativeMode) {
+    public ActionResult<ItemStack> use(World worldIn, PlayerEntity playerIn, Hand handIn) {
+        playerIn.startUsingItem(handIn);
+        if (playerIn instanceof ServerPlayerEntity&&playerIn.abilities.instabuild) {
         	createStructure(playerIn,worldIn);
         }
-        return new ActionResult<>(ActionResultType.SUCCESS, playerIn.getHeldItem(handIn));
+        return new ActionResult<>(ActionResultType.SUCCESS, playerIn.getItemInHand(handIn));
     }
 
     @Override
-    public ItemStack onItemUseFinish(ItemStack stack, World worldIn, LivingEntity entityLiving) {
-        if (worldIn.isRemote) return stack;
+    public ItemStack finishUsingItem(ItemStack stack, World worldIn, LivingEntity entityLiving) {
+        if (worldIn.isClientSide) return stack;
         PlayerEntity entityplayer = entityLiving instanceof PlayerEntity ? (PlayerEntity) entityLiving : null;
         createStructure(entityplayer,worldIn);
         return stack;
     }
     public boolean createStructure(PlayerEntity entityplayer,World worldIn) {
     	if (entityplayer instanceof ServerPlayerEntity) {
-            BlockRayTraceResult brtr = rayTrace(worldIn, entityplayer, FluidMode.ANY);
+            BlockRayTraceResult brtr = getPlayerPOVHitResult(worldIn, entityplayer, FluidMode.ANY);
             if (brtr.getType() == Type.MISS) return false;
-            if(brtr.getFace().getYOffset()!=0)return false;
-            TileEntity te=Utils.getExistingTileEntity(worldIn, brtr.getPos().offset(brtr.getFace().getOpposite(),1));
+            if(brtr.getDirection().getStepY()!=0)return false;
+            TileEntity te=Utils.getExistingTileEntity(worldIn, brtr.getBlockPos().relative(brtr.getDirection().getOpposite(),1));
             System.out.println(te);
             if(!(te instanceof T1GeneratorTileEntity))return false;
             T1GeneratorTileEntity t1te=(T1GeneratorTileEntity) te;
             System.out.println(t1te);
             if(t1te.isDummy())return false;
-            Rotation rot = DirectionUtils.getRotationBetweenFacings(Direction.NORTH, brtr.getFace().getOpposite());
-            ((MultiBlockAccess)(Object)ietm).callForm(worldIn,brtr.getPos().offset(Direction.DOWN).offset(brtr.getFace().rotateY()).offset(brtr.getFace().getOpposite(),2),rot,Mirror.NONE,brtr.getFace());
-            TileEntity nte=Utils.getExistingTileEntity(worldIn, brtr.getPos().offset(brtr.getFace(),1));
+            Rotation rot = DirectionUtils.getRotationBetweenFacings(Direction.NORTH, brtr.getDirection().getOpposite());
+            ((MultiBlockAccess)(Object)ietm).callForm(worldIn,brtr.getBlockPos().relative(Direction.DOWN).relative(brtr.getDirection().getClockWise()).relative(brtr.getDirection().getOpposite(),2),rot,Mirror.NONE,brtr.getDirection());
+            TileEntity nte=Utils.getExistingTileEntity(worldIn, brtr.getBlockPos().relative(brtr.getDirection(),1));
             System.out.println(nte);
             if(nte instanceof T2GeneratorTileEntity) {//bug: cannot get correct te
             	((T2GeneratorTileEntity) nte).setWorking(t1te.isWorking());
@@ -108,7 +111,7 @@ public class GeneratorUpgraderI extends FHBaseItem {
      * returns the action that specifies what animation to play when the items is being used
      */
     @Override
-    public UseAction getUseAction(ItemStack stack) {
+    public UseAction getUseAnimation(ItemStack stack) {
         return UseAction.SPEAR;
     }
 }

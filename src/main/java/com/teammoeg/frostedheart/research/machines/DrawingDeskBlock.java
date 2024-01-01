@@ -1,19 +1,20 @@
 /*
- *  Copyright (c) 2021. TeamMoeg
+ * Copyright (c) 2021-2024 TeamMoeg
  *
- *  This file is part of Energy Level Transition.
+ * This file is part of Frosted Heart.
  *
- *  Energy Level Transition is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, version 3.
+ * Frosted Heart is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3.
  *
- *  Energy Level Transition is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * Frosted Heart is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with Energy Level Transition.  If not, see <https://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 package com.teammoeg.frostedheart.research.machines;
@@ -61,39 +62,41 @@ import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.network.NetworkHooks;
 
+import net.minecraft.block.AbstractBlock.Properties;
+
 public class DrawingDeskBlock extends FHBaseBlock implements IModelOffsetProvider {
 
     public static final BooleanProperty IS_NOT_MAIN = BooleanProperty.create("not_multi_main");
     public static final DirectionProperty FACING = DirectionProperty.create("facing", Direction.Plane.HORIZONTAL);
     public static final BooleanProperty BOOK = BooleanProperty.create("has_book");
 
-    static final VoxelShape shape = Block.makeCuboidShape(0, 0, 0, 16, 15, 16);
-    static final VoxelShape shape2 = Block.makeCuboidShape(0, 0, 0, 16, 12, 16);
+    static final VoxelShape shape = Block.box(0, 0, 0, 16, 15, 16);
+    static final VoxelShape shape2 = Block.box(0, 0, 0, 16, 12, 16);
 
     @Override
     public VoxelShape getCollisionShape(BlockState state, IBlockReader worldIn, BlockPos pos,
                                         ISelectionContext context) {
-        if (state.get(IS_NOT_MAIN))
+        if (state.getValue(IS_NOT_MAIN))
             return shape2;
         return shape;
     }
 
     @Override
     public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
-        if (state.get(IS_NOT_MAIN))
+        if (state.getValue(IS_NOT_MAIN))
             return shape2;
         return shape;
     }
 
     public DrawingDeskBlock(String name, Properties blockProps, BiFunction<Block, Item.Properties, Item> createItemBlock) {
         super(name, blockProps, createItemBlock);
-        this.setDefaultState(this.stateContainer.getBaseState().with(IS_NOT_MAIN, false).with(BOOK, false));
+        this.registerDefaultState(this.stateDefinition.any().setValue(IS_NOT_MAIN, false).setValue(BOOK, false));
         super.setLightOpacity(0);
     }
 
     @Override
-    protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
-        super.fillStateContainer(builder);
+    protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
+        super.createBlockStateDefinition(builder);
         builder.add(IS_NOT_MAIN, FACING, BOOK);
     }
 
@@ -102,114 +105,114 @@ public class DrawingDeskBlock extends FHBaseBlock implements IModelOffsetProvide
     }
 
     public static void setBlockhasbook(World worldIn, BlockPos pos, BlockState state, boolean hasBook) {
-        worldIn.setBlockState(pos, state.with(BOOK, hasBook), 3);
+        worldIn.setBlock(pos, state.setValue(BOOK, hasBook), 3);
     }
 
     @Override
     public BlockState mirror(BlockState state, Mirror mirrorIn) {
-        return state.rotate(mirrorIn.toRotation(state.get(FACING)));
+        return state.rotate(mirrorIn.getRotation(state.getValue(FACING)));
     }
 
     @Override
     public BlockState rotate(BlockState state, IWorld world, BlockPos pos, Rotation direction) {
-        return state.with(FACING, direction.rotate(state.get(FACING)));
+        return state.setValue(FACING, direction.rotate(state.getValue(FACING)));
     }
 
     @Nullable
     @Override
     public BlockState getStateForPlacement(BlockItemUseContext context) {
-        Direction direction = context.getPlacementHorizontalFacing().rotateY();
-        BlockPos blockpos = context.getPos();
-        BlockPos blockpos1 = blockpos.offset(direction);
-        return context.getWorld().getBlockState(blockpos1).isReplaceable(context) ? this.getDefaultState().with(FACING, direction) : null;
+        Direction direction = context.getHorizontalDirection().getClockWise();
+        BlockPos blockpos = context.getClickedPos();
+        BlockPos blockpos1 = blockpos.relative(direction);
+        return context.getLevel().getBlockState(blockpos1).canBeReplaced(context) ? this.defaultBlockState().setValue(FACING, direction) : null;
     }
 
     @Override
-    public void onBlockHarvested(World worldIn, BlockPos pos, BlockState state, PlayerEntity player) {
-        if (!worldIn.isRemote && player.isCreative()) {
-            boolean block = state.get(IS_NOT_MAIN);
+    public void playerWillDestroy(World worldIn, BlockPos pos, BlockState state, PlayerEntity player) {
+        if (!worldIn.isClientSide && player.isCreative()) {
+            boolean block = state.getValue(IS_NOT_MAIN);
             if (block == false) {
-                BlockPos blockpos = pos.offset(getNeighbourDirection(state.get(IS_NOT_MAIN), state.get(FACING)));
+                BlockPos blockpos = pos.relative(getNeighbourDirection(state.getValue(IS_NOT_MAIN), state.getValue(FACING)));
                 BlockState blockstate = worldIn.getBlockState(blockpos);
-                if (blockstate.getBlock() == this && blockstate.get(IS_NOT_MAIN) == true) {
-                    worldIn.setBlockState(blockpos, Blocks.AIR.getDefaultState(), 35);
+                if (blockstate.getBlock() == this && blockstate.getValue(IS_NOT_MAIN) == true) {
+                    worldIn.setBlock(blockpos, Blocks.AIR.defaultBlockState(), 35);
                 }
             }
         }
-        super.onBlockHarvested(worldIn, pos, state, player);
+        super.playerWillDestroy(worldIn, pos, state, player);
     }
 
     @Override
-    public BlockState updatePostPlacement(BlockState stateIn, Direction facing, BlockState facingState, IWorld worldIn, BlockPos currentPos, BlockPos facingPos) {
-        if (facing == getNeighbourDirection(stateIn.get(IS_NOT_MAIN), stateIn.get(FACING)) && facingState.getBlock() != this) {
-            return Blocks.AIR.getDefaultState();
+    public BlockState updateShape(BlockState stateIn, Direction facing, BlockState facingState, IWorld worldIn, BlockPos currentPos, BlockPos facingPos) {
+        if (facing == getNeighbourDirection(stateIn.getValue(IS_NOT_MAIN), stateIn.getValue(FACING)) && facingState.getBlock() != this) {
+            return Blocks.AIR.defaultBlockState();
         }
-        return super.updatePostPlacement(stateIn, facing, facingState, worldIn, currentPos, facingPos);
+        return super.updateShape(stateIn, facing, facingState, worldIn, currentPos, facingPos);
     }
 
     @Override
-    public void onBlockPlacedBy(World worldIn, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
-        if (!worldIn.isRemote) {
-            BlockPos blockpos = pos.offset(state.get(FACING));
-            worldIn.setBlockState(blockpos, state.with(IS_NOT_MAIN, true), 3);
-            worldIn.updateBlock(pos, Blocks.AIR);
-            state.updateNeighbours(worldIn, pos, 3);
+    public void setPlacedBy(World worldIn, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
+        if (!worldIn.isClientSide) {
+            BlockPos blockpos = pos.relative(state.getValue(FACING));
+            worldIn.setBlock(blockpos, state.setValue(IS_NOT_MAIN, true), 3);
+            worldIn.blockUpdated(pos, Blocks.AIR);
+            state.updateNeighbourShapes(worldIn, pos, 3);
         }
     }
 
     @Override
-    public PushReaction getPushReaction(BlockState state) {
+    public PushReaction getPistonPushReaction(BlockState state) {
         return PushReaction.DESTROY;
     }
 
     @Nullable
     @Override
     public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-        if (!state.get(IS_NOT_MAIN))
+        if (!state.getValue(IS_NOT_MAIN))
             return new DrawingDeskTileEntity();
         else return null;
     }
 
     @Override
     public boolean hasTileEntity(BlockState state) {
-        return !state.get(IS_NOT_MAIN);
+        return !state.getValue(IS_NOT_MAIN);
     }
 
     @Override
-    public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
-        if (!worldIn.isRemote && handIn == Hand.MAIN_HAND && !player.isSneaking()) {
-            if (!player.isCreative() && worldIn.getLight(pos) < 8) {
-                player.sendStatusMessage(GuiUtils.translateMessage("research.too_dark"), true);
+    public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+        if (!worldIn.isClientSide && handIn == Hand.MAIN_HAND && !player.isShiftKeyDown()) {
+            if (!player.isCreative() && worldIn.getMaxLocalRawBrightness(pos) < 8) {
+                player.displayClientMessage(GuiUtils.translateMessage("research.too_dark"), true);
             }
             else if (!player.isCreative() && TemperatureCore.getBodyTemperature(player) < -0.2) {
-                player.sendStatusMessage(GuiUtils.translateMessage("research.too_cold"), true);
+                player.displayClientMessage(GuiUtils.translateMessage("research.too_cold"), true);
             }
             else {
-                if (state.get(IS_NOT_MAIN)) {
-                    pos = pos.offset(getNeighbourDirection(state.get(IS_NOT_MAIN), state.get(FACING)));
+                if (state.getValue(IS_NOT_MAIN)) {
+                    pos = pos.relative(getNeighbourDirection(state.getValue(IS_NOT_MAIN), state.getValue(FACING)));
                 }
                 TileEntity ii = Utils.getExistingTileEntity(worldIn, pos);
                 UUID crid=FTBTeamsAPI.getPlayerTeam((ServerPlayerEntity)player).getId();
                 IOwnerTile.trySetOwner(ii,crid);
                 if(crid!=null&&crid.equals(IOwnerTile.getOwner(ii)))
-                	NetworkHooks.openGui((ServerPlayerEntity) player, (IInteractionObjectIE) ii, ii.getPos());
+                	NetworkHooks.openGui((ServerPlayerEntity) player, (IInteractionObjectIE) ii, ii.getBlockPos());
                 else 
-                	player.sendStatusMessage(GuiUtils.translateMessage("research.not_owned"), true);
+                	player.displayClientMessage(GuiUtils.translateMessage("research.not_owned"), true);
             }
         }
         return ActionResultType.SUCCESS;
     }
 
     @Override
-    public boolean eventReceived(BlockState state, World worldIn, BlockPos pos, int id, int param) {
-        super.eventReceived(state, worldIn, pos, id, param);
-        TileEntity tileentity = worldIn.getTileEntity(pos);
-        return tileentity != null && tileentity.receiveClientEvent(id, param);
+    public boolean triggerEvent(BlockState state, World worldIn, BlockPos pos, int id, int param) {
+        super.triggerEvent(state, worldIn, pos, id, param);
+        TileEntity tileentity = worldIn.getBlockEntity(pos);
+        return tileentity != null && tileentity.triggerEvent(id, param);
     }
 
     @Override
     public BlockPos getModelOffset(BlockState arg0, Vector3i arg1) {
-        if (arg0.get(IS_NOT_MAIN))
+        if (arg0.getValue(IS_NOT_MAIN))
             return new BlockPos(1, 0, 0);
         return new BlockPos(0, 0, 0);
         //return null;

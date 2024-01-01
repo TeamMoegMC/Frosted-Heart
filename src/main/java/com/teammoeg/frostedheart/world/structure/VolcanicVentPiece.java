@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -58,18 +58,18 @@ public class VolcanicVentPiece extends StructurePiece {
         this.centerZ = nbt.getInt("z");
     }
 
-    protected void readAdditional(CompoundNBT nbt) {
+    protected void addAdditionalSaveData(CompoundNBT nbt) {
         nbt.putInt("x", this.centerX);
         nbt.putInt("y", this.centerY);
         nbt.putInt("z", this.centerZ);
     }
 
     @Override
-    public boolean func_230383_a_(ISeedReader reader, StructureManager structureManager, ChunkGenerator generator, Random seed, MutableBoundingBox boundingBox, ChunkPos chunkPos, BlockPos pos) {
+    public boolean postProcess(ISeedReader reader, StructureManager structureManager, ChunkGenerator generator, Random seed, MutableBoundingBox boundingBox, ChunkPos chunkPos, BlockPos pos) {
         BlockPos.Mutable mutablePos = new BlockPos.Mutable();
-        for (int x = boundingBox.minX; x <= boundingBox.maxX; x++) {
+        for (int x = boundingBox.x0; x <= boundingBox.x1; x++) {
             mutablePos.setX(x);
-            for (int z = boundingBox.minZ; z <= boundingBox.maxZ; z++) {
+            for (int z = boundingBox.z0; z <= boundingBox.z1; z++) {
                 mutablePos.setZ(z);
                 int distX = x - centerX;
                 int distZ = z - centerZ;
@@ -77,7 +77,7 @@ public class VolcanicVentPiece extends StructurePiece {
                 for (int y = centerY; y <= centerY + 32; y++) {
                     mutablePos.setY(y);
                     if (y < centerY + 32 - dist) {
-                        reader.setBlockState(mutablePos, Blocks.BASALT.getDefaultState(), 2);
+                        reader.setBlock(mutablePos, Blocks.BASALT.defaultBlockState(), 2);
                     }
                 }
             }

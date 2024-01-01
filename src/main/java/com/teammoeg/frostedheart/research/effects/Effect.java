@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -141,10 +141,10 @@ public abstract class Effect extends AutoIDItem implements Writeable {
      * @param pb the pb<br>
      */
     Effect(PacketBuffer pb) {
-        name = pb.readString();
-        tooltip = SerializeUtil.readList(pb, PacketBuffer::readString);
+        name = pb.readUtf();
+        tooltip = SerializeUtil.readList(pb, PacketBuffer::readUtf);
         icon = SerializeUtil.readOptional(pb, FHIcons::readIcon).orElse(null);
-        nonce = pb.readString();
+        nonce = pb.readUtf();
         hidden = pb.readBoolean();
     }
 
@@ -290,10 +290,10 @@ public abstract class Effect extends AutoIDItem implements Writeable {
     @Override
     public void write(PacketBuffer buffer) {
         Effects.writeId(this, buffer);
-        buffer.writeString(name);
-        SerializeUtil.writeList2(buffer, tooltip, PacketBuffer::writeString);
+        buffer.writeUtf(name);
+        SerializeUtil.writeList2(buffer, tooltip, PacketBuffer::writeUtf);
         SerializeUtil.writeOptional(buffer, icon, FHIcon::write);
-        buffer.writeString(nonce);
+        buffer.writeUtf(nonce);
         buffer.writeBoolean(isHidden());
     }
 

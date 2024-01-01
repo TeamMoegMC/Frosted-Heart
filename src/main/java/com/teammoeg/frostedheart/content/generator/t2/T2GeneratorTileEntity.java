@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 TeamMoeg
+ * Copyright (c) 2021-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -14,6 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 package com.teammoeg.frostedheart.content.generator.t2;
@@ -60,7 +61,7 @@ public class T2GeneratorTileEntity extends BurnerGeneratorTileEntity<T2Generator
 	HeatProviderManager manager = new HeatProviderManager(this, c -> {
 		Direction dir = this.getFacing();
 		
-		c.accept(getBlockPosForPos(networkTile).offset(dir.getOpposite()), dir);
+		c.accept(getBlockPosForPos(networkTile).relative(dir.getOpposite()), dir);
 
 	});
 
@@ -186,8 +187,8 @@ public class T2GeneratorTileEntity extends BurnerGeneratorTileEntity<T2Generator
 
 	@Override
 	public AxisAlignedBB getRenderBoundingBox() {
-		return new AxisAlignedBB(pos.getX() - 2, pos.getY() - 2, pos.getZ() - 2, pos.getX() + 2, pos.getY() + 6,
-				pos.getZ() + 2);
+		return new AxisAlignedBB(worldPosition.getX() - 2, worldPosition.getY() - 2, worldPosition.getZ() - 2, worldPosition.getX() + 2, worldPosition.getY() + 6,
+				worldPosition.getZ() + 2);
 	}
 
 	@Override
@@ -203,7 +204,7 @@ public class T2GeneratorTileEntity extends BurnerGeneratorTileEntity<T2Generator
 			for (int y = 0; y < 7; ++y)
 				for (int z = 0; z < 3; ++z) {
 					BlockPos actualPos = getBlockPosForPos(new BlockPos(x, y, z));
-					TileEntity te = Utils.getExistingTileEntity(world, actualPos);
+					TileEntity te = Utils.getExistingTileEntity(level, actualPos);
 					if (te instanceof T2GeneratorTileEntity)
 						consumer.accept((T2GeneratorTileEntity) te);
 				}
@@ -212,22 +213,22 @@ public class T2GeneratorTileEntity extends BurnerGeneratorTileEntity<T2Generator
 	@Override
 	protected void tickEffects(boolean isActive) {
 		if (isActive) {
-			BlockPos blockpos = this.getPos().offset(Direction.UP, 5);
-			Random random = world.rand;
+			BlockPos blockpos = this.getBlockPos().relative(Direction.UP, 5);
+			Random random = level.random;
 			if (isActualOverdrive()) {
 				if (random.nextFloat() < 0.6F) {
 					// for (int i = 0; i < random.nextInt(2)+1; ++i) {
 					if (this.liquidtick != 0)
-						ClientUtils.spawnSteamParticles(world, blockpos);
-					ClientUtils.spawnT2FireParticles(world, blockpos);
+						ClientUtils.spawnSteamParticles(level, blockpos);
+					ClientUtils.spawnT2FireParticles(level, blockpos);
 					// }
 				}
 			} else {
 				if (random.nextFloat() < 0.3F) {
 					// for (int i = 0; i < random.nextInt(2)+1; ++i) {
 					if (this.liquidtick != 0)
-						ClientUtils.spawnSteamParticles(world, blockpos);
-					ClientUtils.spawnT2FireParticles(world, blockpos);
+						ClientUtils.spawnSteamParticles(level, blockpos);
+					ClientUtils.spawnT2FireParticles(level, blockpos);
 					// }
 				}
 			}
@@ -239,7 +240,7 @@ public class T2GeneratorTileEntity extends BurnerGeneratorTileEntity<T2Generator
 	@Override
 	public SteamEnergyNetwork getNetwork() {
 		BlockPos actualPos = getBlockPosForPos(networkTile);
-		TileEntity te = Utils.getExistingTileEntity(world, actualPos);
+		TileEntity te = Utils.getExistingTileEntity(level, actualPos);
 		if (te instanceof T2GeneratorTileEntity) {
 			if (((T2GeneratorTileEntity) te).sen != null) {
 				sen = ((T2GeneratorTileEntity) te).sen;
@@ -313,7 +314,7 @@ public class T2GeneratorTileEntity extends BurnerGeneratorTileEntity<T2Generator
 		super.tickControls();
 
 		
-		int power=this.world.getStrongPower(getBlockPosForPos(redstone));
+		int power=this.level.getDirectSignalTo(getBlockPosForPos(redstone));
 		if(power>0) {
 			if(power>10) {
 				if(!this.isOverdrive())this.setOverdrive(true);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 TeamMoeg
+ * Copyright (c) 2021-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -14,6 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 package com.teammoeg.frostedheart.base.block;
@@ -29,13 +30,13 @@ public class FHBlockInterfaces {
     public interface IActiveState extends IEBlockInterfaces.BlockstateProvider {
         default boolean getIsActive() {
             BlockState state = this.getState();
-            return state.hasProperty(BlockStateProperties.LIT) ? (Boolean) state.get(BlockStateProperties.LIT) : false;
+            return state.hasProperty(BlockStateProperties.LIT) ? (Boolean) state.getValue(BlockStateProperties.LIT) : false;
         }
 
         default void setActive(boolean active) {
             BlockState state = this.getState();
-            if(state.get(BlockStateProperties.LIT)!=active) {
-	            BlockState newState = state.with(BlockStateProperties.LIT, active);
+            if(state.getValue(BlockStateProperties.LIT)!=active) {
+	            BlockState newState = state.setValue(BlockStateProperties.LIT, active);
 	            this.setState(newState);
             }
         }

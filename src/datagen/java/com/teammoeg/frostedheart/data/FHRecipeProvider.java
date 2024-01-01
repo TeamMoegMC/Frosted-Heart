@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 TeamMoeg
+ * Copyright (c) 2021-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -14,6 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 package com.teammoeg.frostedheart.data;
@@ -66,18 +67,18 @@ public class FHRecipeProvider extends RecipeProvider {
 	}
 
 	@Override
-	protected void registerRecipes(@Nonnull Consumer<IFinishedRecipe> out) {
+	protected void buildShapelessRecipes(@Nonnull Consumer<IFinishedRecipe> out) {
 		String[] ovride=new String[] {
 				"dilute_soup",
 				"nail_soup"
 		};
 		THPFluids.getAll().filter(o->!Arrays.stream(ovride).anyMatch(o.getRegistryName().getPath()::equals)).forEach(f-> {
 			
-				out.accept(new WaterLevelFluidRecipe(new ResourceLocation(FHMain.MODID,"water_level/"+f.getRegistryName().getPath()+"_thermos"),Ingredient.fromTag(ItemTags.createOptional(new ResourceLocation(FHMain.MODID,"thermos"))),f,2,2));
+				out.accept(new WaterLevelFluidRecipe(new ResourceLocation(FHMain.MODID,"water_level/"+f.getRegistryName().getPath()+"_thermos"),Ingredient.of(ItemTags.createOptional(new ResourceLocation(FHMain.MODID,"thermos"))),f,2,2));
 		});
 		THPFluids.getAll().filter(o->o.getRegistryName().getPath().equals("dilute_soup")).forEach(f-> {
 		
-				out.accept(new WaterLevelFluidRecipe(new ResourceLocation(FHMain.MODID,"water_level/"+f.getRegistryName().getPath()+"_thermos"),Ingredient.fromTag(ItemTags.createOptional(new ResourceLocation(FHMain.MODID,"thermos"))),f,3,2));
+				out.accept(new WaterLevelFluidRecipe(new ResourceLocation(FHMain.MODID,"water_level/"+f.getRegistryName().getPath()+"_thermos"),Ingredient.of(ItemTags.createOptional(new ResourceLocation(FHMain.MODID,"thermos"))),f,3,2));
 		});
 		for(Block i:RankineLists.MUSHROOM_BLOCKS) {
 			Item mi=i.asItem();
@@ -101,11 +102,11 @@ public class FHRecipeProvider extends RecipeProvider {
 							System.out.println(item.toString()+" not exist");
 							ps.println(item+","+parts[1]);
 						}else {
-							Food f=it.getFood();
+							Food f=it.getFoodProperties();
 							if(f==null)
 								ps.println(item+","+parts[1]);
 							else
-								ps.println(item+","+f.getHealing());
+								ps.println(item+","+f.getNutrition());
 						}
 						DietValueBuilder dvb=new DietValueBuilder(id,item);
 						for(int i=0;i<6;i++) {
@@ -119,15 +120,15 @@ public class FHRecipeProvider extends RecipeProvider {
 					}
 				}
 			}
-			out.accept(new ShapelessCopyDataRecipe(toRL("thermos_from_dyed"),new ItemStack(FHItems.thermos),NonNullList.from(Ingredient.EMPTY,Ingredient.fromTag(ItemTags.createOptional(new ResourceLocation(FHMain.MODID,"colored_thermos"))))));
-			out.accept(new ShapelessCopyDataRecipe(toRL("advanced_thermos_from_dyed"),new ItemStack(FHItems.advanced_thermos),NonNullList.from(Ingredient.EMPTY,Ingredient.fromTag(ItemTags.createOptional(new ResourceLocation(FHMain.MODID,"colored_advanced_thermos"))))));
+			out.accept(new ShapelessCopyDataRecipe(toRL("thermos_from_dyed"),new ItemStack(FHItems.thermos),NonNullList.of(Ingredient.EMPTY,Ingredient.of(ItemTags.createOptional(new ResourceLocation(FHMain.MODID,"colored_thermos"))))));
+			out.accept(new ShapelessCopyDataRecipe(toRL("advanced_thermos_from_dyed"),new ItemStack(FHItems.advanced_thermos),NonNullList.of(Ingredient.EMPTY,Ingredient.of(ItemTags.createOptional(new ResourceLocation(FHMain.MODID,"colored_advanced_thermos"))))));
 			for(String i:FHItems.colors) {
 				Item thermos=ForgeRegistries.ITEMS.getValue(new ResourceLocation(FHMain.MODID,i+"_thermos"));
-				out.accept(new ShapelessCopyDataRecipe(toRL(thermos.getRegistryName().getPath()+"_from_other"),new ItemStack(thermos),NonNullList.from(Ingredient.EMPTY,Ingredient.fromTag(ItemTags.createOptional(new ResourceLocation(FHMain.MODID,"colored_thermos"))),Ingredient.fromItems(ForgeRegistries.ITEMS.getValue(new ResourceLocation(i+"_dye"))))));
-				out.accept(new ShapelessCopyDataRecipe(toRL(thermos.getRegistryName().getPath()),new ItemStack(thermos),NonNullList.from(Ingredient.EMPTY,Ingredient.fromItems(FHItems.thermos),Ingredient.fromItems(Items.STRING),Ingredient.fromItems(Items.STRING),Ingredient.fromItems(ForgeRegistries.ITEMS.getValue(new ResourceLocation(i+"_dye"))))));
+				out.accept(new ShapelessCopyDataRecipe(toRL(thermos.getRegistryName().getPath()+"_from_other"),new ItemStack(thermos),NonNullList.of(Ingredient.EMPTY,Ingredient.of(ItemTags.createOptional(new ResourceLocation(FHMain.MODID,"colored_thermos"))),Ingredient.of(ForgeRegistries.ITEMS.getValue(new ResourceLocation(i+"_dye"))))));
+				out.accept(new ShapelessCopyDataRecipe(toRL(thermos.getRegistryName().getPath()),new ItemStack(thermos),NonNullList.of(Ingredient.EMPTY,Ingredient.of(FHItems.thermos),Ingredient.of(Items.STRING),Ingredient.of(Items.STRING),Ingredient.of(ForgeRegistries.ITEMS.getValue(new ResourceLocation(i+"_dye"))))));
 				thermos=ForgeRegistries.ITEMS.getValue(new ResourceLocation(FHMain.MODID,i+"_advanced_thermos"));
-				out.accept(new ShapelessCopyDataRecipe(toRL(thermos.getRegistryName().getPath()+"_from_other"),new ItemStack(thermos),NonNullList.from(Ingredient.EMPTY,Ingredient.fromTag(ItemTags.createOptional(new ResourceLocation(FHMain.MODID,"colored_advanced_thermos"))),Ingredient.fromItems(ForgeRegistries.ITEMS.getValue(new ResourceLocation(i+"_dye"))))));
-				out.accept(new ShapelessCopyDataRecipe(toRL(thermos.getRegistryName().getPath()),new ItemStack(thermos),NonNullList.from(Ingredient.EMPTY,Ingredient.fromItems(FHItems.advanced_thermos),Ingredient.fromItems(Items.STRING),Ingredient.fromItems(Items.STRING),Ingredient.fromItems(ForgeRegistries.ITEMS.getValue(new ResourceLocation(i+"_dye"))))));
+				out.accept(new ShapelessCopyDataRecipe(toRL(thermos.getRegistryName().getPath()+"_from_other"),new ItemStack(thermos),NonNullList.of(Ingredient.EMPTY,Ingredient.of(ItemTags.createOptional(new ResourceLocation(FHMain.MODID,"colored_advanced_thermos"))),Ingredient.of(ForgeRegistries.ITEMS.getValue(new ResourceLocation(i+"_dye"))))));
+				out.accept(new ShapelessCopyDataRecipe(toRL(thermos.getRegistryName().getPath()),new ItemStack(thermos),NonNullList.of(Ingredient.EMPTY,Ingredient.of(FHItems.advanced_thermos),Ingredient.of(Items.STRING),Ingredient.of(Items.STRING),Ingredient.of(ForgeRegistries.ITEMS.getValue(new ResourceLocation(i+"_dye"))))));
 			}
 		}
 		

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -82,7 +82,7 @@ public class ResearchListeners {
 
         @Override
         public IRecipe<?> getObject(String s) {
-            return FHResearchDataManager.getRecipeManager().getRecipe(new ResourceLocation(s)).orElse(null);
+            return FHResearchDataManager.getRecipeManager().byKey(new ResourceLocation(s)).orElse(null);
         }
 
     }
@@ -265,7 +265,7 @@ public class ResearchListeners {
     }
     @OnlyIn(Dist.CLIENT)
     public static void reloadEditor() {
-    	if(!Minecraft.getInstance().isSingleplayer())
+    	if(!Minecraft.getInstance().hasSingleplayerServer())
     		FHResearch.editor=false;
     }
     @OnlyIn(Dist.CLIENT)
@@ -375,7 +375,7 @@ public class ResearchListeners {
     	if(s==null)
     		return canUseRecipe(r);
         if (recipe.has(r)) {
-            if (s.getEntityWorld().isRemote)
+            if (s.getCommandSenderWorld().isClientSide)
                 return ClientResearchDataAPI.getData().crafting.has(r);
             return ResearchDataAPI.getData((ServerPlayerEntity) s).crafting.has(r);
         }
@@ -410,7 +410,7 @@ public class ResearchListeners {
     public static boolean canUseBlock(PlayerEntity player, Block b) {
         if (block.has(b)) {
         	if(player instanceof FakePlayer)return false;
-            if (player.getEntityWorld().isRemote)
+            if (player.getCommandSenderWorld().isClientSide)
                 return ClientResearchDataAPI.getData().block.has(b);
             return ResearchDataAPI.getData((ServerPlayerEntity) player).block.has(b);
         }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -48,7 +48,7 @@ public class InspireRecipe extends IESerializableRecipe {
     }
 
     @Override
-    public ItemStack getRecipeOutput() {
+    public ItemStack getResultItem() {
         return ItemStack.EMPTY;
     }
 
@@ -60,13 +60,13 @@ public class InspireRecipe extends IESerializableRecipe {
 
 
         @Override
-        public InspireRecipe read(ResourceLocation recipeId, PacketBuffer buffer) {
-            return new InspireRecipe(recipeId, Ingredient.read(buffer), buffer.readVarInt());
+        public InspireRecipe fromNetwork(ResourceLocation recipeId, PacketBuffer buffer) {
+            return new InspireRecipe(recipeId, Ingredient.fromNetwork(buffer), buffer.readVarInt());
         }
 
         @Override
-        public void write(PacketBuffer buffer, InspireRecipe recipe) {
-            recipe.item.write(buffer);
+        public void toNetwork(PacketBuffer buffer, InspireRecipe recipe) {
+            recipe.item.toNetwork(buffer);
             buffer.writeVarInt(recipe.inspire);
         }
 
@@ -77,7 +77,7 @@ public class InspireRecipe extends IESerializableRecipe {
 
         @Override
         public InspireRecipe readFromJson(ResourceLocation arg0, JsonObject arg1) {
-            return new InspireRecipe(arg0, Ingredient.deserialize(arg1.get("item")), arg1.get("amount").getAsInt());
+            return new InspireRecipe(arg0, Ingredient.fromJson(arg1.get("item")), arg1.get("amount").getAsInt());
         }
 
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 TeamMoeg
+ * Copyright (c) 2021-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -14,6 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 package com.teammoeg.frostedheart.content.generator;
@@ -92,7 +93,7 @@ public abstract class AbstractGenerator<T extends AbstractGenerator<T>> extends 
 
     @Override
     public void disassemble() {
-        ChunkData.removeTempAdjust(world, getPos());
+        ChunkData.removeTempAdjust(level, getBlockPos());
         if (shouldUnique() && master() != null)
             master().unregist();
         super.disassemble();
@@ -102,14 +103,14 @@ public abstract class AbstractGenerator<T extends AbstractGenerator<T>> extends 
     	getTeamData().ifPresent(t->{
         if (!t.hasVariant(ResearchVariant.GENERATOR_LOCATION)) return;
         long pos = t.getVariantLong(ResearchVariant.GENERATOR_LOCATION);
-        BlockPos bp = BlockPos.fromLong(pos);
-        if (bp.equals(this.pos))
+        BlockPos bp = BlockPos.of(pos);
+        if (bp.equals(this.worldPosition))
             t.removeVariant(ResearchVariant.GENERATOR_LOCATION);
     	});
     }
 
     public void regist() {
-    	getTeamData().ifPresent(t->t.putVariantLong(ResearchVariant.GENERATOR_LOCATION,master().pos.toLong()));
+    	getTeamData().ifPresent(t->t.putVariantLong(ResearchVariant.GENERATOR_LOCATION,master().worldPosition.asLong()));
     }
 
     public void setOwner(UUID owner) {
@@ -132,12 +133,12 @@ public abstract class AbstractGenerator<T extends AbstractGenerator<T>> extends 
     	return getTeamData().map(t->{
 	        if(!t.building.has(super.multiblockInstance))return false;
 	        if (!t.hasVariant(ResearchVariant.GENERATOR_LOCATION)) {
-	            t.putVariantLong(ResearchVariant.GENERATOR_LOCATION, master().pos.toLong());
+	            t.putVariantLong(ResearchVariant.GENERATOR_LOCATION, master().worldPosition.asLong());
 	            return true;
 	        }
 	        long pos = t.getVariantLong(ResearchVariant.GENERATOR_LOCATION);
-	        BlockPos bp = BlockPos.fromLong(pos);
-	        if (bp.equals(this.pos))
+	        BlockPos bp = BlockPos.of(pos);
+	        if (bp.equals(this.worldPosition))
 	            return true;
 	        return false;
     	}).orElse(false);
@@ -157,20 +158,20 @@ public abstract class AbstractGenerator<T extends AbstractGenerator<T>> extends 
         checkForNeedlessTicking();
         if(isDummy())return;
         // spawn smoke particle
-        if (world != null && world.isRemote && formed) {
+        if (level != null && level.isClientSide && formed) {
             tickEffects(getIsActive());
         }
         
         tickControls();
         //user set shutdown
         if (isUserOperated())
-            if (!world.isRemote && formed && !isWorking()) {
+            if (!level.isClientSide && formed && !isWorking()) {
                 setAllActive(false);
                 onShutDown();
-                ChunkData.removeTempAdjust(world, getPos());
+                ChunkData.removeTempAdjust(level, getBlockPos());
             }
         
-        if (!world.isRemote && formed) {
+        if (!level.isClientSide && formed) {
         	if(isWorking()) {
 	            if (shouldUnique()) {
 	                if (checkInterval <= 0) {
@@ -187,18 +188,18 @@ public abstract class AbstractGenerator<T extends AbstractGenerator<T>> extends 
 	            // set activity status
 	            final boolean activeAfterTick = getIsActive();
 	            if (activeBeforeTick != activeAfterTick) {
-	                this.markDirty();
+	                this.setChanged();
 	                if (activeAfterTick) {
-	                    ChunkData.addPillarTempAdjust(world, getPos(), getActualRange(), getUpperBound(),getLowerBound(),getActualTemp());
+	                    ChunkData.addPillarTempAdjust(level, getBlockPos(), getActualRange(), getUpperBound(),getLowerBound(),getActualTemp());
 	                } else {
-	                    ChunkData.removeTempAdjust(world, getPos());
+	                    ChunkData.removeTempAdjust(level, getBlockPos());
 	                }
 	                setAllActive(activeAfterTick);
 	            } else if (activeAfterTick) {
 	                if (isChanged() || !initialized) {
 	                    initialized = true;
 	                    markChanged(false);
-	                    ChunkData.addPillarTempAdjust(world, getPos(), getActualRange(), getUpperBound(),getLowerBound(), getActualTemp());
+	                    ChunkData.addPillarTempAdjust(level, getBlockPos(), getActualRange(), getUpperBound(),getLowerBound(), getActualTemp());
 	                }
 	            }
         	}else

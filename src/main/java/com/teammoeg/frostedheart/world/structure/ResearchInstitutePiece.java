@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -56,14 +56,14 @@ public class ResearchInstitutePiece extends TemplateStructurePiece {
         this.loadTemplate(templateManager);
     }
 
-    protected void readAdditional(CompoundNBT tagCompound) {
-        super.readAdditional(tagCompound);
+    protected void addAdditionalSaveData(CompoundNBT tagCompound) {
+        super.addAdditionalSaveData(tagCompound);
         tagCompound.putString("Template", this.resource.toString());
         tagCompound.putString("Rot", this.rotation.name());
     }
 
     private void loadTemplate(TemplateManager manager) {
-        Template template = manager.getTemplateDefaulted(this.resource);
+        Template template = manager.getOrCreate(this.resource);
         PlacementSettings placementsettings = (new PlacementSettings()).setRotation(this.rotation).setMirror(Mirror.NONE);
         this.setup(template, this.templatePosition, placementsettings);
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -61,7 +61,7 @@ public class ResearchCategoryPanel extends Panel {
         @Override
         public void addMouseOverText(TooltipList list) {
             list.add(category.getName());
-            list.add(category.getDesc().mergeStyle(TextFormatting.GRAY));
+            list.add(category.getDesc().withStyle(TextFormatting.GRAY));
         }
 
         @Override

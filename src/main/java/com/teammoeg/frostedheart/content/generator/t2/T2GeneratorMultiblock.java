@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 TeamMoeg
+ * Copyright (c) 2021-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -14,6 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 package com.teammoeg.frostedheart.content.generator.t2;
@@ -37,7 +38,7 @@ public class T2GeneratorMultiblock extends FHBaseMultiblock {
     public T2GeneratorMultiblock() {
         super(new ResourceLocation(FHMain.MODID, "multiblocks/generator_t2"),
                 new BlockPos(1, 1, 1), new BlockPos(1, 1, 2), new BlockPos(3, 7, 3),
-                () -> FHMultiblocks.generator_t2.getDefaultState());
+                () -> FHMultiblocks.generator_t2.defaultBlockState());
     }
 
     @Override
@@ -54,7 +55,7 @@ public class T2GeneratorMultiblock extends FHBaseMultiblock {
         if (renderStack == null)
             renderStack = new ItemStack(FHMultiblocks.generator_t2);
         transform.translate(1.5D, 1.5D, 1.5D);
-        ClientUtils.mc().getItemRenderer().renderItem(
+        ClientUtils.mc().getItemRenderer().renderStatic(
                 renderStack,
                 ItemCameraTransforms.TransformType.NONE,
                 0xf000f0,

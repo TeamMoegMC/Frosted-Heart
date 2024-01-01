@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -70,22 +70,22 @@ public class SelectDialog<T> extends EditDialog {
         ).open();
     };
     public static final Editor<ResourceLocation> EDITOR_ADVANCEMENT = (p, l, v, c) -> {
-        ClientAdvancementManager cam = ClientUtils.mc().player.connection.getAdvancementManager();
-        Advancement adv = cam.getAdvancementList().getAdvancement(v);
+        ClientAdvancementManager cam = ClientUtils.mc().player.connection.getAdvancements();
+        Advancement adv = cam.getAdvancements().get(v);
 
-        new SelectDialog<Advancement>(p, l, adv, e -> c.accept(e.getId()), () -> cam.getAdvancementList().getAll(),
-                Advancement::getDisplayText, advx -> new String[]{advx.getDisplayText().getString(), advx.getId().toString()},
+        new SelectDialog<Advancement>(p, l, adv, e -> c.accept(e.getId()), () -> cam.getAdvancements().getAllAdvancements(),
+                Advancement::getChatComponent, advx -> new String[]{advx.getChatComponent().getString(), advx.getId().toString()},
                 advx -> FHIcons.getIcon(advx.getDisplay().getIcon())
         ).open();
     };
     public static final Editor<EntityType<?>> EDITOR_ENTITY = (p, l, v, c) -> {
-        new SelectDialog<>(p, l, v, c, ForgeRegistries.ENTITIES::getValues, EntityType::getName,e->new String[] {e.getName().getString(),e.getRegistryName().toString()}
+        new SelectDialog<>(p, l, v, c, ForgeRegistries.ENTITIES::getValues, EntityType::getDescription,e->new String[] {e.getDescription().getString(),e.getRegistryName().toString()}
         ).open();
     };
     public static final Editor<String> EDITOR_ITEM_TAGS = (p, l, v, c) -> {
     
     	
-        new SelectDialog<>(p, l, v, c,()->Minecraft.getInstance().world.getTags().getItemTags().getRegisteredTags().stream().map(ResourceLocation::toString).collect(Collectors.toSet())).open();
+        new SelectDialog<>(p, l, v, c,()->Minecraft.getInstance().level.getTagManager().getItems().getAvailableTags().stream().map(ResourceLocation::toString).collect(Collectors.toSet())).open();
     };
     String lbl;
     T val;

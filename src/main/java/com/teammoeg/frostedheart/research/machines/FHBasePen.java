@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -24,6 +24,8 @@ import com.teammoeg.frostedheart.base.item.FHBaseItem;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 
+import net.minecraft.item.Item.Properties;
+
 public class FHBasePen extends FHBaseItem implements IPen {
 
     public FHBasePen(String name, Properties properties) {
@@ -32,7 +34,7 @@ public class FHBasePen extends FHBaseItem implements IPen {
 
     @Override
     public void doDamage(PlayerEntity e, ItemStack stack, int val) {
-        stack.damageItem(val, e, ex -> {
+        stack.hurtAndBreak(val, e, ex -> {
         });
     }
 

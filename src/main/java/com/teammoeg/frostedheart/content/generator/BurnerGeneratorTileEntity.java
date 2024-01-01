@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 TeamMoeg
+ * Copyright (c) 2021-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -14,6 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 package com.teammoeg.frostedheart.content.generator;
@@ -101,7 +102,7 @@ public abstract class BurnerGeneratorTileEntity<T extends BurnerGeneratorTileEnt
         }
 
         @Override
-        public int size() {
+        public int getCount() {
             return 2;
         }
     }
@@ -121,7 +122,7 @@ public abstract class BurnerGeneratorTileEntity<T extends BurnerGeneratorTileEnt
         
         if (!descPacket) {
             
-            currentItem = ItemStack.read(nbt.getCompound("currentItem"));
+            currentItem = ItemStack.of(nbt.getCompound("currentItem"));
             ItemStackHelper.loadAllItems(nbt, inventory);
         }
         
@@ -146,14 +147,14 @@ public abstract class BurnerGeneratorTileEntity<T extends BurnerGeneratorTileEnt
     @Nonnull
     @Override
     public VoxelShape getBlockBounds(@Nullable ISelectionContext ctx) {
-        return VoxelShapes.fullCube();
+        return VoxelShapes.block();
     }
 
     @Override
-    public boolean receiveClientEvent(int id, int arg) {
+    public boolean triggerEvent(int id, int arg) {
         if (id == 0)
             this.formed = arg == 1;
-        markDirty();
+        setChanged();
         this.markContainingBlockForUpdate(null);
         return true;
     }
@@ -264,7 +265,7 @@ public abstract class BurnerGeneratorTileEntity<T extends BurnerGeneratorTileEnt
         GeneratorRecipe recipe = GeneratorRecipe.findRecipe(inventory.get(INPUT_SLOT));
         if (recipe == null)
             return null;
-        if (inventory.get(OUTPUT_SLOT).isEmpty() || (ItemStack.areItemsEqual(inventory.get(OUTPUT_SLOT), recipe.output) &&
+        if (inventory.get(OUTPUT_SLOT).isEmpty() || (ItemStack.isSame(inventory.get(OUTPUT_SLOT), recipe.output) &&
                 inventory.get(OUTPUT_SLOT).getCount() + recipe.output.getCount() <= getSlotLimit(OUTPUT_SLOT))) {
             return recipe;
         }
@@ -323,7 +324,7 @@ public abstract class BurnerGeneratorTileEntity<T extends BurnerGeneratorTileEnt
             else
                 process--;
             this.setActive(true);
-            this.markDirty();
+            this.setChanged();
             this.markContainingBlockForUpdate(null);
         }
         // process not started yet
@@ -353,14 +354,14 @@ public abstract class BurnerGeneratorTileEntity<T extends BurnerGeneratorTileEnt
                 this.process = (int)(recipe.time*effi) * modifier;
                 this.processMax = process;
                 setActive(true);
-                this.markDirty();
+                this.setChanged();
                 markContainingBlockForUpdate(null);
             } else {
             	if(this.processMax!=0) {
 	                this.process = 0;
 	                processMax = 0;
 	                setActive(false);
-	                this.markDirty();
+	                this.setChanged();
 	                markContainingBlockForUpdate(null);
             	}
             }

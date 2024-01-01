@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -38,7 +38,7 @@ public class FHBiomes {
 //    public static RegistryObject<Biome> RELIC = BIOME_REGISTER.register("relic", () -> new VolcanicBiome().build());
 
     public static RegistryKey<Biome> makeKey(Biome biome) {
-        return RegistryKey.getOrCreateKey(Registry.BIOME_KEY, biome.getRegistryName());
+        return RegistryKey.create(Registry.BIOME_REGISTRY, biome.getRegistryName());
     }
 
     public static void Biomes() {

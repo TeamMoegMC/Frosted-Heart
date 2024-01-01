@@ -1,19 +1,20 @@
 /*
- * Copyright (c) 2021 TeamMoeg
+ * Copyright (c) 2021-2024 TeamMoeg
  *
- * This file is part of Steam Powered.
+ * This file is part of Frosted Heart.
  *
- * Steam Powered is free software: you can redistribute it and/or modify
+ * Frosted Heart is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3.
  *
- * Steam Powered is distributed in the hope that it will be useful,
+ * Frosted Heart is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with Steam Powered. If not, see <https://www.gnu.org/licenses/>.
+ * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 package com.teammoeg.frostedheart.content.decoration.oilburner;
@@ -44,19 +45,21 @@ import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import net.minecraftforge.fluids.FluidUtil;
 
+import net.minecraft.block.AbstractBlock.Properties;
+
 public class OilBurnerBlock extends FHBaseBlock{
 
     public static final BooleanProperty LIT = BlockStateProperties.LIT;
 
     public OilBurnerBlock(String name, Properties blockProps,
                           BiFunction<Block, net.minecraft.item.Item.Properties, Item> createItemBlock) {
-        super(name, blockProps.setLightLevel(FHUtils.getLightValueLit(15)), createItemBlock);
-        this.setDefaultState(this.stateContainer.getBaseState().with(LIT, Boolean.FALSE));
+        super(name, blockProps.lightLevel(FHUtils.getLightValueLit(15)), createItemBlock);
+        this.registerDefaultState(this.stateDefinition.any().setValue(LIT, Boolean.FALSE));
     }
 
     @Override
-    protected void fillStateContainer(Builder<Block, BlockState> builder) {
-        super.fillStateContainer(builder);
+    protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
+        super.createBlockStateDefinition(builder);
         builder.add(LIT);
     }
 
@@ -71,29 +74,29 @@ public class OilBurnerBlock extends FHBaseBlock{
     }
 
     @Override
-    public void onEntityWalk(World w, BlockPos p, Entity e) {
-        if (w.getBlockState(p).get(LIT))
+    public void stepOn(World w, BlockPos p, Entity e) {
+        if (w.getBlockState(p).getValue(LIT))
             if (e instanceof LivingEntity)
-                e.setFire(60);
+                e.setSecondsOnFire(60);
     }
 
     @Override
     public void animateTick(BlockState stateIn, World worldIn, BlockPos pos, Random rand) {
         super.animateTick(stateIn, worldIn, pos, rand);
-        if (stateIn.get(LIT)) {
+        if (stateIn.getValue(LIT)) {
             for (int i = 0; i < rand.nextInt(2) + 2; ++i) {
-                ClientUtils.spawnSmokeParticles(worldIn, pos.up());
-                ClientUtils.spawnFireParticles(worldIn, pos.up());
+                ClientUtils.spawnSmokeParticles(worldIn, pos.above());
+                ClientUtils.spawnFireParticles(worldIn, pos.above());
             }
         }
     }
 
 	@Override
-	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player,
+	public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity player,
 			Hand handIn, BlockRayTraceResult hit) {
-		if (FluidUtil.interactWithFluidHandler(player, handIn,worldIn, pos,hit.getFace()))
+		if (FluidUtil.interactWithFluidHandler(player, handIn,worldIn, pos,hit.getDirection()))
 			return ActionResultType.SUCCESS;
-		return super.onBlockActivated(state, worldIn, pos, player, handIn, hit);
+		return super.use(state, worldIn, pos, player, handIn, hit);
 	}
 
 }

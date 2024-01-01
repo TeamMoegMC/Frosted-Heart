@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 TeamMoeg
+ * Copyright (c) 2021-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -14,12 +14,15 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 package com.teammoeg.frostedheart.base.item;
 
 import net.minecraft.block.Block;
 import net.minecraft.item.Food;
+
+import net.minecraft.item.Item.Properties;
 
 public class FoodBlockItem extends FHBlockItem {
     public FoodBlockItem(Block block, Properties props, Food food) {

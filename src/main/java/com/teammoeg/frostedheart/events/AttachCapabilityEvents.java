@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -41,7 +41,7 @@ public class AttachCapabilityEvents {
     @SubscribeEvent
     public static void attachToWorld(AttachCapabilitiesEvent<World> event) {
         // only attach to dimension with skylight (i.e. overworld)
-        if (!event.getObject().getDimensionType().doesFixedTimeExist()) {
+        if (!event.getObject().dimensionType().hasFixedTime()) {
             event.addCapability(ClimateData.ID, new ClimateData());
             
         }
@@ -50,9 +50,9 @@ public class AttachCapabilityEvents {
     @SubscribeEvent
     public static void attachToChunk(AttachCapabilitiesEvent<Chunk> event) {
         if (!event.getObject().isEmpty()) {
-            World world = event.getObject().getWorld();
+            World world = event.getObject().getLevel();
             ChunkPos chunkPos = event.getObject().getPos();
-            if (!world.isRemote) {
+            if (!world.isClientSide) {
                 if (!event.getCapabilities().containsKey(ChunkDataCapabilityProvider.KEY))
                     event.addCapability(ChunkDataCapabilityProvider.KEY, new ChunkData(chunkPos));
             }

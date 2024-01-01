@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -104,7 +104,7 @@ public class DrawDeskPanel extends Panel {
 
             @Override
             public void onClicked(MouseButton arg0) {
-                PacketHandler.sendToServer(new FHDrawingDeskOperationPacket(dd.getTile().getPos(), 3));
+                PacketHandler.sendToServer(new FHDrawingDeskOperationPacket(dd.getTile().getBlockPos(), 3));
             }
 
             @Override

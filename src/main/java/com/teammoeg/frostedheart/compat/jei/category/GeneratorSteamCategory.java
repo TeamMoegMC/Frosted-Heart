@@ -1,19 +1,20 @@
 /*
- * Copyright (c) 2021 TeamMoeg
+ * Copyright (c) 2021-2024 TeamMoeg
  *
- * This file is part of Immersive Industry.
+ * This file is part of Frosted Heart.
  *
- * Immersive Industry is free software: you can redistribute it and/or modify
+ * Frosted Heart is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3.
  *
- * Immersive Industry is distributed in the hope that it will be useful,
+ * Frosted Heart is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with Immersive Industry. If not, see <https://www.gnu.org/licenses/>.
+ * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 package com.teammoeg.frostedheart.compat.jei.category;
@@ -105,15 +106,15 @@ public class GeneratorSteamCategory implements IRecipeCategory<GeneratorSteamRec
         List<ITextComponent> tooltip = new ArrayList<>();
 
         if (isMouseIn(mouseX, mouseY, 8, 9, 2, 54)) {
-            tooltip.add(GuiUtils.translateGui("generator.temperature.level").appendString(String.valueOf(recipe.tempMod)));
+            tooltip.add(GuiUtils.translateGui("generator.temperature.level").append(String.valueOf(recipe.tempMod)));
         }
 
         if (isMouseIn(mouseX, mouseY, 157, 9, 2, 54)) {
-            tooltip.add(GuiUtils.translateGui("generator.range.level").appendString(String.valueOf(recipe.rangeMod)));
+            tooltip.add(GuiUtils.translateGui("generator.range.level").append(String.valueOf(recipe.rangeMod)));
         }
 
         if (isMouseIn(mouseX, mouseY, 142, 9, 2, 54)) {
-            tooltip.add(GuiUtils.translateGui("generator.power.level").appendString(String.valueOf(recipe.power)));
+            tooltip.add(GuiUtils.translateGui("generator.power.level").append(String.valueOf(recipe.power)));
         }
         return tooltip;
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 TeamMoeg
+ * Copyright (c) 2021-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -14,6 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 package com.teammoeg.frostedheart.util;
@@ -31,29 +32,29 @@ public class FHProps {
     }
 
     public static final AbstractBlock.Properties stoneDecoProps = AbstractBlock.Properties
-            .create(Material.ROCK)
+            .of(Material.STONE)
             .sound(SoundType.STONE)
-            .setRequiresTool()
+            .requiresCorrectToolForDrops()
             .harvestTool(ToolType.PICKAXE)
-            .hardnessAndResistance(2, 10);
+            .strength(2, 10);
     public static final AbstractBlock.Properties metalDecoProps = AbstractBlock.Properties
-            .create(Material.IRON)
+            .of(Material.METAL)
             .sound(SoundType.METAL)
-            .setRequiresTool()
+            .requiresCorrectToolForDrops()
             .harvestTool(ToolType.PICKAXE)
-            .hardnessAndResistance(2, 10);
+            .strength(2, 10);
     public static final AbstractBlock.Properties cropProps = AbstractBlock.Properties
-            .create(Material.PLANTS)
-            .doesNotBlockMovement()
-            .tickRandomly()
-            .zeroHardnessAndResistance()
+            .of(Material.PLANT)
+            .noCollission()
+            .randomTicks()
+            .instabreak()
             .sound(SoundType.CROP);
     public static final AbstractBlock.Properties ore_gravel = AbstractBlock.Properties
-            .create(Material.SAND)
-            .sound(SoundType.GROUND)
-            .setRequiresTool()
+            .of(Material.SAND)
+            .sound(SoundType.GRAVEL)
+            .requiresCorrectToolForDrops()
             .harvestTool(ToolType.SHOVEL)
-            .hardnessAndResistance(0.6F);
-    public static final Item.Properties itemProps = new Item.Properties().group(FHMain.itemGroup);
-    public static final AbstractBlock.Properties berryBushBlocks = AbstractBlock.Properties.create(Material.PLANTS).tickRandomly().doesNotBlockMovement().sound(SoundType.SWEET_BERRY_BUSH);
+            .strength(0.6F);
+    public static final Item.Properties itemProps = new Item.Properties().tab(FHMain.itemGroup);
+    public static final AbstractBlock.Properties berryBushBlocks = AbstractBlock.Properties.of(Material.PLANT).randomTicks().noCollission().sound(SoundType.SWEET_BERRY_BUSH);
 }

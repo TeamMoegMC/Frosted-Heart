@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 TeamMoeg
+ * Copyright (c) 2021-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -14,6 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 package com.teammoeg.frostedheart.content.steamenergy.charger;
@@ -58,7 +59,7 @@ public class ChargerRecipe extends IESerializableRecipe {
     }
 
     @Override
-    public ItemStack getRecipeOutput() {
+    public ItemStack getResultItem() {
         return this.output;
     }
 
@@ -81,22 +82,22 @@ public class ChargerRecipe extends IESerializableRecipe {
         public ChargerRecipe readFromJson(ResourceLocation recipeId, JsonObject json) {
             ItemStack output = readOutput(json.get("result"));
             IngredientWithSize input = IngredientWithSize.deserialize(json.get("input"));
-            float cost = JSONUtils.getInt(json, "cost");
+            float cost = JSONUtils.getAsInt(json, "cost");
             return new ChargerRecipe(recipeId, output, input, cost);
         }
 
         @Nullable
         @Override
-        public ChargerRecipe read(ResourceLocation recipeId, PacketBuffer buffer) {
-            ItemStack output = buffer.readItemStack();
+        public ChargerRecipe fromNetwork(ResourceLocation recipeId, PacketBuffer buffer) {
+            ItemStack output = buffer.readItem();
             IngredientWithSize input = IngredientWithSize.read(buffer);
             float cost = buffer.readFloat();
             return new ChargerRecipe(recipeId, output, input, cost);
         }
 
         @Override
-        public void write(PacketBuffer buffer, ChargerRecipe recipe) {
-            buffer.writeItemStack(recipe.output);
+        public void toNetwork(PacketBuffer buffer, ChargerRecipe recipe) {
+            buffer.writeItem(recipe.output);
             recipe.input.write(buffer);
             buffer.writeFloat(recipe.cost);
         }

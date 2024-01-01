@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 TeamMoeg
+ * Copyright (c) 2021-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -14,6 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 package com.teammoeg.frostedheart.content.generator.t2;
@@ -34,7 +35,7 @@ public class T2GeneratorContainer extends IEBaseContainer<T2GeneratorTileEntity>
 
         this.addSlot(new IESlot(this, this.inv, 0, 80, 12) {
             @Override
-            public boolean isItemValid(ItemStack itemStack) {
+            public boolean mayPlace(ItemStack itemStack) {
                 return GeneratorRecipe.findRecipe(itemStack) != null;
             }
         });
@@ -49,7 +50,7 @@ public class T2GeneratorContainer extends IEBaseContainer<T2GeneratorTileEntity>
         for (int i = 0; i < 9; i++)
             addSlot(new Slot(inventoryPlayer, i, 8 + i * 18, 142));
         data = tile.guiData;
-        trackIntArray(data);
+        addDataSlots(data);
     }
 }
 

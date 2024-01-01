@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -59,7 +59,7 @@ public interface DefrostRecipe extends IRecipe<IInventory> {
 
         public ItemStack readOutput(JsonElement json) {
             if (json.isJsonObject())
-                return ShapedRecipe.deserializeItem(json.getAsJsonObject());
+                return ShapedRecipe.itemFromJson(json.getAsJsonObject());
             String s1 = json.getAsString();
             ResourceLocation resourcelocation = new ResourceLocation(s1);
             return new ItemStack(Registry.ITEM.getOptional(resourcelocation).orElseThrow(() -> {
@@ -69,10 +69,10 @@ public interface DefrostRecipe extends IRecipe<IInventory> {
 
         @Override
         public T readFromJson(ResourceLocation recipeId, JsonObject json) {
-            String s = JSONUtils.getString(json, "group", "");
-            JsonElement jsonelement = JSONUtils.isJsonArray(json, "ingredient") ? JSONUtils.getJsonArray(json, "ingredient")
-                    : JSONUtils.getJsonObject(json, "ingredient");
-            Ingredient ingredient = Ingredient.deserialize(jsonelement);
+            String s = JSONUtils.getAsString(json, "group", "");
+            JsonElement jsonelement = JSONUtils.isArrayNode(json, "ingredient") ? JSONUtils.getAsJsonArray(json, "ingredient")
+                    : JSONUtils.getAsJsonObject(json, "ingredient");
+            Ingredient ingredient = Ingredient.fromJson(jsonelement);
             ItemStack[] itemstacks = null;
 
             if (json.get("results") != null && json.get("results").isJsonArray()) {
@@ -86,32 +86,32 @@ public interface DefrostRecipe extends IRecipe<IInventory> {
                 itemstacks[0] = readOutput(json.get("result"));
             } else
                 throw new com.google.gson.JsonSyntaxException("Missing result, expected to find a string or object");
-            float f = JSONUtils.getFloat(json, "experience", 0.0F);
-            int i = JSONUtils.getInt(json, "cookingtime", 100);
+            float f = JSONUtils.getAsFloat(json, "experience", 0.0F);
+            int i = JSONUtils.getAsInt(json, "cookingtime", 100);
             return factory.create(recipeId, s, ingredient, itemstacks != null ? itemstacks : new ItemStack[0], f, i);
         }
 
         @Nullable
         @Override
-        public T read(ResourceLocation recipeId, PacketBuffer buffer) {
-            String s = buffer.readString();
-            Ingredient ingredient = Ingredient.read(buffer);
+        public T fromNetwork(ResourceLocation recipeId, PacketBuffer buffer) {
+            String s = buffer.readUtf();
+            Ingredient ingredient = Ingredient.fromNetwork(buffer);
             int itemlen = buffer.readVarInt();
             ItemStack[] itemstacks = new ItemStack[itemlen];
             for (int i = 0; i < itemlen; i++)
-                itemstacks[i] = buffer.readItemStack();
+                itemstacks[i] = buffer.readItem();
             float f = buffer.readFloat();
             int i = buffer.readVarInt();
             return factory.create(recipeId, s, ingredient, itemstacks, f, i);
         }
 
         @Override
-        public void write(PacketBuffer buffer, DefrostRecipe recipe) {
-            buffer.writeString(recipe.getGroup());
-            recipe.getIngredient().write(buffer);
+        public void toNetwork(PacketBuffer buffer, DefrostRecipe recipe) {
+            buffer.writeUtf(recipe.getGroup());
+            recipe.getIngredient().toNetwork(buffer);
             buffer.writeVarInt(recipe.getIss().length);
             for (int i = 0; i < recipe.getIss().length; i++)
-                buffer.writeItemStack(recipe.getIss()[i]);
+                buffer.writeItem(recipe.getIss()[i]);
 
         }
     }

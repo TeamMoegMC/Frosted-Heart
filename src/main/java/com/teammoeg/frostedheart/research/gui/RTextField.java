@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -96,11 +96,11 @@ public class RTextField extends Widget {
         Theme theme = getGui().getTheme();
 
         if (maxLine > 0) {
-            List<ITextProperties> ls = theme.listFormattedStringToWidth(new StringTextComponent("").appendSibling(txt),
+            List<ITextProperties> ls = theme.listFormattedStringToWidth(new StringTextComponent("").append(txt),
                     (int) (maxWidth / scale));
             formattedText = ls.subList(0, Math.min(ls.size(), (int) (maxLine / scale))).toArray(new ITextProperties[0]);
         } else {
-            formattedText = theme.listFormattedStringToWidth(new StringTextComponent("").appendSibling(txt), (int) (maxWidth / scale))
+            formattedText = theme.listFormattedStringToWidth(new StringTextComponent("").append(txt), (int) (maxWidth / scale))
                     .toArray(new ITextProperties[0]);
         }
 
@@ -147,7 +147,7 @@ public class RTextField extends Widget {
                             textFlags);
                 }
             } else {
-                matrixStack.push();
+                matrixStack.pushPose();
                 matrixStack.translate(tx, ty, 0.0D);
                 matrixStack.scale(scale, scale, 1.0F);
 
@@ -156,7 +156,7 @@ public class RTextField extends Widget {
                     theme.drawString(matrixStack, formattedText[i], 0.0F, i * textSpacing, col, textFlags);
                 }
 
-                matrixStack.pop();
+                matrixStack.popPose();
             }
         }
     }

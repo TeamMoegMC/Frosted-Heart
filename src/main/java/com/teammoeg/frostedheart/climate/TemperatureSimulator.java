@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -56,7 +56,7 @@ public class TemperatureSimulator {
 	private static final int rdiff = 10;
 	private static final float v0 = .4f;
 	private static final VoxelShape EMPTY=VoxelShapes.empty();
-	private static final VoxelShape FULL=VoxelShapes.fullCube();
+	private static final VoxelShape FULL=VoxelShapes.block();
 	private double[] qx = new double[n], qy = new double[n], qz = new double[n];// Qpos, position of particle.
 	private static float[] vx = new float[n], vy = new float[n], vz = new float[n];// Vp, speed vector list, this list
 																					// is considered a distributed ball
@@ -107,7 +107,7 @@ public class TemperatureSimulator {
 	public Map<BlockPos, CachedBlockInfo> posinfo = new HashMap<>();// position to info cache
 
 	public TemperatureSimulator(ServerPlayerEntity player) {
-		int sourceX = (int) player.getPosX(), sourceY = (int) player.getPosYEye(), sourceZ = (int) player.getPosZ();
+		int sourceX = (int) player.getX(), sourceY = (int) player.getEyeY(), sourceZ = (int) player.getZ();
 		// System.out.println(sourceX+","+sourceY+","+sourceZ);
 		// these are block position offset
 		int offsetN = sourceZ - range;
@@ -122,14 +122,14 @@ public class TemperatureSimulator {
 		origin = new BlockPos((chunkOffsetW+1) << 4, (chunkOffsetD+1) << 4, (chunkOffsetN+1) << 4);
 		// fetch all sections to lower calculation cost
 		int i = 0;
-		world = player.getServerWorld();
+		world = player.getLevel();
 		for (int x = chunkOffsetW; x <= chunkOffsetW+1; x++)
 			for (int z = chunkOffsetN; z <= chunkOffsetN+1; z++) {
 				ChunkSection[] css = world.getChunk(x, z).getSections();
 				for (ChunkSection cs : css) {
 					if (cs == null)
 						continue;
-					int ynum = cs.getYLocation() >> 4;
+					int ynum = cs.bottomBlockY() >> 4;
 					if (ynum == chunkOffsetD) {
 						sections[i] = cs;
 					}
@@ -139,7 +139,7 @@ public class TemperatureSimulator {
 				}
 				i += 2;
 			}
-		rnd = new Random(player.getPosition().toLong());
+		rnd = new Random(player.blockPosition().asLong());
 	}
 
 	/**
@@ -166,11 +166,11 @@ public class TemperatureSimulator {
 			y += 16;
 		}
 		if (x >= 16 || y >= 16 || z >= 16 || x < 0 || y < 0 || z < 0) {// out of bounds
-			return Blocks.AIR.getDefaultState();
+			return Blocks.AIR.defaultBlockState();
 		}
 		ChunkSection current = sections[i];
 		if (current == null)
-			return Blocks.AIR.getDefaultState();
+			return Blocks.AIR.defaultBlockState();
 		try {
 			return current.getBlockState(x, y, z);
 		} catch (Exception ex) {
@@ -205,29 +205,29 @@ public class TemperatureSimulator {
 
 		BlockTempData b = FHDataManager.getBlockData(bs.getBlock());
 		if (b == null)
-			return new CachedBlockInfo(bs.getCollisionShape(world, pos));
+			return new CachedBlockInfo(bs.getBlockSupportShape(world, pos));
 
 		float cblocktemp = 0;
 		if (b.isLit()) {
 			boolean litOrActive = false;
-			if (bs.hasProperty(BlockStateProperties.LIT) && bs.get(BlockStateProperties.LIT))
+			if (bs.hasProperty(BlockStateProperties.LIT) && bs.getValue(BlockStateProperties.LIT))
 				litOrActive = true;
 			if (litOrActive)
 				cblocktemp += b.getTemp();
 		} else
 			cblocktemp += b.getTemp();
 		if (b.isLevel()) {
-			if (bs.hasProperty(BlockStateProperties.LEVEL_0_15)) {
-				cblocktemp *= (bs.get(BlockStateProperties.LEVEL_0_15) + 1) / 16;
-			} else if (bs.hasProperty(BlockStateProperties.LEVEL_0_8)) {
-				cblocktemp *= (bs.get(BlockStateProperties.LEVEL_0_8) + 1) / 9;
-			} else if (bs.hasProperty(BlockStateProperties.LEVEL_1_8)) {
-				cblocktemp *= (bs.get(BlockStateProperties.LEVEL_1_8)) / 8;
-			} else if (bs.hasProperty(BlockStateProperties.LEVEL_0_3)) {
-				cblocktemp *= (bs.get(BlockStateProperties.LEVEL_0_3) + 1) / 4;
+			if (bs.hasProperty(BlockStateProperties.LEVEL)) {
+				cblocktemp *= (bs.getValue(BlockStateProperties.LEVEL) + 1) / 16;
+			} else if (bs.hasProperty(BlockStateProperties.LEVEL_COMPOSTER)) {
+				cblocktemp *= (bs.getValue(BlockStateProperties.LEVEL_COMPOSTER) + 1) / 9;
+			} else if (bs.hasProperty(BlockStateProperties.LEVEL_FLOWING)) {
+				cblocktemp *= (bs.getValue(BlockStateProperties.LEVEL_FLOWING)) / 8;
+			} else if (bs.hasProperty(BlockStateProperties.LEVEL_CAULDRON)) {
+				cblocktemp *= (bs.getValue(BlockStateProperties.LEVEL_CAULDRON) + 1) / 4;
 			}
 		}
-		return new CachedBlockInfo(bs.getCollisionShape(world, pos), cblocktemp);
+		return new CachedBlockInfo(bs.getBlockSupportShape(world, pos), cblocktemp);
 	}
 
 	/**
@@ -239,7 +239,7 @@ public class TemperatureSimulator {
 			return true;
 		if (info.shape == EMPTY)
 			return false;
-		return info.shape.contains(MathHelper.frac(x), MathHelper.frac(y), MathHelper.frac(z));
+		return info.shape.isFullWide(MathHelper.frac(x), MathHelper.frac(y), MathHelper.frac(z));
 
 	}
 

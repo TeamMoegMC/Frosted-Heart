@@ -1,3 +1,22 @@
+/*
+ * Copyright (c) 2024 TeamMoeg
+ *
+ * This file is part of Frosted Heart.
+ *
+ * Frosted Heart is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3.
+ *
+ * Frosted Heart is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
 package com.teammoeg.frostedheart.trade.policy;
 
 import java.util.List;
@@ -21,12 +40,12 @@ public class DemandData extends BaseData {
 
 	public DemandData(JsonObject jo) {
 		super(jo);
-		item = Ingredient.deserialize(jo.get("demand"));
+		item = Ingredient.fromJson(jo.get("demand"));
 	}
 
 	public DemandData(PacketBuffer pb) {
 		super(pb);
-		item = Ingredient.read(pb);
+		item = Ingredient.fromNetwork(pb);
 	}
 
 	@Override
@@ -39,7 +58,7 @@ public class DemandData extends BaseData {
 	@Override
 	public JsonElement serialize() {
 		JsonObject jo = super.serialize().getAsJsonObject();
-		jo.add("demand", item.serialize());
+		jo.add("demand", item.toJson());
 		return jo;
 	}
 
@@ -47,7 +66,7 @@ public class DemandData extends BaseData {
 	public void write(PacketBuffer buffer) {
 		buffer.writeVarInt(2);
 		super.write(buffer);
-		item.write(buffer);
+		item.toNetwork(buffer);
 	}
 
 	@Override

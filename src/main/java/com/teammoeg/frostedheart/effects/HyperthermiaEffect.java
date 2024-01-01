@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 TeamMoeg
+ * Copyright (c) 2021-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -14,6 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 package com.teammoeg.frostedheart.effects;
@@ -35,21 +36,21 @@ public class HyperthermiaEffect extends Effect {
     }
 
     @Override
-    public void performEffect(LivingEntity entityLivingBaseIn, int amplifier) {
+    public void applyEffectTick(LivingEntity entityLivingBaseIn, int amplifier) {
         if (entityLivingBaseIn instanceof ServerPlayerEntity) {
             if (entityLivingBaseIn.getHealth() > 20.0F) {
-                entityLivingBaseIn.attackEntityFrom(FHDamageSources.HYPERTHERMIA, 1F);
+                entityLivingBaseIn.hurt(FHDamageSources.HYPERTHERMIA, 1F);
             } else if (entityLivingBaseIn.getHealth() > 10.0F) {
-                entityLivingBaseIn.attackEntityFrom(FHDamageSources.HYPERTHERMIA, 0.5F);
+                entityLivingBaseIn.hurt(FHDamageSources.HYPERTHERMIA, 0.5F);
             } else if (entityLivingBaseIn.getHealth() > 5.0F) {
-                entityLivingBaseIn.attackEntityFrom(FHDamageSources.HYPERTHERMIA, 0.3F);
+                entityLivingBaseIn.hurt(FHDamageSources.HYPERTHERMIA, 0.3F);
             } else {
-                entityLivingBaseIn.attackEntityFrom(FHDamageSources.HYPERTHERMIA, 0.2F);
+                entityLivingBaseIn.hurt(FHDamageSources.HYPERTHERMIA, 0.2F);
             }
         }
     }
 
-    public boolean isReady(int duration, int amplifier) {
+    public boolean isDurationEffectTick(int duration, int amplifier) {
         if (amplifier <= 1) return false;//0 or 1 does not damage
         int k = 60 >> (amplifier - 2);//2 or higher does damage
         if (k > 0) {

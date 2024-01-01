@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 TeamMoeg
+ * Copyright (c) 2021-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -14,6 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 package com.teammoeg.frostedheart.content.steamenergy.charger;
@@ -70,12 +71,12 @@ public class ChargerTileEntity extends IEBaseTileEntity implements
             ChargerRecipe cr = ChargerRecipe.findRecipe(is);
             if (cr != null) {
                 if (power >= cr.cost && is.getCount() >= cr.input.getCount()) {
-                    if (!world.isRemote) {
+                    if (!level.isClientSide) {
                         power -= cr.cost;
                         is.setCount(is.getCount() - cr.input.getCount());
                         ItemStack gain = cr.output.copy();
                         FHUtils.giveItem(pe, gain);
-                        markDirty();
+                        setChanged();
                         this.markContainingBlockForUpdate(null);
                     }
                     drawEffect();
@@ -84,16 +85,16 @@ public class ChargerTileEntity extends IEBaseTileEntity implements
             }
 
             if (power >= 100) {
-                List<SmokingRecipe> irs = this.world.getRecipeManager().getRecipesForType(IRecipeType.SMOKING);
+                List<SmokingRecipe> irs = this.level.getRecipeManager().getAllRecipesFor(IRecipeType.SMOKING);
                 for (SmokingRecipe sr : irs) {
                     if (sr.getIngredients().iterator().next().test(is)) {
-                        if (!world.isRemote) {
-                            power -= sr.getCookTime() / 20;
-                            splitAndSpawnExperience(pe.getEntityWorld(), pe.getPosition(), sr.getExperience());
+                        if (!level.isClientSide) {
+                            power -= sr.getCookingTime() / 20;
+                            splitAndSpawnExperience(pe.getCommandSenderWorld(), pe.blockPosition(), sr.getExperience());
                             is.setCount(is.getCount() - 1);
-                            ItemStack gain = sr.getCraftingResult(null).copy();
+                            ItemStack gain = sr.assemble(null).copy();
                             FHUtils.giveItem(pe, gain);
-                            markDirty();
+                            setChanged();
                             this.markContainingBlockForUpdate(null);
                         }
                         drawEffect();
@@ -105,13 +106,13 @@ public class ChargerTileEntity extends IEBaseTileEntity implements
                 Collection<CampfireDefrostRecipe> irs = CampfireDefrostRecipe.recipeList.values();
                 for (CampfireDefrostRecipe sr : irs) {
                     if (sr.getIngredient().test(is)) {
-                        if (!world.isRemote) {
-                            power -= sr.getCookTime() / 80;
-                            splitAndSpawnExperience(pe.getEntityWorld(), pe.getPosition(), sr.getExperience());
+                        if (!level.isClientSide) {
+                            power -= sr.getCookingTime() / 80;
+                            splitAndSpawnExperience(pe.getCommandSenderWorld(), pe.blockPosition(), sr.getExperience());
                             is.setCount(is.getCount() - 1);
-                            ItemStack gain = sr.getCraftingResult(null).copy();
+                            ItemStack gain = sr.assemble(null).copy();
                             FHUtils.giveItem(pe, gain);
-                            markDirty();
+                            setChanged();
                             this.markContainingBlockForUpdate(null);
                         }
                         drawEffect();
@@ -131,16 +132,16 @@ public class ChargerTileEntity extends IEBaseTileEntity implements
         }
 
         while (i > 0) {
-            int j = ExperienceOrbEntity.getXPSplit(i);
+            int j = ExperienceOrbEntity.getExperienceValue(i);
             i -= j;
-            world.addEntity(new ExperienceOrbEntity(world, pos.getX(), pos.getY(), pos.getZ(), j));
+            world.addFreshEntity(new ExperienceOrbEntity(world, pos.getX(), pos.getY(), pos.getZ(), j));
         }
 
     }
 
     public void drawEffect() {
-        if (world != null && world.isRemote) {
-            ClientUtils.spawnSteamParticles(world, this.getPos());
+        if (level != null && level.isClientSide) {
+            ClientUtils.spawnSteamParticles(level, this.getBlockPos());
         }
     }
 
@@ -157,7 +158,7 @@ public class ChargerTileEntity extends IEBaseTileEntity implements
     @Override
     public boolean connect(Direction to, int dist) {
 
-        return network.reciveConnection(world, pos, to, dist);
+        return network.reciveConnection(level, worldPosition, to, dist);
     }
 
 
@@ -166,31 +167,31 @@ public class ChargerTileEntity extends IEBaseTileEntity implements
     }
 
     public Direction getDirection() {
-        return this.getBlockState().get(BlockStateProperties.FACING);
+        return this.getBlockState().getValue(BlockStateProperties.FACING);
     }
 
     @Override
     public void tick() {
-        if (!world.isRemote) {
+        if (!level.isClientSide) {
             if (network.isValid()) {
                 network.tick();
                 float actual = network.drainHeat(Math.min(200, (getMaxPower() - power) / 0.8F));
                 if (actual > 0) {
                     power += actual * 0.8;
                     this.setActive(true);
-                    markDirty();
+                    setChanged();
                     this.markContainingBlockForUpdate(null);
                 } else
                     this.setActive(false);
             } else this.setActive(false);
         } else if (getIsActive()) {
-            ClientUtils.spawnSteamParticles(this.getWorld(), pos);
+            ClientUtils.spawnSteamParticles(this.getLevel(), worldPosition);
         }
     }
 
     @Override
     public boolean canConnectAt(Direction dir) {
-        Direction bd = this.getBlockState().get(BlockStateProperties.FACING);
+        Direction bd = this.getBlockState().getValue(BlockStateProperties.FACING);
         return dir == bd || (bd != Direction.DOWN && dir == Direction.DOWN) || (bd == Direction.UP && dir == Direction.NORTH) || (bd == Direction.DOWN && dir == Direction.SOUTH);
     }
 

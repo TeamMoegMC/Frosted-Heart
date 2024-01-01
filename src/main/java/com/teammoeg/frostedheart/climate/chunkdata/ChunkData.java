@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 TeamMoeg
+ * Copyright (c) 2021-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -14,6 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 package com.teammoeg.frostedheart.climate.chunkdata;
@@ -84,9 +85,9 @@ public class ChunkData implements ICapabilitySerializable<CompoundNBT> {
         //if (data == null) {
         //System.out.println("no cache at"+pos);
         if (world instanceof IWorld)
-            return ((IWorld) world).getChunkProvider().isChunkLoaded(pos) ? getCapability(world.getChunk(pos.asBlockPos()))
+            return ((IWorld) world).getChunkSource().isEntityTickingChunk(pos) ? getCapability(world.getChunk(pos.getWorldPosition()))
                     .orElse(ChunkData.EMPTY) : ChunkData.EMPTY;
-        return world.chunkExists(pos.x, pos.z) ? getCapability(world.getChunk(pos.asBlockPos()))
+        return world.hasChunk(pos.x, pos.z) ? getCapability(world.getChunk(pos.getWorldPosition()))
                 .orElse(ChunkData.EMPTY) : ChunkData.EMPTY;
         //}
         //return data;
@@ -108,7 +109,7 @@ public class ChunkData implements ICapabilitySerializable<CompoundNBT> {
      * Updates server side cache first.
      */
     private static void addChunkAdjust(IWorld world, ChunkPos chunkPos, ITemperatureAdjust adjx) {
-        if (world != null && !world.isRemote()) {
+        if (world != null && !world.isClientSide()) {
             IChunk chunk = world.getChunk(chunkPos.x, chunkPos.z);
             ChunkData data = ChunkData.getCapability(chunk).orElseGet(() -> null);
             if (data != null) {
@@ -125,7 +126,7 @@ public class ChunkData implements ICapabilitySerializable<CompoundNBT> {
      * Updates server side cache first. Then send a sync packet to every client.
      */
     private static void removeChunkAdjust(IWorld world, ChunkPos chunkPos, BlockPos src) {
-        if (world != null && !world.isRemote()) {
+        if (world != null && !world.isClientSide()) {
             IChunk chunk = world.getChunk(chunkPos.x, chunkPos.z);
             ChunkData data = ChunkData.getCapability(chunk).orElseGet(() -> null);
             if (data != null)
@@ -140,7 +141,7 @@ public class ChunkData implements ICapabilitySerializable<CompoundNBT> {
      * Updates server side cache first. Then send a sync packet to every client.
      */
     private static void removeChunkAdjust(IWorld world, ChunkPos chunkPos, ITemperatureAdjust adj) {
-        if (world != null && !world.isRemote()) {
+        if (world != null && !world.isClientSide()) {
             IChunk chunk = world.getChunk(chunkPos.x, chunkPos.z);
             ChunkData data = ChunkData.getCapability(chunk).orElseGet(() -> null);
             if (data != null)
@@ -422,7 +423,7 @@ public class ChunkData implements ICapabilitySerializable<CompoundNBT> {
      */
     private static final class Immutable extends ChunkData {
         private Immutable() {
-            super(new ChunkPos(ChunkPos.SENTINEL));
+            super(new ChunkPos(ChunkPos.INVALID_CHUNK_POS));
         }
 
         @Override

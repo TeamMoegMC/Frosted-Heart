@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -239,7 +239,7 @@ public class ResearchData implements VariantProvider{
         // first do simple verify
         for (IngredientWithSize iws : research.getRequiredItems()) {
             int count = iws.getCount();
-            for (ItemStack it : player.inventory.mainInventory) {
+            for (ItemStack it : player.inventory.items) {
                 if (iws.testIgnoringSize(it)) {
                     count -= it.getCount();
                     if (count <= 0)
@@ -253,7 +253,7 @@ public class ResearchData implements VariantProvider{
         List<ItemStack> ret = new ArrayList<>();
         for (IngredientWithSize iws : research.getRequiredItems()) {
             int count = iws.getCount();
-            for (ItemStack it : player.inventory.mainInventory) {
+            for (ItemStack it : player.inventory.items) {
                 if (iws.testIgnoringSize(it)) {
                     int redcount = Math.min(count, it.getCount());
                     ret.add(it.split(redcount));

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -44,6 +44,8 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 
+import net.minecraft.item.Item.Properties;
+
 public class CoalHandStove extends FHBaseItem implements IHeatingEquipment {
     public final static int max_fuel = 800;
 
@@ -57,11 +59,11 @@ public class CoalHandStove extends FHBaseItem implements IHeatingEquipment {
     }
 
     @Override
-    public void addInformation(ItemStack stack, @Nullable World world, List<ITextComponent> list, ITooltipFlag flag) {
-        list.add(GuiUtils.translateTooltip("handstove.add_fuel").mergeStyle(TextFormatting.GRAY));
+    public void appendHoverText(ItemStack stack, @Nullable World world, List<ITextComponent> list, ITooltipFlag flag) {
+        list.add(GuiUtils.translateTooltip("handstove.add_fuel").withStyle(TextFormatting.GRAY));
         if (getAshAmount(stack) >= 800)
-            list.add(GuiUtils.translateTooltip("handstove.trash_ash").mergeStyle(TextFormatting.RED));
-        list.add(GuiUtils.translateTooltip("handstove.fuel", getFuelAmount(stack) / 2).mergeStyle(TextFormatting.GRAY));
+            list.add(GuiUtils.translateTooltip("handstove.trash_ash").withStyle(TextFormatting.RED));
+        list.add(GuiUtils.translateTooltip("handstove.fuel", getFuelAmount(stack) / 2).withStyle(TextFormatting.GRAY));
     }
 
     @Override
@@ -110,35 +112,35 @@ public class CoalHandStove extends FHBaseItem implements IHeatingEquipment {
     }
 
     @Override
-    public UseAction getUseAction(ItemStack stack) {
+    public UseAction getUseAnimation(ItemStack stack) {
         return UseAction.EAT;
     }
 
     ResourceLocation ashitem = new ResourceLocation("frostedheart", "ash");
 
     @Override
-    public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand handIn) {
-        ItemStack stack = playerIn.getHeldItem(handIn);
+    public ActionResult<ItemStack> use(World worldIn, PlayerEntity playerIn, Hand handIn) {
+        ItemStack stack = playerIn.getItemInHand(handIn);
         ActionResult<ItemStack> FAIL = new ActionResult<>(ActionResultType.FAIL, stack);
-        if (getAshAmount(playerIn.getHeldItem(handIn)) >= 800) {
-            playerIn.setActiveHand(handIn);
+        if (getAshAmount(playerIn.getItemInHand(handIn)) >= 800) {
+            playerIn.startUsingItem(handIn);
             return new ActionResult<>(ActionResultType.SUCCESS, stack);
         }
         return FAIL;
     }
 
     @Override
-    public ItemStack onItemUseFinish(ItemStack stack, World worldIn, LivingEntity entityLiving) {
+    public ItemStack finishUsingItem(ItemStack stack, World worldIn, LivingEntity entityLiving) {
         int ash = getAshAmount(stack);
         if (ash >= 800) {
-            ITag<Item> item = TagCollectionManager.getManager().getItemTags().get(ashitem);
+            ITag<Item> item = TagCollectionManager.getInstance().getItems().getTag(ashitem);
             setAshAmount(stack, ash - 800);
             if (getFuelAmount(stack) < 2)
                 stack.getTag().putInt("CustomModelData", 0);
             else
                 stack.getTag().putInt("CustomModelData", 1);
-            if (item != null && entityLiving instanceof PlayerEntity && !item.getAllElements().isEmpty()) {
-                ItemStack ret = new ItemStack(item.getAllElements().get(0));
+            if (item != null && entityLiving instanceof PlayerEntity && !item.getValues().isEmpty()) {
+                ItemStack ret = new ItemStack(item.getValues().get(0));
                 FHUtils.giveItem((PlayerEntity) entityLiving, ret);
             }
         }

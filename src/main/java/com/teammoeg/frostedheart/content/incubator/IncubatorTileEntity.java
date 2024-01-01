@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -104,7 +104,7 @@ public class IncubatorTileEntity extends FHBaseTileEntity implements ITickableTi
 		if(i==1)
 			return IncubateRecipe.canBeCatalyst(itemStack)||itemStack.getItem()==Items.ROTTEN_FLESH;
 		if(i==2)
-			return IncubateRecipe.canBeInput(itemStack)||itemStack.isFood();
+			return IncubateRecipe.canBeInput(itemStack)||itemStack.isEdible();
 		if (i == 3)
 			return false;
 		return true;
@@ -145,14 +145,14 @@ public class IncubatorTileEntity extends FHBaseTileEntity implements ITickableTi
     @Override
     public void markBlockForUpdate(BlockPos pos, BlockState newState)
 	{
-		BlockState state = world.getBlockState(pos);
+		BlockState state = level.getBlockState(pos);
 		if(newState==null)
 			newState = state;
-		world.notifyBlockUpdate(pos, state, newState, 3);
+		level.sendBlockUpdated(pos, state, newState, 3);
 	}
 	@Override
 	public void tick() {
-		if (!this.world.isRemote) {
+		if (!this.level.isClientSide) {
 			if (process > 0) {
 				if(efficiency<=0.005) {
 					out=ItemStack.EMPTY;
@@ -161,7 +161,7 @@ public class IncubatorTileEntity extends FHBaseTileEntity implements ITickableTi
 					efficiency=0;
 					lprocess=0;
 					this.setActive(false);
-					this.markDirty();
+					this.setChanged();
 					this.markContainingBlockForUpdate(null);
 					return;
 				}
@@ -190,7 +190,7 @@ public class IncubatorTileEntity extends FHBaseTileEntity implements ITickableTi
 							}else
 								efficiency-=0.005;
 							this.setActive(false);
-							this.markDirty();
+							this.setChanged();
 							this.markContainingBlockForUpdate(null);
 							return;
 						}
@@ -209,7 +209,7 @@ public class IncubatorTileEntity extends FHBaseTileEntity implements ITickableTi
 					this.setActive(false);
 				}
 		
-				this.markDirty();
+				this.setChanged();
 				this.markContainingBlockForUpdate(null);
 				return;
 			} else if (!out.isEmpty() || !outfluid.isEmpty()) {
@@ -248,7 +248,7 @@ public class IncubatorTileEntity extends FHBaseTileEntity implements ITickableTi
 							outfluid = ir.output_fluid.copy();
 							isFoodRecipe = false;
 							lprocess=0;
-							this.markDirty();
+							this.setChanged();
 							this.markContainingBlockForUpdate(null);
 							return;
 						}
@@ -257,18 +257,18 @@ public class IncubatorTileEntity extends FHBaseTileEntity implements ITickableTi
 					ItemStack catalyst=inventory.get(1);
 					
 					ItemStack in=inventory.get(2);
-					if(!in.isEmpty()&&in.isFood()) {
+					if(!in.isEmpty()&&in.isEdible()) {
 						if(!catalyst.isEmpty()&&catalyst.getItem()==Items.ROTTEN_FLESH&&(efficiency<=0.01||!isFoodRecipe)) {
 							isFoodRecipe=true;
 							last=food;
 							catalyst.shrink(1);
 							efficiency = 0.2f;
-							this.markDirty();
+							this.setChanged();
 							this.markContainingBlockForUpdate(null);
 							return;
 						}
 						if(efficiency>0.01) {
-							int value=in.getItem().getFood().getHealing();
+							int value=in.getItem().getFoodProperties().getNutrition();
 							if(in.getItem() instanceof StewItem) {
 								value=ThermopoliumApi.getInfo(in).healing;
 								
@@ -282,7 +282,7 @@ public class IncubatorTileEntity extends FHBaseTileEntity implements ITickableTi
 							process = processMax = 20 * 20*value;
 							water=1;
 							this.setActive(true);
-							this.markDirty();
+							this.setChanged();
 							this.markContainingBlockForUpdate(null);
 							return;
 						}
@@ -300,7 +300,7 @@ public class IncubatorTileEntity extends FHBaseTileEntity implements ITickableTi
 				}
 				this.setActive(false);
 				if(changed) {
-					this.markDirty();
+					this.setChanged();
 					this.markContainingBlockForUpdate(null);
 				}
 				
@@ -324,7 +324,7 @@ public class IncubatorTileEntity extends FHBaseTileEntity implements ITickableTi
 			last=new ResourceLocation(compound.getString("last"));
 			water = compound.getInt("water");
 			ItemStackHelper.loadAllItems(compound, this.inventory);
-			out = ItemStack.read(compound.getCompound("out"));
+			out = ItemStack.of(compound.getCompound("out"));
 			outfluid = FluidStack.loadFluidStackFromNBT(compound.getCompound("outfluid"));
 		}
 	}

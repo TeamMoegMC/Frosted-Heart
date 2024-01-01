@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -77,7 +77,7 @@ public class EffectCrafting extends Effect {
     private void initItem() {
     	unlocks.clear();
         for (IRecipe<?> r : FHResearchDataManager.getRecipeManager().getRecipes()) {
-            if (r.getRecipeOutput().getItem().equals(this.item)) {
+            if (r.getResultItem().getItem().equals(this.item)) {
                 unlocks.add(r);
             }
         }
@@ -86,7 +86,7 @@ public class EffectCrafting extends Effect {
     private void initStack() {
     	unlocks.clear();
         for (IRecipe<?> r : FHResearchDataManager.getRecipeManager().getRecipes()) {
-            if (r.getRecipeOutput().equals(item)) {
+            if (r.getResultItem().equals(item)) {
                 unlocks.add(r);
             }
         }
@@ -98,13 +98,13 @@ public class EffectCrafting extends Effect {
 		}else if(itemStack!=null) {
 			initStack();
 		}else {
-			unlocks.replaceAll(o->FHResearchDataManager.getRecipeManager().getRecipe(o.getId()).orElse(null));
+			unlocks.replaceAll(o->FHResearchDataManager.getRecipeManager().byKey(o.getId()).orElse(null));
 			unlocks.removeIf(o->o==null);
 		}
 	}
     public EffectCrafting(ResourceLocation recipe) {
         super("@gui." + FHMain.MODID + ".effect.crafting", new ArrayList<>());
-        Optional<? extends IRecipe<?>> r = FHResearchDataManager.getRecipeManager().getRecipe(recipe);
+        Optional<? extends IRecipe<?>> r = FHResearchDataManager.getRecipeManager().byKey(recipe);
 
         if (r.isPresent()) {
             unlocks.add(r.get());
@@ -114,7 +114,7 @@ public class EffectCrafting extends Effect {
     public void setList(Collection<String> ls) {
         unlocks.clear();
         for (String s : ls) {
-            Optional<? extends IRecipe<?>> r = FHResearchDataManager.getRecipeManager().getRecipe(new ResourceLocation(s));
+            Optional<? extends IRecipe<?>> r = FHResearchDataManager.getRecipeManager().byKey(new ResourceLocation(s));
 
             if (r.isPresent()) {
                 unlocks.add(r.get());
@@ -134,7 +134,7 @@ public class EffectCrafting extends Effect {
                 initStack();
             }
         } else if (jo.has("recipes")) {
-            unlocks = SerializeUtil.parseJsonElmList(jo.get("recipes"), e -> FHResearchDataManager.getRecipeManager().getRecipe(new ResourceLocation(e.getAsString())).orElse(null));
+            unlocks = SerializeUtil.parseJsonElmList(jo.get("recipes"), e -> FHResearchDataManager.getRecipeManager().byKey(new ResourceLocation(e.getAsString())).orElse(null));
             unlocks.removeIf(Objects::isNull);
         }
     }
@@ -143,9 +143,9 @@ public class EffectCrafting extends Effect {
         super(pb);
         item = SerializeUtil.readOptional(pb, p -> p.readRegistryIdUnsafe(ForgeRegistries.ITEMS)).orElse(null);
         if (item == null) {
-            itemStack = SerializeUtil.readOptional(pb, PacketBuffer::readItemStack).orElse(null);
+            itemStack = SerializeUtil.readOptional(pb, PacketBuffer::readItem).orElse(null);
             if (itemStack == null) {
-                unlocks = SerializeUtil.readList(pb, p -> FHResearchDataManager.getRecipeManager().getRecipe(p.readResourceLocation()).orElse(null));
+                unlocks = SerializeUtil.readList(pb, p -> FHResearchDataManager.getRecipeManager().byKey(p.readResourceLocation()).orElse(null));
                 unlocks.removeIf(Objects::isNull);
             } else initStack();
         } else initItem();
@@ -190,7 +190,7 @@ public class EffectCrafting extends Effect {
         super.write(buffer);
         SerializeUtil.writeOptional(buffer, item, (o, b) -> b.writeRegistryIdUnsafe(ForgeRegistries.ITEMS, o));
         if (item == null) {
-            SerializeUtil.writeOptional2(buffer, itemStack, PacketBuffer::writeItemStack);
+            SerializeUtil.writeOptional2(buffer, itemStack, PacketBuffer::writeItem);
             if (itemStack == null)
                 SerializeUtil.writeList(buffer, unlocks, (o, b) -> b.writeResourceLocation(o.getId()));
         }
@@ -205,8 +205,8 @@ public class EffectCrafting extends Effect {
         else {
             Set<ItemStack> stacks = new HashSet<>();
             for (IRecipe<?> r : unlocks) {
-                if (!r.getRecipeOutput().isEmpty()) {
-                    stacks.add(r.getRecipeOutput());
+                if (!r.getResultItem().isEmpty()) {
+                    stacks.add(r.getResultItem());
                 }
             }
             if (!stacks.isEmpty())
@@ -225,21 +225,21 @@ public class EffectCrafting extends Effect {
         List<ITextComponent> tooltip = new ArrayList<>();
 
         if (item != null)
-            tooltip.add(new TranslationTextComponent(item.getTranslationKey()));
+            tooltip.add(new TranslationTextComponent(item.getDescriptionId()));
         else if (itemStack != null)
-            tooltip.add(itemStack.getDisplayName());
+            tooltip.add(itemStack.getHoverName());
         else {
             Set<ItemStack> stacks = new HashSet<>();
             for (IRecipe<?> r : unlocks) {
-                if (!r.getRecipeOutput().isEmpty()) {
-                    stacks.add(r.getRecipeOutput());
+                if (!r.getResultItem().isEmpty()) {
+                    stacks.add(r.getResultItem());
                 }
             }
             if (stacks.isEmpty())
                 tooltip.add(GuiUtils.translateGui("effect.recipe.error"));
             else
                 for (ItemStack is : stacks) {
-                    tooltip.add(is.getDisplayName());
+                    tooltip.add(is.getHoverName());
                 }
         }
 
@@ -249,9 +249,9 @@ public class EffectCrafting extends Effect {
     @Override
     public String getBrief() {
         if (item != null)
-            return "Craft " + new TranslationTextComponent(item.getTranslationKey()).getString();
+            return "Craft " + new TranslationTextComponent(item.getDescriptionId()).getString();
         if (itemStack != null)
-            return "Craft " + itemStack.getDisplayName().getString();
+            return "Craft " + itemStack.getHoverName().getString();
         if (!unlocks.isEmpty())
             return "Craft" + unlocks.get(0).getId() + (unlocks.size() > 1 ? " ..." : "");
         return "Craft nothing";

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -35,7 +35,7 @@ public class ClimateCommand {
         LiteralArgumentBuilder<CommandSource> get = Commands.literal("get")
                 .executes((ct) -> {
                 	try {
-                           ct.getSource().sendFeedback(new StringTextComponent(String.valueOf(ClimateData.get(ct.getSource().getWorld()))),true);
+                           ct.getSource().sendSuccess(new StringTextComponent(String.valueOf(ClimateData.get(ct.getSource().getLevel()))),true);
                 	}catch(Exception ex) {
                 		ex.printStackTrace();
                 	}
@@ -44,24 +44,24 @@ public class ClimateCommand {
         LiteralArgumentBuilder<CommandSource> rebuild = Commands.literal("rebuild")
                 .executes((ct) -> {
                 	
-                    ClimateData.get(ct.getSource().getWorld()).resetTempEvent(ct.getSource().getWorld());
-                    ct.getSource().sendFeedback(new StringTextComponent("Succeed!").mergeStyle(TextFormatting.GREEN), false);
+                    ClimateData.get(ct.getSource().getLevel()).resetTempEvent(ct.getSource().getLevel());
+                    ct.getSource().sendSuccess(new StringTextComponent("Succeed!").withStyle(TextFormatting.GREEN), false);
                     return Command.SINGLE_SUCCESS;
         });
         LiteralArgumentBuilder<CommandSource> init = Commands.literal("init")
         .executes((ct) -> {
-            ClimateData.get(ct.getSource().getWorld()).addInitTempEvent(ct.getSource().getWorld());
-            ct.getSource().sendFeedback(new StringTextComponent("Succeed!").mergeStyle(TextFormatting.GREEN), false);
+            ClimateData.get(ct.getSource().getLevel()).addInitTempEvent(ct.getSource().getLevel());
+            ct.getSource().sendSuccess(new StringTextComponent("Succeed!").withStyle(TextFormatting.GREEN), false);
             return Command.SINGLE_SUCCESS;
         });
         LiteralArgumentBuilder<CommandSource> reset = Commands.literal("resetVanilla")
                 .executes((ct) -> {
-                	ct.getSource().getWorld().serverWorldInfo.setThunderTime(0);
-                	ct.getSource().getWorld().serverWorldInfo.setRainTime(0);
-                	ct.getSource().getWorld().serverWorldInfo.setClearWeatherTime(0);
+                	ct.getSource().getLevel().serverLevelData.setThunderTime(0);
+                	ct.getSource().getLevel().serverLevelData.setRainTime(0);
+                	ct.getSource().getLevel().serverLevelData.setClearWeatherTime(0);
                     return Command.SINGLE_SUCCESS;
                 });
         
-        dispatcher.register(Commands.literal(FHMain.MODID).requires(s -> s.hasPermissionLevel(2)).then(Commands.literal("climate").then(get).then(init).then(rebuild).then(reset)));
+        dispatcher.register(Commands.literal(FHMain.MODID).requires(s -> s.hasPermission(2)).then(Commands.literal("climate").then(get).then(init).then(rebuild).then(reset)));
     }
 }

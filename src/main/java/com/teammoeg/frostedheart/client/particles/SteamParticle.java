@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 TeamMoeg
+ * Copyright (c) 2021-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -14,6 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 package com.teammoeg.frostedheart.client.particles;
@@ -28,10 +29,10 @@ public class SteamParticle extends FHParticle {
 
     public SteamParticle(ClientWorld world, double x, double y, double z, double motionX, double motionY, double motionZ) {
         super(world, x, y, z, motionX, motionY, motionZ);
-        this.particleGravity = -0.05F;
-        this.particleRed = this.particleGreen = this.particleBlue = (float) (Math.random() * 0.2) + 0.8f;
+        this.gravity = -0.05F;
+        this.rCol = this.gCol = this.bCol = (float) (Math.random() * 0.2) + 0.8f;
         this.originalScale = 0.25F;
-        this.maxAge = (int) (80.0D / (Math.random() * 0.2D + 0.8D));
+        this.lifetime = (int) (80.0D / (Math.random() * 0.2D + 0.8D));
     }
 
     public static class Factory implements IParticleFactory<BasicParticleType> {
@@ -42,9 +43,9 @@ public class SteamParticle extends FHParticle {
         }
 
         @Override
-        public Particle makeParticle(BasicParticleType typeIn, ClientWorld worldIn, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
+        public Particle createParticle(BasicParticleType typeIn, ClientWorld worldIn, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
             SteamParticle steamParticle = new SteamParticle(worldIn, x, y, z, xSpeed, ySpeed, zSpeed);
-            steamParticle.selectSpriteRandomly(this.spriteSet);
+            steamParticle.pickSprite(this.spriteSet);
             return steamParticle;
         }
     }

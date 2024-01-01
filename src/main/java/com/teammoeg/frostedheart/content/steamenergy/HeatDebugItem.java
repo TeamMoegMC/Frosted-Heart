@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 TeamMoeg
+ * Copyright (c) 2021-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -14,6 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 package com.teammoeg.frostedheart.content.steamenergy;
@@ -38,9 +39,11 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
 
+import net.minecraft.item.Item.Properties;
+
 public class HeatDebugItem extends Item {
     public HeatDebugItem(String name) {
-        super(new Properties().maxStackSize(1).setNoRepair().group(FHMain.itemGroup));
+        super(new Properties().stacksTo(1).setNoRepair().tab(FHMain.itemGroup));
         setRegistryName(FHMain.MODID, name);
         FHContent.registeredFHItems.add(this);
 
@@ -50,33 +53,33 @@ public class HeatDebugItem extends Item {
         return 1;
     }
 
-    public UseAction getUseAction(ItemStack stack) {
+    public UseAction getUseAnimation(ItemStack stack) {
         return UseAction.NONE;
     }
 
     //Dont add to creative tag
     @Override
-    public void fillItemGroup(ItemGroup group, NonNullList<ItemStack> items) {
+    public void fillItemCategory(ItemGroup group, NonNullList<ItemStack> items) {
     }
 
-    public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand handIn) {
+    public ActionResult<ItemStack> use(World worldIn, PlayerEntity playerIn, Hand handIn) {
     	
-        RayTraceResult raytraceresult = rayTrace(worldIn, playerIn, RayTraceContext.FluidMode.SOURCE_ONLY);
-        ItemStack itemstack = playerIn.getHeldItem(handIn);
-        if(worldIn.isRemote)return ActionResult.resultSuccess(itemstack);
+        RayTraceResult raytraceresult = getPlayerPOVHitResult(worldIn, playerIn, RayTraceContext.FluidMode.SOURCE_ONLY);
+        ItemStack itemstack = playerIn.getItemInHand(handIn);
+        if(worldIn.isClientSide)return ActionResult.success(itemstack);
         if (raytraceresult.getType() == RayTraceResult.Type.BLOCK) {
-            BlockPos blockpos = ((BlockRayTraceResult) raytraceresult).getPos();
+            BlockPos blockpos = ((BlockRayTraceResult) raytraceresult).getBlockPos();
             TileEntity te = Utils.getExistingTileEntity(worldIn, blockpos);
             if (te instanceof HeatController) {
-                playerIn.sendMessage(new StringTextComponent("HeatProvider network=" + ((HeatController) te).getNetwork()), playerIn.getUniqueID());
+                playerIn.sendMessage(new StringTextComponent("HeatProvider network=" + ((HeatController) te).getNetwork()), playerIn.getUUID());
             } else if (te instanceof EnergyNetworkProvider) {
-                playerIn.sendMessage(new StringTextComponent("EnergyNetworkProvider network=" + ((EnergyNetworkProvider) te).getNetwork()), playerIn.getUniqueID());
+                playerIn.sendMessage(new StringTextComponent("EnergyNetworkProvider network=" + ((EnergyNetworkProvider) te).getNetwork()), playerIn.getUUID());
             } else if (te instanceof INetworkConsumer) {
             	if(((INetworkConsumer) te).getHolder()!=null)
-            		playerIn.sendMessage(new StringTextComponent("EnergyNetworkConsumer data=" + ((INetworkConsumer) te).getHolder()), playerIn.getUniqueID());
+            		playerIn.sendMessage(new StringTextComponent("EnergyNetworkConsumer data=" + ((INetworkConsumer) te).getHolder()), playerIn.getUUID());
             }
-            return ActionResult.resultSuccess(itemstack);
+            return ActionResult.success(itemstack);
         }
-        return ActionResult.resultFail(itemstack);
+        return ActionResult.fail(itemstack);
     }
 }

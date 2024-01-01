@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -30,8 +30,8 @@ import net.minecraft.item.Item;
 
 public class AccessControlBlock extends FHBaseBlock {
     public AccessControlBlock(String name, BiFunction<Block, Item.Properties, Item> createItemBlock) {
-        super(name, Block.Properties.create(Material.IRON).sound(SoundType.STONE).setRequiresTool()
-                .hardnessAndResistance(0, 2000).notSolid(), createItemBlock);
+        super(name, Block.Properties.of(Material.METAL).sound(SoundType.STONE).requiresCorrectToolForDrops()
+                .strength(0, 2000).noOcclusion(), createItemBlock);
 
     }
 }

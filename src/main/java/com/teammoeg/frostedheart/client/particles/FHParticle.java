@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 TeamMoeg
+ * Copyright (c) 2021-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -14,6 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 package com.teammoeg.frostedheart.client.particles;
@@ -35,9 +36,9 @@ public class FHParticle extends SpriteTexturedParticle {
 
     public FHParticle(ClientWorld world, double x, double y, double z, double motionX, double motionY, double motionZ) {
         super(world, x, y, z, motionX, motionY, motionZ);
-        this.motionX *= 1.25;
-        this.motionY *= 1.25;
-        this.motionZ *= 1.25;
+        this.xd *= 1.25;
+        this.yd *= 1.25;
+        this.zd *= 1.25;
     }
 
     public IParticleRenderType getRenderType() {
@@ -45,36 +46,36 @@ public class FHParticle extends SpriteTexturedParticle {
     }
 
     @Override
-    public void renderParticle(IVertexBuilder worldRendererIn, ActiveRenderInfo entityIn, float pt) {
-        float age = (this.age + pt) / maxAge * 32.0F;
+    public void render(IVertexBuilder worldRendererIn, ActiveRenderInfo entityIn, float pt) {
+        float age = (this.age + pt) / lifetime * 32.0F;
 
         age = MathHelper.clamp(age, 0.0F, 1.0F);
-        super.particleAlpha = MathHelper.clamp(1 - (this.age + pt) / maxAge, 0.0F, 1.0F);
-        super.particleScale = originalScale * (age + this.age * 0.0375F);
-        super.renderParticle(worldRendererIn, entityIn, pt);
+        super.alpha = MathHelper.clamp(1 - (this.age + pt) / lifetime, 0.0F, 1.0F);
+        super.quadSize = originalScale * (age + this.age * 0.0375F);
+        super.render(worldRendererIn, entityIn, pt);
     }
 
     public void tick() {
-        this.prevPosX = posX;
-        this.prevPosY = posY;
-        this.prevPosZ = posZ;
-        if (age >= maxAge)
-            setExpired();
+        this.xo = x;
+        this.yo = y;
+        this.zo = z;
+        if (age >= lifetime)
+            remove();
         this.age++;
-        this.motionY -= 0.04D * particleGravity;
-        move(motionX, motionY, motionZ);
+        this.yd -= 0.04D * gravity;
+        move(xd, yd, zd);
 
-        if (posY == prevPosY) {
-            this.motionX *= 1.1D;
-            this.motionZ *= 1.1D;
+        if (y == yo) {
+            this.xd *= 1.1D;
+            this.zd *= 1.1D;
         }
-        this.motionX *= 0.96D;
-        this.motionY *= 0.96D;
-        this.motionZ *= 0.96D;
+        this.xd *= 0.96D;
+        this.yd *= 0.96D;
+        this.zd *= 0.96D;
 
         if (onGround) {
-            this.motionX *= 0.67D;
-            this.motionZ *= 0.67D;
+            this.xd *= 0.67D;
+            this.zd *= 0.67D;
         }
     }
 

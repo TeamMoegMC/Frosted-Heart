@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 TeamMoeg
+ * Copyright (c) 2021-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -14,6 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 package com.teammoeg.frostedheart.base.item;
@@ -31,12 +32,12 @@ public class FHBlockItem extends BlockItem {
     }
 
     public FHBlockItem(Block block) {
-        this(block, new Item.Properties().group(FHMain.itemGroup));
+        this(block, new Item.Properties().tab(FHMain.itemGroup));
         setRegistryName(block.getRegistryName());
     }
 
     public FHBlockItem(Block block, Item.Properties props, String name) {
-        this(block, new Item.Properties().group(FHMain.itemGroup));
+        this(block, new Item.Properties().tab(FHMain.itemGroup));
         this.setRegistryName(FHMain.MODID, name);
         FHContent.registeredFHItems.add(this);
     }

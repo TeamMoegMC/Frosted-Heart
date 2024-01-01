@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 TeamMoeg
+ * Copyright (c) 2021-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -14,6 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 package com.teammoeg.frostedheart.content.steamenergy.radiator;
@@ -76,7 +77,7 @@ public class RadiatorTileEntity extends AbstractGenerator<RadiatorTileEntity> im
 
     @Override
     public boolean connect(Direction to, int dist) {
-        return network.reciveConnection(world, pos, to, dist);
+        return network.reciveConnection(level, worldPosition, to, dist);
     }
 
 
@@ -148,8 +149,8 @@ public class RadiatorTileEntity extends AbstractGenerator<RadiatorTileEntity> im
 
     @Override
     protected void tickEffects(boolean isActive) {
-        if (world != null && world.isRemote && isActive && world.rand.nextFloat() < 0.2) {
-            ClientUtils.spawnSteamParticles(world, this.getPos());
+        if (level != null && level.isClientSide && isActive && level.random.nextFloat() < 0.2) {
+            ClientUtils.spawnSteamParticles(level, this.getBlockPos());
         }
     }
 
@@ -172,7 +173,7 @@ public class RadiatorTileEntity extends AbstractGenerator<RadiatorTileEntity> im
     public void forEachBlock(Consumer<RadiatorTileEntity> consumer) {
         for (int y = 0; y < 3; ++y) {
             BlockPos actualPos = getBlockPosForPos(new BlockPos(0, y, 0));
-            TileEntity te = Utils.getExistingTileEntity(world, actualPos);
+            TileEntity te = Utils.getExistingTileEntity(level, actualPos);
             if (te instanceof RadiatorTileEntity)
                 consumer.accept((RadiatorTileEntity) te);
         }

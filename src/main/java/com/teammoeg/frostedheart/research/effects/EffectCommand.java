@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -66,7 +66,7 @@ public class EffectCommand extends Effect {
 
 	public EffectCommand(PacketBuffer pb) {
 		super(pb);
-		rewards = SerializeUtil.readList(pb, PacketBuffer::readString);
+		rewards = SerializeUtil.readList(pb, PacketBuffer::readUtf);
 	}
 
 	@Override
@@ -82,14 +82,14 @@ public class EffectCommand extends Effect {
 		Map<String, Object> overrides = new HashMap<>();
 		overrides.put("p", triggerPlayer.getGameProfile().getName());
 
-		BlockPos pos = triggerPlayer.getPosition();
+		BlockPos pos = triggerPlayer.blockPosition();
 		overrides.put("x", pos.getX());
 		overrides.put("y", pos.getY());
 		overrides.put("z", pos.getZ());
 
 		overrides.put("t", team.getTeam().get().getStringID());
-		Commands cmds = FHResearchDataManager.server.getCommandManager();
-		CommandSource source = FHResearchDataManager.server.getCommandSource();
+		Commands cmds = FHResearchDataManager.server.getCommands();
+		CommandSource source = FHResearchDataManager.server.createCommandSourceStack();
 		for (String s : rewards) {
 
 			for (Map.Entry<String, Object> entry : overrides.entrySet()) {
@@ -98,7 +98,7 @@ public class EffectCommand extends Effect {
 				}
 			}
 
-			cmds.handleCommand(source, s);
+			cmds.performCommand(source, s);
 		}
 
 		return true;
@@ -120,7 +120,7 @@ public class EffectCommand extends Effect {
 	@Override
 	public void write(PacketBuffer buffer) {
 		super.write(buffer);
-		SerializeUtil.writeList2(buffer, rewards, PacketBuffer::writeString);
+		SerializeUtil.writeList2(buffer, rewards, PacketBuffer::writeUtf);
 	}
 
 	@Override

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -35,13 +35,13 @@ public class AtlasUV extends TexturedUV {
 
     //blit with texture bind and altas set add point
     public void blit(Minecraft mc, MatrixStack s, int lx, int ly, Point loc, int mx, int my, int p3, int p4) {
-        mc.getTextureManager().bindTexture(texture);
+        mc.getTextureManager().bind(texture);
         super.blit(s, lx, ly, loc, mx, my, p3, p4);
     }
 
     //blit with texture bind and altas set
     public void blit(Minecraft mc, MatrixStack s, int lx, int ly, int mx, int my, int p3, int p4) {
-        mc.getTextureManager().bindTexture(texture);
+        mc.getTextureManager().bind(texture);
         super.blit(s, lx, ly, mx, my, p3, p4);
     }
 }

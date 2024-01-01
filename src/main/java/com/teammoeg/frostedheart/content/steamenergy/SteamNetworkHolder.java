@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -58,7 +58,7 @@ public class SteamNetworkHolder {
      * @return true, if connected
      */
     public boolean reciveConnection(World w,BlockPos pos,Direction from,int dist) {
-    	TileEntity te = Utils.getExistingTileEntity(w, pos.offset(from));
+    	TileEntity te = Utils.getExistingTileEntity(w, pos.relative(from));
         if (te instanceof EnergyNetworkProvider) {
             this.connect(((EnergyNetworkProvider) te).getNetwork(), dist);
             return true;

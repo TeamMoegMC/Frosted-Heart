@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 TeamMoeg
+ * Copyright (c) 2021-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -14,6 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 package com.teammoeg.frostedheart.climate.data;
@@ -191,7 +192,7 @@ public class FHDataManager {
     }
 
     public static Float getWorldTemp(World w) {
-        WorldTempData data = FHDataManager.<WorldTempData>get(FHDataType.World).get(w.getDimensionKey().getLocation());
+        WorldTempData data = FHDataManager.<WorldTempData>get(FHDataType.World).get(w.dimension().location());
         if (data != null)
             return data.getTemp();
         return null;

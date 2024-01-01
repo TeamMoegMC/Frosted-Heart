@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 TeamMoeg
+ * Copyright (c) 2021-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -14,6 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 package com.teammoeg.frostedheart.content.incubator;
@@ -31,19 +32,19 @@ public class IncubatorT1Container extends IEBaseContainer<IncubatorTileEntity> {
 
         this.addSlot(new IESlot(this, this.inv, 0, 34, 52) {
             @Override
-            public boolean isItemValid(ItemStack itemStack) {
+            public boolean mayPlace(ItemStack itemStack) {
                 return tile.isStackValid(0, itemStack);
             }
         });
         this.addSlot(new IESlot(this, this.inv, 1, 16, 17) {
             @Override
-            public boolean isItemValid(ItemStack itemStack) {
+            public boolean mayPlace(ItemStack itemStack) {
                 return tile.isStackValid(1, itemStack);
             }
         });
         this.addSlot(new IESlot(this, this.inv, 2, 34, 17) {
             @Override
-            public boolean isItemValid(ItemStack itemStack) {
+            public boolean mayPlace(ItemStack itemStack) {
                 return tile.isStackValid(2, itemStack);
             }
         });

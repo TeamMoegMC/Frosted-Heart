@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -36,7 +36,7 @@ public class ContraptionCostUtils {
         float movecost = 0;
         for (BlockInfo bi : cont.getBlocks().values()) {
             try {
-                if (!bi.state.getCollisionShape(cont.getContraptionWorld(), bi.pos).isEmpty()) {
+                if (!bi.state.getBlockSupportShape(cont.getContraptionWorld(), bi.pos).isEmpty()) {
                     movecost += 0.125F;
                 } else
                     movecost += 0.075F;
@@ -62,7 +62,7 @@ public class ContraptionCostUtils {
             double dY=bi.pos.getY();
             double distance = Math.sqrt((dX * dX) + (dZ * dZ)+(dY * dY));
             try {
-                if (bi.state.getCollisionShape(cont.getContraptionWorld(), bi.pos) != VoxelShapes.empty()) {
+                if (bi.state.getBlockSupportShape(cont.getContraptionWorld(), bi.pos) != VoxelShapes.empty()) {
                     movecost += 0.125F * 2.56F * distance;
                 } else
                     movecost += 0.075F * 2.56F * distance;

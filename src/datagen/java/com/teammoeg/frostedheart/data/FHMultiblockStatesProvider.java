@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 TeamMoeg
+ * Copyright (c) 2021-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -14,6 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 package com.teammoeg.frostedheart.data;
@@ -59,9 +60,9 @@ import net.minecraftforge.common.data.ExistingFileHelper.ResourceType;
 
 public class FHMultiblockStatesProvider extends FHExtendedStatesProvider {
 	protected static final ResourceType MODEL = new ResourceType(ResourcePackType.CLIENT_RESOURCES, ".json", "models");
-	private static final List<Vector3i> CUBE_THREE = BlockPos.getAllInBox(-1, -1, -1, 1, 1, 1)
-			.map(BlockPos::toImmutable).collect(Collectors.toList());
-	private static final List<Vector3i> CUBE_TWO = BlockPos.getAllInBox(0, 0, -1, 1, 1, 0).map(BlockPos::toImmutable)
+	private static final List<Vector3i> CUBE_THREE = BlockPos.betweenClosedStream(-1, -1, -1, 1, 1, 1)
+			.map(BlockPos::immutable).collect(Collectors.toList());
+	private static final List<Vector3i> CUBE_TWO = BlockPos.betweenClosedStream(0, 0, -1, 1, 1, 0).map(BlockPos::immutable)
 			.collect(Collectors.toList());
 
 	public FHMultiblockStatesProvider(DataGenerator gen, ExistingFileHelper exFileHelper) {
@@ -82,13 +83,13 @@ public class FHMultiblockStatesProvider extends FHExtendedStatesProvider {
 		super.itemModel(FHBlocks.incubator1, bmf("incubator"));
 		super.itemModel(FHBlocks.incubator2, bmf("heat_incubator"));
 		super.horizontalBlock(FHBlocks.incubator2,
-				s -> s.get(BlockStateProperties.LIT) ? bmf("heat_incubator_active") : bmf("heat_incubator"));
+				s -> s.getValue(BlockStateProperties.LIT) ? bmf("heat_incubator_active") : bmf("heat_incubator"));
 		// super.itemModel(FHBlocks.mech_calc,models().withExistingParent("block/mechanical_calculator",
 		// modLoc("block/mechanical_calculator")));
 		for (Block blk : new Block[] { FHBlocks.fluorite_ore, FHBlocks.halite_ore }) {
 			String regName = blk.getRegistryName().getPath();
 			getVariantBuilder(blk).forAllStates(state -> {
-				int i = state.get(RankineOreBlock.TYPE);
+				int i = state.getValue(RankineOreBlock.TYPE);
 				try {
 					List<String> backgrounds = Arrays.asList(WorldgenUtils.ORE_TEXTURES.get(i).split(":"));
 					String mod = backgrounds.get(0);
@@ -167,11 +168,11 @@ public class FHMultiblockStatesProvider extends FHExtendedStatesProvider {
 		else
 			possibleMirrorStates = new boolean[1];
 		for (boolean mirrored : possibleMirrorStates)
-			for (Direction dir : facing.getAllowedValues()) {
+			for (Direction dir : facing.getPossibleValues()) {
 				final int angleY;
 				final int angleX;
-				if (facing.getAllowedValues().contains(Direction.UP)) {
-					angleX = -90 * dir.getYOffset();
+				if (facing.getPossibleValues().contains(Direction.UP)) {
+					angleX = -90 * dir.getStepY();
 					if (dir.getAxis() != Direction.Axis.Y)
 						angleY = getAngle(dir, 180);
 					else

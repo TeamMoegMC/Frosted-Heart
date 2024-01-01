@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 TeamMoeg
+ * Copyright (c) 2021-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -14,6 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 package com.teammoeg.frostedheart.content.steamenergy;
@@ -65,8 +66,8 @@ public class HeatPipeTileEntity extends IEBaseTileEntity implements EnergyNetwor
             network.connect(newNetwork, lengthx);
             for (Direction d : Direction.values()) {
                 if (from == d) continue;
-                BlockPos n = this.getPos().offset(d);
-                TileEntity te = Utils.getExistingTileEntity(this.getWorld(), n);
+                BlockPos n = this.getBlockPos().relative(d);
+                TileEntity te = Utils.getExistingTileEntity(this.getLevel(), n);
                 if (te instanceof INetworkConsumer) {
                 		((INetworkConsumer) te).tryConnectAt(d.getOpposite(), lengthx + 1);
                 }
@@ -79,7 +80,7 @@ public class HeatPipeTileEntity extends IEBaseTileEntity implements EnergyNetwor
 
     public boolean connect(Direction to, int ndist) {
         if (justPropagated) return true;
-        TileEntity te = Utils.getExistingTileEntity(this.getWorld(), this.getPos().offset(to));
+        TileEntity te = Utils.getExistingTileEntity(this.getLevel(), this.getBlockPos().relative(to));
         if (te instanceof EnergyNetworkProvider) {
             SteamEnergyNetwork newNetwork = ((EnergyNetworkProvider) te).getNetwork();
             justPropagated = true;

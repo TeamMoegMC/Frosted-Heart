@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -72,7 +72,7 @@ public class EnergyCore {
         data.putLong("lastsleep", tsls);
         
         int adenergy=0;
-        boolean isBodyNotWell = player.getActivePotionEffect(FHEffects.HYPERTHERMIA) != null || player.getActivePotionEffect(FHEffects.HYPOTHERMIA) != null;
+        boolean isBodyNotWell = player.getEffect(FHEffects.HYPERTHERMIA) != null || player.getEffect(FHEffects.HYPOTHERMIA) != null;
         if (!isBodyNotWell) {
             double m;
             TeamResearchData trd = ResearchDataAPI.getData(player);
@@ -106,7 +106,7 @@ public class EnergyCore {
             //System.out.println(nenergy);
             double cenergy=5/n;
             if(tenergy*2<M&&nenergy<=5) {
-            	player.addPotionEffect(new EffectInstance(FHEffects.SAD,200));
+            	player.addEffect(new EffectInstance(FHEffects.SAD,200));
             }
             if(tenergy<13500)
             	nenergy=Math.max(nenergy,1);
@@ -133,7 +133,7 @@ public class EnergyCore {
         float nkeep = 0;
         CompoundNBT data = TemperatureCore.getFHData(player);
         long lsd = data.getLong("lastsleepdate");
-        long csd = (player.world.getDayTime() + 12000L) / 24000L;
+        long csd = (player.level.getDayTime() + 12000L) / 24000L;
         //System.out.println("slept");
         if (csd == lsd) return;
         //System.out.println("sleptx");
@@ -149,7 +149,7 @@ public class EnergyCore {
                     nkeep += iw.getFactor(player, is);
             }
         }
-        for (ItemStack is : player.getArmorInventoryList()) {
+        for (ItemStack is : player.getArmorSlots()) {
             if (is.isEmpty())
                 continue;
             Item it = is.getItem();
@@ -158,7 +158,7 @@ public class EnergyCore {
             } else {//include inner
                 String s = ItemNBTHelper.getString(is, "inner_cover");
                 IWarmKeepingEquipment iw = null;
-                EquipmentSlotType aes = MobEntity.getSlotForItemStack(is);
+                EquipmentSlotType aes = MobEntity.getEquipmentSlotForItem(is);
                 if (s.length() > 0 && aes != null) {
                     iw = FHDataManager.getArmor(s + "_" + aes.getName());
                 } else
@@ -186,7 +186,7 @@ public class EnergyCore {
     }
 
     public static boolean consumeEnergy(ServerPlayerEntity player, int val) {
-        if (player.abilities.isCreativeMode) return true;
+        if (player.abilities.instabuild) return true;
         CompoundNBT data = TemperatureCore.getFHData(player);
         long energy = data.getLong("energy");
         if (energy  >= val) {
@@ -225,7 +225,7 @@ public class EnergyCore {
         TemperatureCore.setFHData(player, data);
     }
     public static boolean useExtraEnergy(ServerPlayerEntity player, int val) {
-    	if (player.abilities.isCreativeMode) return true;
+    	if (player.abilities.instabuild) return true;
         CompoundNBT data = TemperatureCore.getFHData(player);
         long energy = data.getLong("cenergy");
         if(energy>=val) {
@@ -236,7 +236,7 @@ public class EnergyCore {
         return false;
     }
     public static boolean hasExtraEnergy(PlayerEntity player, int val) {
-    	if (player.abilities.isCreativeMode) return true;
+    	if (player.abilities.instabuild) return true;
         CompoundNBT data = TemperatureCore.getFHData(player);
         long energy = data.getLong("cenergy");
         return energy>=val;
@@ -263,7 +263,7 @@ public class EnergyCore {
     }
 
     public static boolean hasEnoughEnergy(PlayerEntity player, int val) {
-        if (player.abilities.isCreativeMode) return true;
+        if (player.abilities.instabuild) return true;
         CompoundNBT data = TemperatureCore.getFHData(player);
         long touse=data.getLong("energy")+data.getLong("penergy");
         return touse >= val;
@@ -274,7 +274,7 @@ public class EnergyCore {
     }
     public static void reportEnergy(PlayerEntity player) {
         CompoundNBT data = TemperatureCore.getFHData(player);
-        player.sendMessage(new StringTextComponent("Energy:" + data.getLong("energy") + ",Persist Energy: " + data.getLong("penergy")+",Extra Energy: "+data.getLong("cenergy")), player.getUniqueID());
+        player.sendMessage(new StringTextComponent("Energy:" + data.getLong("energy") + ",Persist Energy: " + data.getLong("penergy")+",Extra Energy: "+data.getLong("cenergy")), player.getUUID());
     }
 
     @SubscribeEvent
@@ -283,7 +283,7 @@ public class EnergyCore {
                 && event.player instanceof ServerPlayerEntity) {
 
             ServerPlayerEntity player = (ServerPlayerEntity) event.player;
-            if (player.ticksExisted % 20 == 0)
+            if (player.tickCount % 20 == 0)
                 EnergyCore.dT(player);
         }
     }
@@ -301,8 +301,8 @@ public class EnergyCore {
 
     @SubscribeEvent
     public static void checkSleep(SleepingTimeCheckEvent event) {
-        if (event.getPlayer().getSleepTimer() >= 100 && !event.getPlayer().getEntityWorld().isRemote) {
-            EnergyCore.applySleep(ChunkData.getTemperature(event.getPlayer().getEntityWorld(), event.getSleepingLocation().orElseGet(event.getPlayer()::getPosition)), (ServerPlayerEntity) event.getPlayer());
+        if (event.getPlayer().getSleepTimer() >= 100 && !event.getPlayer().getCommandSenderWorld().isClientSide) {
+            EnergyCore.applySleep(ChunkData.getTemperature(event.getPlayer().getCommandSenderWorld(), event.getSleepingLocation().orElseGet(event.getPlayer()::blockPosition)), (ServerPlayerEntity) event.getPlayer());
         }
     }
 }

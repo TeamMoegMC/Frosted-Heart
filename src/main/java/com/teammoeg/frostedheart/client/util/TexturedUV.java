@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -40,25 +40,25 @@ public class TexturedUV extends UV {
 
     //blit with texture bind at IngameGui add point
     public void blit(Minecraft mc, MatrixStack s, int lx, int ly, Point loc) {
-        mc.getTextureManager().bindTexture(texture);
-        super.blit(mc.ingameGUI, s, lx, ly, loc);
+        mc.getTextureManager().bind(texture);
+        super.blit(mc.gui, s, lx, ly, loc);
     }
 
     //blit with texture bind at IngameGui
     public void blit(Minecraft mc, MatrixStack s, int lx, int ly) {
-        mc.getTextureManager().bindTexture(texture);
-        super.blit(mc.ingameGUI, s, lx, ly);
+        mc.getTextureManager().bind(texture);
+        super.blit(mc.gui, s, lx, ly);
     }
 
     //blit with texture bind add point
     public void blit(Minecraft mc, AbstractGui gui, MatrixStack s, int lx, int ly, Point loc) {
-        mc.getTextureManager().bindTexture(texture);
+        mc.getTextureManager().bind(texture);
         super.blit(gui, s, lx, ly, loc);
     }
 
     //blit with texture bind
     public void blit(Minecraft mc, AbstractGui gui, MatrixStack s, int lx, int ly) {
-        mc.getTextureManager().bindTexture(texture);
+        mc.getTextureManager().bind(texture);
         super.blit(gui, s, lx, ly);
     }
 }

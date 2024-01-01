@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -44,8 +44,8 @@ public class LabeledSelection<R> extends LabeledPane<Button> {
     }
 
     public static LabeledSelection<String> createCriterion(Panel p, String lab, ResourceLocation adv, String val, Consumer<String> cb) {
-        ClientAdvancementManager cam = ClientUtils.mc().player.connection.getAdvancementManager();
-        Advancement advx = cam.getAdvancementList().getAdvancement(adv);
+        ClientAdvancementManager cam = ClientUtils.mc().player.connection.getAdvancements();
+        Advancement advx = cam.getAdvancements().get(adv);
         List<String> cit = new ArrayList<>();
         cit.add("");
         if (advx != null) {

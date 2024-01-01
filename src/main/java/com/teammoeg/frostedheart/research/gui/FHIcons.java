@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -135,7 +135,7 @@ public class FHIcons {
 		}
 
 		public FHItemIcon(PacketBuffer buffer) {
-			stack = SerializeUtil.readOptional(buffer, PacketBuffer::readItemStack).orElse(null);
+			stack = SerializeUtil.readOptional(buffer, PacketBuffer::readItem).orElse(null);
 			init();
 		}
 
@@ -157,14 +157,14 @@ public class FHIcons {
 		public void draw(MatrixStack matrixStack, int x, int y, int w, int h) {
 			nested.draw(matrixStack, x, y, w, h);
 			if (stack != null && stack.getCount() > 1) {
-				matrixStack.push();
+				matrixStack.pushPose();
 				matrixStack.translate(x + w - 8, y + h - 7, 199);
-				matrixStack.push();
+				matrixStack.pushPose();
 				matrixStack.scale(w / 16f, h / 16f, 0);
-				ClientUtils.mc().fontRenderer.drawStringWithShadow(matrixStack, String.valueOf(stack.getCount()), 0, 0,
+				ClientUtils.mc().font.drawShadow(matrixStack, String.valueOf(stack.getCount()), 0, 0,
 						0xffffffff);
-				matrixStack.pop();
-				matrixStack.pop();
+				matrixStack.popPose();
+				matrixStack.popPose();
 			}
 		}
 
@@ -181,7 +181,7 @@ public class FHIcons {
 		@Override
 		public void write(PacketBuffer buffer) {
 			super.write(buffer);
-			SerializeUtil.writeOptional2(buffer, stack, PacketBuffer::writeItemStack);
+			SerializeUtil.writeOptional2(buffer, stack, PacketBuffer::writeItem);
 		}
 
 		public ItemStack getStack() {
@@ -215,12 +215,12 @@ public class FHIcons {
 			GuiHelper.setupDrawing();
 			if (large != null)
 				large.draw(ms, x, y, w, h);
-			ms.push();
+			ms.pushPose();
 			ms.translate(0, 0, 110);// let's get top most
 			GuiHelper.setupDrawing();
 			if (small != null)
 				small.draw(ms, x + w / 2, y + h / 2, w / 2, h / 2);
-			ms.pop();
+			ms.popPose();
 		}
 
 		@Override
@@ -290,31 +290,31 @@ public class FHIcons {
 		Ingredient igd;
 
 		public FHIngredientIcon(JsonElement elm) {
-			this(Ingredient.deserialize(elm.getAsJsonObject().get("ingredient")));
+			this(Ingredient.fromJson(elm.getAsJsonObject().get("ingredient")));
 		}
 
 		public FHIngredientIcon(PacketBuffer buffer) {
-			this(Ingredient.read(buffer));
+			this(Ingredient.fromNetwork(buffer));
 
 		}
 
 		public FHIngredientIcon(Ingredient i) {
 			igd = i;
-			for (ItemStack stack : igd.getMatchingStacks())
+			for (ItemStack stack : igd.getItems())
 				icons.add(new FHItemIcon(stack));
 		}
 
 		@Override
 		public JsonElement serialize() {
 			JsonObject jo = super.serialize().getAsJsonObject();
-			jo.add("ingredient", igd.serialize());
+			jo.add("ingredient", igd.toJson());
 			return jo;
 		}
 
 		@Override
 		public void write(PacketBuffer buffer) {
 			super.write(buffer);
-			igd.write(buffer);
+			igd.toNetwork(buffer);
 		}
 	}
 
@@ -364,8 +364,8 @@ public class FHIcons {
 			this(new ResourceLocation(elm.getAsJsonObject().get("location").getAsString()),
 					elm.getAsJsonObject().get("x").getAsInt(), elm.getAsJsonObject().get("y").getAsInt(),
 					elm.getAsJsonObject().get("w").getAsInt(), elm.getAsJsonObject().get("h").getAsInt(),
-					JSONUtils.getInt(elm.getAsJsonObject(), "tw", 256),
-					JSONUtils.getInt(elm.getAsJsonObject(), "th", 256));
+					JSONUtils.getAsInt(elm.getAsJsonObject(), "tw", 256),
+					JSONUtils.getAsInt(elm.getAsJsonObject(), "th", 256));
 		}
 
 		public FHTextureUVIcon(PacketBuffer buffer) {
@@ -438,7 +438,7 @@ public class FHIcons {
 		}
 
 		public FHDelegateIcon(PacketBuffer buffer) {
-			this(buffer.readString());
+			this(buffer.readUtf());
 		}
 
 		@Override
@@ -457,7 +457,7 @@ public class FHIcons {
 		@Override
 		public void write(PacketBuffer buffer) {
 			super.write(buffer);
-			buffer.writeString(name);
+			buffer.writeUtf(name);
 		}
 	}
 
@@ -474,22 +474,22 @@ public class FHIcons {
 		}
 
 		public FHTextIcon(PacketBuffer buffer) {
-			this(buffer.readString());
+			this(buffer.readUtf());
 		}
 
 		@Override
 		public void draw(MatrixStack ms, int x, int y, int w, int h) {
 
-			ms.push();
+			ms.pushPose();
 			ms.translate(x, y, 0);
 			ms.scale(w / 16f, h / 16f, 0);
 
-			ms.push();
+			ms.pushPose();
 
 			ms.scale(2.286f, 2.286f, 0);// scale font height 7 to height 16
-			ClientUtils.mc().fontRenderer.drawStringWithShadow(ms, text, 0, 0, 0xFFFFFFFF);
-			ms.pop();
-			ms.pop();
+			ClientUtils.mc().font.drawShadow(ms, text, 0, 0, 0xFFFFFFFF);
+			ms.popPose();
+			ms.popPose();
 			GuiHelper.setupDrawing();
 		}
 
@@ -503,7 +503,7 @@ public class FHIcons {
 		@Override
 		public void write(PacketBuffer buffer) {
 			super.write(buffer);
-			buffer.writeString(text);
+			buffer.writeUtf(text);
 		}
 	}
 
@@ -758,7 +758,7 @@ public class FHIcons {
 	 * This does not preserve nbt on save
 	 */
 	public static FHIcon getStackIcons(Collection<ItemStack> rewards) {
-		return new FHIngredientIcon(Ingredient.fromStacks(rewards.stream()));
+		return new FHIngredientIcon(Ingredient.of(rewards.stream()));
 	}
 
 	public static FHIcon getIcon(JsonElement elm) {
@@ -795,11 +795,11 @@ public class FHIcons {
 	}
 
 	public static FHIcon getIcon(IItemProvider[] items) {
-		return new FHIngredientIcon(Ingredient.fromItems(items));
+		return new FHIngredientIcon(Ingredient.of(items));
 	}
 
 	public static FHIcon getIcon(Collection<IItemProvider> items) {
-		return new FHIngredientIcon(Ingredient.fromItems(items.toArray(new IItemProvider[0])));
+		return new FHIngredientIcon(Ingredient.of(items.toArray(new IItemProvider[0])));
 	}
 
 }

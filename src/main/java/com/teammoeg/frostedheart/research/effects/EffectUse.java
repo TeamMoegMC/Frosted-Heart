@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -114,7 +114,7 @@ public class EffectUse extends Effect {
     public List<ITextComponent> getDefaultTooltip() {
         List<ITextComponent> tooltip = new ArrayList<>();
         for (Block b : blocks) {
-            tooltip.add(b.getTranslatedName());
+            tooltip.add(b.getName());
         }
 
         return tooltip;
@@ -124,6 +124,6 @@ public class EffectUse extends Effect {
     public String getBrief() {
         if (blocks.isEmpty())
             return "Use nothing";
-        return "Use " + blocks.get(0).getTranslatedName().getString() + (blocks.size() > 1 ? " ..." : "");
+        return "Use " + blocks.get(0).getName().getString() + (blocks.size() > 1 ? " ..." : "");
     }
 }

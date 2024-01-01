@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 TeamMoeg
+ * Copyright (c) 2021-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -14,6 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 package com.teammoeg.frostedheart.content.generator.t1;
@@ -48,7 +49,7 @@ public class T1GeneratorScreen extends IEContainerScreen<T1GeneratorContainer> {
     public void init() {
         super.init();
         this.buttons.clear();
-        this.addButton(new GuiButtonBoolean(guiLeft + 56, guiTop + 35, 19, 10, "", tile.isWorking(), TEXTURE, 0, 245, 0,
+        this.addButton(new GuiButtonBoolean(leftPos + 56, topPos + 35, 19, 10, "", tile.isWorking(), TEXTURE, 0, 245, 0,
                 btn -> {
                     CompoundNBT tag = new CompoundNBT();
                     tile.setWorking(!btn.getState());
@@ -56,7 +57,7 @@ public class T1GeneratorScreen extends IEContainerScreen<T1GeneratorContainer> {
                     PacketHandler.sendToServer(new MessageTileSync(tile.master(), tag));
                     fullInit();
                 }));
-        this.addButton(new GuiButtonBoolean(guiLeft + 101, guiTop + 35, 19, 10, "", tile.isOverdrive(), TEXTURE, 0, 245, 0,
+        this.addButton(new GuiButtonBoolean(leftPos + 101, topPos + 35, 19, 10, "", tile.isOverdrive(), TEXTURE, 0, 245, 0,
                 btn -> {
                     CompoundNBT tag = new CompoundNBT();
                     tile.setOverdrive(!btn.getState());
@@ -88,11 +89,11 @@ public class T1GeneratorScreen extends IEContainerScreen<T1GeneratorContainer> {
         }
 
         if (isMouseIn(mouseX, mouseY, 12, 13, 2, 54) && tile.getIsActive()) {
-            tooltip.add(GuiUtils.translateGui("generator.temperature.level").appendString(GuiUtils.toTemperatureDeltaIntString(tile.getActualTemp())));
+            tooltip.add(GuiUtils.translateGui("generator.temperature.level").append(GuiUtils.toTemperatureDeltaIntString(tile.getActualTemp())));
         }
 
         if (isMouseIn(mouseX, mouseY, 161, 13, 2, 54) && tile.getIsActive()) {
-            tooltip.add(GuiUtils.translateGui("generator.range.level").appendString(Integer.toString(tile.getActualRange())));
+            tooltip.add(GuiUtils.translateGui("generator.range.level").append(Integer.toString(tile.getActualRange())));
         }
 
         if (!tooltip.isEmpty()) {
@@ -101,24 +102,24 @@ public class T1GeneratorScreen extends IEContainerScreen<T1GeneratorContainer> {
     }
 
     @Override
-    protected void drawGuiContainerBackgroundLayer(MatrixStack transform, float partial, int x, int y) {
+    protected void renderBg(MatrixStack transform, float partial, int x, int y) {
         ClientUtils.bindTexture(TEXTURE);
-        this.blit(transform, guiLeft, guiTop, 0, 0, xSize, ySize);
+        this.blit(transform, leftPos, topPos, 0, 0, imageWidth, imageHeight);
 
         // recipe progress icon
         if (tile.processMax > 0 && tile.process > 0) {
             int h = (int) (12 * (tile.process / (float) tile.processMax));
-            this.blit(transform, guiLeft + 84, guiTop + 47 - h, 179, 1 + 12 - h, 9, h);
+            this.blit(transform, leftPos + 84, topPos + 47 - h, 179, 1 + 12 - h, 9, h);
         }
 
         // work button
         if (tile.isWorking()) {
-            this.blit(transform, guiLeft + 56, guiTop + 35, 232, 1, 19, 10);
+            this.blit(transform, leftPos + 56, topPos + 35, 232, 1, 19, 10);
         }
 
         // overdrive button
         if (tile.isOverdrive()) {
-            this.blit(transform, guiLeft + 101, guiTop + 35, 232, 12, 19, 10);
+            this.blit(transform, leftPos + 101, topPos + 35, 232, 12, 19, 10);
         }
 
         float tempLevel = tile.getTemperatureLevel();
@@ -128,20 +129,20 @@ public class T1GeneratorScreen extends IEContainerScreen<T1GeneratorContainer> {
         if (tile.getIsActive()) {
             int offset = (int) ((4 - tempLevel) * 14);
             int bar = (int) ((tempLevel - 1) * 14);
-            this.blit(transform, guiLeft + 12, guiTop + 13 + offset, 181, 30, 2, 12 + bar);
+            this.blit(transform, leftPos + 12, topPos + 13 + offset, 181, 30, 2, 12 + bar);
         }
 
         // range bar
         if (tile.getIsActive()) {
             int offset = (int) ((4 - rangeLevel) * 14);
             int bar = (int) ((rangeLevel - 1) * 14);
-            this.blit(transform, guiLeft + 161, guiTop + 13 + offset, 181, 30, 2, 12 + bar);
+            this.blit(transform, leftPos + 161, topPos + 13 + offset, 181, 30, 2, 12 + bar);
         }
     }
 
     @Override
     public boolean isMouseIn(int mouseX, int mouseY, int x, int y, int w, int h) {
-        return mouseX >= guiLeft + x && mouseY >= guiTop + y
-                && mouseX < guiLeft + x + w && mouseY < guiTop + y + h;
+        return mouseX >= leftPos + x && mouseY >= topPos + y
+                && mouseX < leftPos + x + w && mouseY < topPos + y + h;
     }
 }

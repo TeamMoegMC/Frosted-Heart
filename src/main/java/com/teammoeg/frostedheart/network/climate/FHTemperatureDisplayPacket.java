@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 TeamMoeg
+ * Copyright (c) 2021-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -14,6 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 package com.teammoeg.frostedheart.network.climate;
@@ -77,7 +78,7 @@ public class FHTemperatureDisplayPacket {
         this.isAction=isAction;
     }
     public FHTemperatureDisplayPacket(PacketBuffer buffer) {
-        langKey=buffer.readString();
+        langKey=buffer.readUtf();
         temp=buffer.readVarIntArray();
         boolean[] bs=SerializeUtil.readBooleans(buffer);
         isStatus=bs[0];
@@ -85,7 +86,7 @@ public class FHTemperatureDisplayPacket {
     }
 
     public void encode(PacketBuffer buffer) {
-        buffer.writeString(langKey);
+        buffer.writeUtf(langKey);
         buffer.writeVarIntArray(temp);
         SerializeUtil.writeBooleans(buffer,isStatus,isAction);
     }
@@ -99,9 +100,9 @@ public class FHTemperatureDisplayPacket {
             }
             TranslationTextComponent tosend=new TranslationTextComponent("message." + FHMain.MODID + "."+langKey,ss);
             if(isStatus)
-            	player.sendStatusMessage(tosend, false);
+            	player.displayClientMessage(tosend, false);
             else
-            	player.sendMessage(tosend,player.getUniqueID());
+            	player.sendMessage(tosend,player.getUUID());
             
         });
         context.get().setPacketHandled(true);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -63,7 +63,7 @@ public class FHResearchDataManager {
 	public static RecipeManager getRecipeManager() {
 		if (server != null)
 			return server.getRecipeManager();
-		return ClientUtils.mc().world.getRecipeManager();
+		return ClientUtils.mc().level.getRecipeManager();
 	}
 
 	public Collection<TeamResearchData> getAllData() {
@@ -72,7 +72,7 @@ public class FHResearchDataManager {
 
 	public void load() {
 		FHResearch.editor=false;
-		local = server.func_240776_a_(dataFolder);
+		local = server.getWorldPath(dataFolder);
 		regfile = new File(local.toFile().getParentFile(), "fhregistries.dat");
 		FHResearch.clearAll();
 		if (regfile.exists()) {

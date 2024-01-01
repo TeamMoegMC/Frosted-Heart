@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 TeamMoeg
+ * Copyright (c) 2021-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -14,6 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 package com.teammoeg.frostedheart.research.network;
@@ -93,7 +94,7 @@ public class FHDrawingDeskOperationPacket {
 
     public void handle(Supplier<NetworkEvent.Context> context) {
         context.get().enqueueWork(() -> {
-            ServerWorld world = Objects.requireNonNull(context.get().getSender()).getServerWorld();
+            ServerWorld world = Objects.requireNonNull(context.get().getSender()).getLevel();
             TileEntity tile = Utils.getExistingTileEntity(world, pos);
             if (tile instanceof DrawingDeskTileEntity) {
                 ResearchGame rg = ((DrawingDeskTileEntity) tile).getGame();
@@ -114,7 +115,7 @@ public class FHDrawingDeskOperationPacket {
                 }
                 if (flag) {
                     ((DrawingDeskTileEntity) tile).updateGame(context.get().getSender());
-                    ((DrawingDeskTileEntity) tile).markDirty();
+                    ((DrawingDeskTileEntity) tile).setChanged();
                     ((DrawingDeskTileEntity) tile).markContainingBlockForUpdate(null);
                 }
             }

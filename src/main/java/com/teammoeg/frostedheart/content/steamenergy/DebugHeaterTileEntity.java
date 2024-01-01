@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 TeamMoeg
+ * Copyright (c) 2021-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -14,6 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 package com.teammoeg.frostedheart.content.steamenergy;
@@ -34,7 +35,7 @@ public class DebugHeaterTileEntity extends IEBaseTileEntity implements HeatContr
     SteamEnergyNetwork network = new SteamEnergyNetwork(this);
     HeatProviderManager manager=new HeatProviderManager(this,c->{
     	for (Direction d : Direction.values()) {
-    		c.accept(pos.offset(d), d.getOpposite());
+    		c.accept(worldPosition.relative(d), d.getOpposite());
         }
     });
     @Override
@@ -62,7 +63,7 @@ public class DebugHeaterTileEntity extends IEBaseTileEntity implements HeatContr
 
     @Override
     public float getTemperatureLevel() {
-        return this.getBlockState().get(BlockStateProperties.LEVEL_1_8);
+        return this.getBlockState().getValue(BlockStateProperties.LEVEL_FLOWING);
     }
 
     @Override

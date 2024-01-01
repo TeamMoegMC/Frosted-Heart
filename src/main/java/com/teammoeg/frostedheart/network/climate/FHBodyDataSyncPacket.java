@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 TeamMoeg
+ * Copyright (c) 2021-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -14,6 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 package com.teammoeg.frostedheart.network.climate;
@@ -39,11 +40,11 @@ public class FHBodyDataSyncPacket {
     }
 
     public FHBodyDataSyncPacket(PacketBuffer buffer) {
-        data = buffer.readCompoundTag();
+        data = buffer.readNbt();
     }
 
     public void encode(PacketBuffer buffer) {
-        buffer.writeCompoundTag(data);
+        buffer.writeNbt(data);
     }
 
     public void handle(Supplier<NetworkEvent.Context> context) {

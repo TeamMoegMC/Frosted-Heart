@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -51,10 +51,10 @@ public class TagLootCondition implements ILootCondition {
     @SuppressWarnings("resource")
     @Override
     public boolean test(LootContext t) {
-        if (t.has(LootParameters.ORIGIN)) {
-            Vector3d v = t.get(LootParameters.ORIGIN);
+        if (t.hasParam(LootParameters.ORIGIN)) {
+            Vector3d v = t.getParamOrNull(LootParameters.ORIGIN);
             BlockPos bp = new BlockPos(v.x, v.y, v.z);
-            World w = t.getWorld();
+            World w = t.getLevel();
             BlockState bs = w.getBlockState(bp);
 
             return bs != null && tag.contains(bs.getBlock());
@@ -63,7 +63,7 @@ public class TagLootCondition implements ILootCondition {
     }
 
     @Override
-    public LootConditionType getConditionType() {
+    public LootConditionType getType() {
         return TYPE;
     }
 
@@ -77,7 +77,7 @@ public class TagLootCondition implements ILootCondition {
         @Nonnull
         @Override
         public TagLootCondition deserialize(JsonObject jsonObject, JsonDeserializationContext context) {
-            Tags.IOptionalNamedTag<Block> optional = BlockTags.createOptional(new ResourceLocation(JSONUtils.getString(jsonObject, "tag")));
+            Tags.IOptionalNamedTag<Block> optional = BlockTags.createOptional(new ResourceLocation(JSONUtils.getAsString(jsonObject, "tag")));
             return new TagLootCondition(optional);
         }
     }

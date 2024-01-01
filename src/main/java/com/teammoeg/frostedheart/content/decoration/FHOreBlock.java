@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -32,22 +32,24 @@ import net.minecraft.item.Item;
 import net.minecraft.state.StateContainer;
 import net.minecraft.world.World;
 
+import net.minecraft.block.AbstractBlock.Properties;
+
 public class FHOreBlock extends FHBaseBlock {
     public FHOreBlock(String name, Properties blockProps, BiFunction<Block, Item.Properties, Item> createItemBlock) {
         super(name, blockProps, createItemBlock);
     }
 
     public BlockState getStateForPlacement(BlockItemUseContext context) {
-        World world = context.getWorld();
-        BlockState target = world.getBlockState(context.getPos().offset(context.getFace().getOpposite()));
+        World world = context.getLevel();
+        BlockState target = world.getBlockState(context.getClickedPos().relative(context.getClickedFace().getOpposite()));
         if (target.getBlock() instanceof RankineOreBlock) {
-            return this.getDefaultState().with(RankineOreBlock.TYPE, target.get(RankineOreBlock.TYPE));
+            return this.defaultBlockState().setValue(RankineOreBlock.TYPE, target.getValue(RankineOreBlock.TYPE));
         } else {
-            return WorldgenUtils.ORE_STONES.contains(target.getBlock()) ? this.getDefaultState().with(RankineOreBlock.TYPE, WorldgenUtils.ORE_STONES.indexOf(target.getBlock())) : this.getDefaultState().with(RankineOreBlock.TYPE, 0);
+            return WorldgenUtils.ORE_STONES.contains(target.getBlock()) ? this.defaultBlockState().setValue(RankineOreBlock.TYPE, WorldgenUtils.ORE_STONES.indexOf(target.getBlock())) : this.defaultBlockState().setValue(RankineOreBlock.TYPE, 0);
         }
     }
 
-    protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
         builder.add(RankineOreBlock.TYPE);
     }
 }

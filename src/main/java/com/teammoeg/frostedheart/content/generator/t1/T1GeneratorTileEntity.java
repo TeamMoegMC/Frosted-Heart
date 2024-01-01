@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 TeamMoeg
+ * Copyright (c) 2021-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -14,6 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 package com.teammoeg.frostedheart.content.generator.t1;
@@ -46,7 +47,7 @@ public final class T1GeneratorTileEntity extends BurnerGeneratorTileEntity<T1Gen
             for (int y = 0; y < 4; ++y)
                 for (int z = 0; z < 3; ++z) {
                     BlockPos actualPos = getBlockPosForPos(new BlockPos(x, y, z));
-                    TileEntity te = Utils.getExistingTileEntity(world, actualPos);
+                    TileEntity te = Utils.getExistingTileEntity(level, actualPos);
                     if (te instanceof T1GeneratorTileEntity)
                         consumer.accept((T1GeneratorTileEntity) te);
                 }
@@ -73,12 +74,12 @@ public final class T1GeneratorTileEntity extends BurnerGeneratorTileEntity<T1Gen
     @Override
     protected void tickEffects(boolean isActive) {
         if (isActive) {
-            BlockPos blockpos = this.getPos();
-            Random random = world.rand;
+            BlockPos blockpos = this.getBlockPos();
+            Random random = level.random;
             if (random.nextFloat() < 0.2F) {
                 //for (int i = 0; i < random.nextInt(2) + 2; ++i) {
-                    ClientUtils.spawnSmokeParticles(world, blockpos);
-                    ClientUtils.spawnFireParticles(world, blockpos);
+                    ClientUtils.spawnSmokeParticles(level, blockpos);
+                    ClientUtils.spawnFireParticles(level, blockpos);
                 //}
             }
         }

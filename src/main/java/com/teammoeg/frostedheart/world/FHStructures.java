@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -46,7 +46,7 @@ public class FHStructures {
 
 
     public static void registerStructureGenerate() {
-        Structure.NAME_STRUCTURE_BIMAP.put(FHStructures.OBSERVATORY.getRegistryName().toString(), FHStructures.OBSERVATORY);
+        Structure.STRUCTURES_REGISTRY.put(FHStructures.OBSERVATORY.getRegistryName().toString(), FHStructures.OBSERVATORY);
 //        Structure.NAME_STRUCTURE_BIMAP.put(FHStructures.VOLCANIC_VENT.getRegistryName().toString(), FHStructures.VOLCANIC_VENT);
 
         HashMap<Structure<?>, StructureSeparationSettings> StructureSettingMap = new HashMap<>();
@@ -54,20 +54,20 @@ public class FHStructures {
 //        StructureSettingMap.put(VOLCANIC_VENT,new StructureSeparationSettings(12,8,123456));
 
 
-        DimensionStructuresSettings.field_236191_b_ = ImmutableMap.<Structure<?>, StructureSeparationSettings>builder()
-                .putAll(DimensionStructuresSettings.field_236191_b_)
+        DimensionStructuresSettings.DEFAULTS = ImmutableMap.<Structure<?>, StructureSeparationSettings>builder()
+                .putAll(DimensionStructuresSettings.DEFAULTS)
                 .putAll(StructureSettingMap)
                 .build();
-        Structure.field_236384_t_ = ImmutableList.<Structure<?>>builder()
-                .addAll(Structure.field_236384_t_)
+        Structure.NOISE_AFFECTING_FEATURES = ImmutableList.<Structure<?>>builder()
+                .addAll(Structure.NOISE_AFFECTING_FEATURES)
                 .add(FHStructures.OBSERVATORY.getStructure())
                 .build();
-        WorldGenRegistries.NOISE_SETTINGS.forEach(settings -> {
-            Map<Structure<?>, StructureSeparationSettings> structureMap = settings.getStructures().func_236195_a_();
+        WorldGenRegistries.NOISE_GENERATOR_SETTINGS.forEach(settings -> {
+            Map<Structure<?>, StructureSeparationSettings> structureMap = settings.structureSettings().structureConfig();
             if (structureMap instanceof ImmutableMap) {
                 Map<Structure<?>, StructureSeparationSettings> tempMap = new HashMap<>(structureMap);
                 tempMap.putAll(StructureSettingMap);
-                settings.getStructures().field_236193_d_ = tempMap;
+                settings.structureSettings().structureConfig = tempMap;
             } else structureMap.putAll(StructureSettingMap);
         });
     }

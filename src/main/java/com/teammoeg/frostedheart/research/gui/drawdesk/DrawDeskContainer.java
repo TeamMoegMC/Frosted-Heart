@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -41,7 +41,7 @@ public class DrawDeskContainer extends IEBaseContainer<DrawingDeskTileEntity> {
 
         boolean enabled = true;
 
-        public boolean isEnabled() {
+        public boolean isActive() {
             return enabled;
         }
 
@@ -57,7 +57,7 @@ public class DrawDeskContainer extends IEBaseContainer<DrawingDeskTileEntity> {
 
         boolean enabled = true;
 
-        public boolean isEnabled() {
+        public boolean isActive() {
             return enabled;
         }
 
@@ -71,19 +71,19 @@ public class DrawDeskContainer extends IEBaseContainer<DrawingDeskTileEntity> {
        
         this.addSlot(new EnableIESlot(this, this.inv,DrawingDeskTileEntity.PAPER_SLOT, 114, 161) {// paper
             @Override
-            public boolean isItemValid(ItemStack itemStack) {
+            public boolean mayPlace(ItemStack itemStack) {
                 return tile.isStackValid(DrawingDeskTileEntity.PAPER_SLOT, itemStack);
             }
         });
         this.addSlot(new EnableIESlot(this, this.inv, DrawingDeskTileEntity.INK_SLOT, 114, 178) {// pen
             @Override
-            public boolean isItemValid(ItemStack itemStack) {
+            public boolean mayPlace(ItemStack itemStack) {
                 return tile.isStackValid(DrawingDeskTileEntity.INK_SLOT, itemStack);
             }
         });
         this.addSlot(new EnableIESlot(this, this.inv,DrawingDeskTileEntity.EXAMINE_SLOT, 114, 93) {// research
             @Override
-            public boolean isItemValid(ItemStack itemStack) {
+            public boolean mayPlace(ItemStack itemStack) {
                 return tile.isStackValid(DrawingDeskTileEntity.EXAMINE_SLOT, itemStack);
             }
 
@@ -104,7 +104,7 @@ public class DrawDeskContainer extends IEBaseContainer<DrawingDeskTileEntity> {
     }
 
     public void setEnabled(boolean en) {
-        for (Slot s : this.inventorySlots) {
+        for (Slot s : this.slots) {
             if (s instanceof Enabled)
                 ((Enabled) s).setEnabled(en);
         }

@@ -1,19 +1,20 @@
 /*
- * Copyright (c) 2021 TeamMoeg
+ * Copyright (c) 2021-2024 TeamMoeg
  *
- * This file is part of Immersive Industry.
+ * This file is part of Frosted Heart.
  *
- * Immersive Industry is free software: you can redistribute it and/or modify
+ * Frosted Heart is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3.
  *
- * Immersive Industry is distributed in the hope that it will be useful,
+ * Frosted Heart is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with Immersive Industry. If not, see <https://www.gnu.org/licenses/>.
+ * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 package com.teammoeg.frostedheart.compat.jei.category;
@@ -75,7 +76,7 @@ public class GeneratorFuelCategory implements IRecipeCategory<GeneratorRecipe> {
         FIRE.draw(transform, 60, 30);
         SWITCH.draw(transform, 32, 32);
         String burnTime = String.valueOf(recipe.time) + " ticks";
-        ClientUtils.mc().fontRenderer.drawString(transform, burnTime, 80, 60, 0xFFFFFF);
+        ClientUtils.mc().font.draw(transform, burnTime, 80, 60, 0xFFFFFF);
     }
 
     @Override

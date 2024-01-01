@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 TeamMoeg
+ * Copyright (c) 2021-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -14,6 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 package com.teammoeg.frostedheart.climate.data;
@@ -45,7 +46,7 @@ public class FHDataReloadManager implements IResourceManagerReloadListener {
         StructureUtils.addBanedBlocks();
         WorldClimate.clear();
         for (FHDataType dat : FHDataType.values()) {
-            for (ResourceLocation rl : manager.getAllResourceLocations(dat.type.getLocation(), (s) -> s.endsWith(".json"))) {
+            for (ResourceLocation rl : manager.listResources(dat.type.getLocation(), (s) -> s.endsWith(".json"))) {
                 try {
                     try (IResource rc = manager.getResource(rl);
                          InputStream stream = rc.getInputStream();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 TeamMoeg
+ * Copyright (c) 2021-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -14,6 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 package com.teammoeg.frostedheart.content.temperature.heatervest;
@@ -34,44 +35,44 @@ public class HeaterVestModel<T extends LivingEntity> extends FHArmorBaseModel<T>
 
     public HeaterVestModel(float modelSize, float yOffsetIn, int textureWidthIn, int textureHeightIn) {
         super(modelSize, yOffsetIn, textureWidthIn, textureHeightIn);
-        ((ModelAccess) this).setRenderType(RenderType::getEntityTranslucent);
+        ((ModelAccess) this).setRenderType(RenderType::entityTranslucent);
 
-        textureWidth = 32;
-        textureHeight = 32;
+        texWidth = 32;
+        texHeight = 32;
 
         front = new ModelRenderer(this);
-        front.setRotationPoint(0.0F, 12.0F, 0.0F);
-        front.setTextureOffset(0, 16).addBox(-2.5F, -9.75F, -4.5F, 5.0F, 6.0F, 2.0F, 0.0F, false);
-        bipedBody.addChild(front);
+        front.setPos(0.0F, 12.0F, 0.0F);
+        front.texOffs(0, 16).addBox(-2.5F, -9.75F, -4.5F, 5.0F, 6.0F, 2.0F, 0.0F, false);
+        body.addChild(front);
 
         deco = new ModelRenderer(this);
-        deco.setRotationPoint(0.0F, -1.0F, 0.0F);
+        deco.setPos(0.0F, -1.0F, 0.0F);
         front.addChild(deco);
         setRotationAngle(deco, -0.3927F, 0.0F, 0.0F);
-        deco.setTextureOffset(14, 16).addBox(-3.0F, -3.0F, -5.25F, 6.0F, 3.0F, 2.0F, 0.0F, false);
+        deco.texOffs(14, 16).addBox(-3.0F, -3.0F, -5.25F, 6.0F, 3.0F, 2.0F, 0.0F, false);
 
         back = new ModelRenderer(this);
-        back.setRotationPoint(0.0F, 12.0F, 0.0F);
-        back.setTextureOffset(0, 0).addBox(-4.0F, -12.0F, -3.0F, 8.0F, 12.0F, 4.0F, 0.0F, false);
-        bipedBody.addChild(back);
+        back.setPos(0.0F, 12.0F, 0.0F);
+        back.texOffs(0, 0).addBox(-4.0F, -12.0F, -3.0F, 8.0F, 12.0F, 4.0F, 0.0F, false);
+        body.addChild(back);
 
-        this.bipedHead.showModel = false;
-        this.bipedHeadwear.showModel = false;
-        this.bipedLeftArm.showModel = false;
-        this.bipedRightArm.showModel = false;
-        this.bipedLeftLeg.showModel = false;
-        this.bipedRightLeg.showModel = false;
+        this.head.visible = false;
+        this.hat.visible = false;
+        this.leftArm.visible = false;
+        this.rightArm.visible = false;
+        this.leftLeg.visible = false;
+        this.rightLeg.visible = false;
     }
 
     public void setRotationAngle(ModelRenderer modelRenderer, float x, float y, float z) {
-        modelRenderer.rotateAngleX = x;
-        modelRenderer.rotateAngleY = y;
-        modelRenderer.rotateAngleZ = z;
+        modelRenderer.xRot = x;
+        modelRenderer.yRot = y;
+        modelRenderer.zRot = z;
     }
 
     @Override
-    public void render(MatrixStack matrixStackIn, IVertexBuilder bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
-        super.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
+    public void renderToBuffer(MatrixStack matrixStackIn, IVertexBuilder bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
+        super.renderToBuffer(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
     }
 
     static HeaterVestModel modelInstance;

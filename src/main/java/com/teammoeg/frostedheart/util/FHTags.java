@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -31,7 +31,7 @@ public class FHTags {
         public static final ITag.INamedTag<Block> ALWAYS_BREAKABLE = create("always_breakable");
 
         private static ITag.INamedTag<Block> create(String id) {
-            return BlockTags.makeWrapperTag(new ResourceLocation(FHMain.MODID, id).toString());
+            return BlockTags.bind(new ResourceLocation(FHMain.MODID, id).toString());
         }
     }
 }

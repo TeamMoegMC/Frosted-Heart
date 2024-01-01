@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 TeamMoeg
+ * Copyright (c) 2021-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -14,6 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 package com.teammoeg.frostedheart.content.temperature;
@@ -44,6 +45,8 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 
+import net.minecraft.item.Item.Properties;
+
 public class SteamBottleItem extends FHBaseItem implements IHeatingEquipment, ITempAdjustFood, EnergyHelper.IIEEnergyItem {
 
 
@@ -56,9 +59,9 @@ public class SteamBottleItem extends FHBaseItem implements IHeatingEquipment, IT
      * the Item before the action is complete.
      */
     @Override
-    public ItemStack onItemUseFinish(ItemStack stack, World worldIn, LivingEntity entityLiving) {
+    public ItemStack finishUsingItem(ItemStack stack, World worldIn, LivingEntity entityLiving) {
         PlayerEntity entityplayer = entityLiving instanceof PlayerEntity ? (PlayerEntity) entityLiving : null;
-        if (entityplayer == null || !entityplayer.abilities.isCreativeMode) {
+        if (entityplayer == null || !entityplayer.abilities.instabuild) {
             stack.shrink(1);
         }
 
@@ -67,16 +70,16 @@ public class SteamBottleItem extends FHBaseItem implements IHeatingEquipment, IT
         }
 
         if (entityplayer != null) {
-            entityplayer.addStat(Stats.ITEM_USED.get(this));
+            entityplayer.awardStat(Stats.ITEM_USED.get(this));
         }
 
-        if (entityplayer == null || !entityplayer.abilities.isCreativeMode) {
+        if (entityplayer == null || !entityplayer.abilities.instabuild) {
             if (stack.isEmpty()) {
                 return new ItemStack(Items.GLASS_BOTTLE);
             }
 
             if (entityplayer != null) {
-                entityplayer.inventory.addItemStackToInventory(new ItemStack(Items.GLASS_BOTTLE));
+                entityplayer.inventory.add(new ItemStack(Items.GLASS_BOTTLE));
             }
         }
 
@@ -84,10 +87,10 @@ public class SteamBottleItem extends FHBaseItem implements IHeatingEquipment, IT
     }
 
     @Override
-    public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+    public void appendHoverText(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         String stored = this.getEnergyStored(stack) + "/" + this.getMaxEnergyStored(stack);
-        tooltip.add(GuiUtils.translateTooltip("meme.steam_bottle").mergeStyle(TextFormatting.GRAY));
-        tooltip.add(GuiUtils.translateTooltip("steam_stored", stored).mergeStyle(TextFormatting.GOLD));
+        tooltip.add(GuiUtils.translateTooltip("meme.steam_bottle").withStyle(TextFormatting.GRAY));
+        tooltip.add(GuiUtils.translateTooltip("steam_stored", stored).withStyle(TextFormatting.GOLD));
     }
 
     /**
@@ -99,8 +102,8 @@ public class SteamBottleItem extends FHBaseItem implements IHeatingEquipment, IT
     }
 
     @Override
-    public void onCreated(ItemStack stack, World worldIn, PlayerEntity playerIn) {
-        super.onCreated(stack, worldIn, playerIn);
+    public void onCraftedBy(ItemStack stack, World worldIn, PlayerEntity playerIn) {
+        super.onCraftedBy(stack, worldIn, playerIn);
         this.receiveEnergy(stack, 240, false);
     }
 
@@ -109,7 +112,7 @@ public class SteamBottleItem extends FHBaseItem implements IHeatingEquipment, IT
      * returns the action that specifies what animation to play when the items is being used
      */
     @Override
-    public UseAction getUseAction(ItemStack stack) {
+    public UseAction getUseAnimation(ItemStack stack) {
         return UseAction.DRINK;
     }
 
@@ -118,14 +121,14 @@ public class SteamBottleItem extends FHBaseItem implements IHeatingEquipment, IT
      * {@link #onItemUse}.
      */
     @Override
-    public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand handIn) {
-        playerIn.setActiveHand(handIn);
-        return new ActionResult<>(ActionResultType.SUCCESS, playerIn.getHeldItem(handIn));
+    public ActionResult<ItemStack> use(World worldIn, PlayerEntity playerIn, Hand handIn) {
+        playerIn.startUsingItem(handIn);
+        return new ActionResult<>(ActionResultType.SUCCESS, playerIn.getItemInHand(handIn));
     }
 
     @Override
-    public void fillItemGroup(ItemGroup group, NonNullList<ItemStack> items) {
-        if (this.isInGroup(group)) {
+    public void fillItemCategory(ItemGroup group, NonNullList<ItemStack> items) {
+        if (this.allowdedIn(group)) {
             ItemStack is = new ItemStack(this);
             this.receiveEnergy(is, this.getMaxEnergyStored(is), false);
             items.add(is);

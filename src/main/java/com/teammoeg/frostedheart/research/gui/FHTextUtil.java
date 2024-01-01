@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -53,7 +53,7 @@ public class FHTextUtil {
     public static ITextComponent getOptional(String orig, String type, Supplier<String> pid) {
         if (orig==null||orig.length() == 0) {
         	String key=type + "." + FHMain.MODID + "." + pid.get();
-    		if(I18n.hasKey(key))
+    		if(I18n.exists(key))
     			return ClientTextComponentUtils.parse("{"+key+"}");
     		return null;
         }
