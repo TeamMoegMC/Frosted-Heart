@@ -21,9 +21,9 @@ package com.teammoeg.frostedheart.climate;
 
 import com.teammoeg.frostedheart.FHMain;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.nbt.CompoundTag;
 
 /**
  * The core of our dynamic body & environment temperature system
@@ -33,7 +33,7 @@ import net.minecraft.nbt.CompoundNBT;
  */
 public class TemperatureCore {
 
-	public static float getBlockTemp(ServerPlayerEntity spe) {
+	public static float getBlockTemp(ServerPlayer spe) {
 		/*long time = System.nanoTime();
 		try {*/
 
@@ -52,15 +52,15 @@ public class TemperatureCore {
 	 * On the basis of 37 celsius degree.
 	 * Example: return -1 when body temp is 36C.
 	 */
-	public static float getBodyTemperature(PlayerEntity spe) {
-		CompoundNBT nc = spe.getPersistentData().getCompound(DATA_ID);
+	public static float getBodyTemperature(Player spe) {
+		CompoundTag nc = spe.getPersistentData().getCompound(DATA_ID);
 		if (nc == null)
 			return 0;
 		return nc.getFloat("bodytemperature");
 	}
 
-	public static float getLastTemperature(PlayerEntity spe) {
-		CompoundNBT nc = spe.getPersistentData().getCompound(DATA_ID);
+	public static float getLastTemperature(Player spe) {
+		CompoundTag nc = spe.getPersistentData().getCompound(DATA_ID);
 		if (nc == null)
 			return 0;
 		return nc.getFloat("lasttemperature");
@@ -70,44 +70,44 @@ public class TemperatureCore {
 	 * On the basis of 0 celsius degree.
 	 * Example: return -20 when env temp is -20C.
 	 */
-	public static float getEnvTemperature(PlayerEntity spe) {
-		CompoundNBT nc = spe.getPersistentData().getCompound(DATA_ID);
+	public static float getEnvTemperature(Player spe) {
+		CompoundTag nc = spe.getPersistentData().getCompound(DATA_ID);
 		if (nc == null)
 			return 0;
 		return nc.getFloat("envtemperature");
 	}
 
-	public static CompoundNBT getFHData(PlayerEntity spe) {
-		CompoundNBT nc = spe.getPersistentData().getCompound(DATA_ID);
+	public static CompoundTag getFHData(Player spe) {
+		CompoundTag nc = spe.getPersistentData().getCompound(DATA_ID);
 		if (nc == null)
-			return new CompoundNBT();
+			return new CompoundTag();
 		return nc;
 	}
 
-	public static void setFHData(PlayerEntity spe, CompoundNBT nc) {
+	public static void setFHData(Player spe, CompoundTag nc) {
 		spe.getPersistentData().put(DATA_ID, nc);
 	}
 
-	public static void setBodyTemperature(PlayerEntity spe, float val) {
-		CompoundNBT nc = spe.getPersistentData().getCompound(DATA_ID);
+	public static void setBodyTemperature(Player spe, float val) {
+		CompoundTag nc = spe.getPersistentData().getCompound(DATA_ID);
 		if (nc == null)
-			nc = new CompoundNBT();
+			nc = new CompoundTag();
 		nc.putFloat("bodytemperature", val);
 		spe.getPersistentData().put(DATA_ID, nc);
 	}
 
-	public static void setEnvTemperature(PlayerEntity spe, float val) {
-		CompoundNBT nc = spe.getPersistentData().getCompound(DATA_ID);
+	public static void setEnvTemperature(Player spe, float val) {
+		CompoundTag nc = spe.getPersistentData().getCompound(DATA_ID);
 		if (nc == null)
-			nc = new CompoundNBT();
+			nc = new CompoundTag();
 		nc.putFloat("envtemperature", val);
 		spe.getPersistentData().put(DATA_ID, nc);
 	}
 
-	public static void setTemperature(PlayerEntity spe, float body, float env) {
-		CompoundNBT nc = spe.getPersistentData().getCompound(DATA_ID);
+	public static void setTemperature(Player spe, float body, float env) {
+		CompoundTag nc = spe.getPersistentData().getCompound(DATA_ID);
 		if (nc == null)
-			nc = new CompoundNBT();
+			nc = new CompoundTag();
 		nc.putFloat("bodytemperature", body);
 		nc.putFloat("envtemperature", env);
 		nc.putFloat("deltatemperature", nc.getFloat("lasttemperature") - body);

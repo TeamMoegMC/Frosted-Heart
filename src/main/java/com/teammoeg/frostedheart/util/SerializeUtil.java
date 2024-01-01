@@ -38,22 +38,22 @@ import com.google.gson.JsonPrimitive;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.teammoeg.frostedheart.FHMain;
 
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.INBT;
-import net.minecraft.nbt.JsonToNBT;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.nbt.TagParser;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.registries.ForgeRegistries;
 
 public class SerializeUtil {
     public static class Deserializer<T extends JsonElement, U extends Writeable> {
         private int id;
         public Function<T, U> fromJson;
-        public Function<PacketBuffer, U> fromPacket;
+        public Function<FriendlyByteBuf, U> fromPacket;
 
-        public Deserializer(Function<T, U> fromJson, Function<PacketBuffer, U> fromPacket) {
+        public Deserializer(Function<T, U> fromJson, Function<FriendlyByteBuf, U> fromPacket) {
             super();
             this.fromJson = fromJson;
             this.fromPacket = fromPacket;
@@ -63,11 +63,11 @@ public class SerializeUtil {
             return fromJson.apply(json);
         }
 
-        public U read(PacketBuffer packet) {
+        public U read(FriendlyByteBuf packet) {
             return fromPacket.apply(packet);
         }
 
-        public void write(PacketBuffer packet, U obj) {
+        public void write(FriendlyByteBuf packet, U obj) {
             packet.writeVarInt(id);
             obj.write(packet);
         }
@@ -77,11 +77,11 @@ public class SerializeUtil {
         }
     }
     public static class CompoundBuilder{
-    	CompoundNBT nbt=new CompoundNBT();
+    	CompoundTag nbt=new CompoundTag();
     	public static CompoundBuilder create() {
     		return new CompoundBuilder();
     	}
-    	public CompoundBuilder put(String key,INBT val) {
+    	public CompoundBuilder put(String key,Tag val) {
     		nbt.put(key, val);
     		return this;
     	}
@@ -89,7 +89,7 @@ public class SerializeUtil {
     		nbt.putUUID(key, val);
     		return this;
     	}
-    	public CompoundNBT build() {
+    	public CompoundTag build() {
     		return nbt;
     	}
 		public CompoundBuilder put(String key,int val) {
@@ -104,21 +104,21 @@ public class SerializeUtil {
     }
 
 
-    public static <T> Optional<T> readOptional(PacketBuffer buffer, Function<PacketBuffer, T> func) {
+    public static <T> Optional<T> readOptional(FriendlyByteBuf buffer, Function<FriendlyByteBuf, T> func) {
         if (buffer.readBoolean())
             return Optional.ofNullable(func.apply(buffer));
         return Optional.empty();
     }
 
-    public static <T> void writeOptional(PacketBuffer buffer, T data, BiConsumer<T, PacketBuffer> func) {
+    public static <T> void writeOptional(FriendlyByteBuf buffer, T data, BiConsumer<T, FriendlyByteBuf> func) {
         writeOptional(buffer, Optional.ofNullable(data), func);
     }
 
-    public static <T> void writeOptional2(PacketBuffer buffer, T data, BiConsumer<PacketBuffer, T> func) {
+    public static <T> void writeOptional2(FriendlyByteBuf buffer, T data, BiConsumer<FriendlyByteBuf, T> func) {
         writeOptional(buffer, data, (a, b) -> func.accept(b, a));
     }
 
-    public static <T> void writeOptional(PacketBuffer buffer, Optional<T> data, BiConsumer<T, PacketBuffer> func) {
+    public static <T> void writeOptional(FriendlyByteBuf buffer, Optional<T> data, BiConsumer<T, FriendlyByteBuf> func) {
         if (data.isPresent()) {
             buffer.writeBoolean(true);
             func.accept(data.get(), buffer);
@@ -126,7 +126,7 @@ public class SerializeUtil {
         }
         buffer.writeBoolean(false);
     }
-    public static boolean[] readBooleans(PacketBuffer buffer) {
+    public static boolean[] readBooleans(FriendlyByteBuf buffer) {
         boolean[] ret=new boolean[8];
         byte in=buffer.readByte();
         for(int i=ret.length-1;i>=0;i--) {
@@ -139,7 +139,7 @@ public class SerializeUtil {
      * Write boolean as a byte into buffer
      * @param elms elements to write, 8 elements max
      * */
-    public static void writeBooleans(PacketBuffer buffer,boolean...elms) {
+    public static void writeBooleans(FriendlyByteBuf buffer,boolean...elms) {
         if (elms.length>8) {
         	throw new IllegalArgumentException("count of boolean must not excess 8");
         }
@@ -153,7 +153,7 @@ public class SerializeUtil {
         buffer.writeByte(b);
     }
     
-    public static <T> List<T> readList(PacketBuffer buffer, Function<PacketBuffer, T> func) {
+    public static <T> List<T> readList(FriendlyByteBuf buffer, Function<FriendlyByteBuf, T> func) {
         if (!buffer.readBoolean())
             return null;
         int cnt = buffer.readVarInt();
@@ -162,7 +162,7 @@ public class SerializeUtil {
             nums.add(func.apply(buffer));
         return nums;
     }
-    public static short[] readShortArray(PacketBuffer buffer) {
+    public static short[] readShortArray(FriendlyByteBuf buffer) {
         if (!buffer.readBoolean())
             return null;
         int cnt = buffer.readVarInt();
@@ -171,7 +171,7 @@ public class SerializeUtil {
             nums[i]=buffer.readShort();
         return nums;
     }
-    public static void writeShortArray(PacketBuffer buffer,short[] arr) {
+    public static void writeShortArray(FriendlyByteBuf buffer,short[] arr) {
     	if (arr == null) {
             buffer.writeBoolean(false);
             return;
@@ -181,7 +181,7 @@ public class SerializeUtil {
         for(short s:arr)
         	buffer.writeShort(s);
     }
-    public static <T> void writeList(PacketBuffer buffer, Collection<T> elms, BiConsumer<T, PacketBuffer> func) {
+    public static <T> void writeList(FriendlyByteBuf buffer, Collection<T> elms, BiConsumer<T, FriendlyByteBuf> func) {
         if (elms == null) {
             buffer.writeBoolean(false);
             return;
@@ -191,7 +191,7 @@ public class SerializeUtil {
         elms.forEach(e -> func.accept(e, buffer));
     }
 
-    public static <T> void writeList2(PacketBuffer buffer, Collection<T> elms, BiConsumer<PacketBuffer, T> func) {
+    public static <T> void writeList2(FriendlyByteBuf buffer, Collection<T> elms, BiConsumer<FriendlyByteBuf, T> func) {
         if (elms == null) {
             buffer.writeBoolean(false);
             return;
@@ -200,19 +200,19 @@ public class SerializeUtil {
         buffer.writeVarInt(elms.size());
         elms.forEach(e -> func.accept(buffer, e));
     }
-    public static <K,V> void writeMap(PacketBuffer buffer,Map<K,V> elms, BiConsumer<K, PacketBuffer> keywriter, BiConsumer<V, PacketBuffer> valuewriter) {
+    public static <K,V> void writeMap(FriendlyByteBuf buffer,Map<K,V> elms, BiConsumer<K, FriendlyByteBuf> keywriter, BiConsumer<V, FriendlyByteBuf> valuewriter) {
         writeList(buffer,elms.entrySet(),(p,b)->{
         	keywriter.accept(p.getKey(),b);
         	valuewriter.accept(p.getValue(), b);
         });
     }
-    public static <V> void writeStringMap(PacketBuffer buffer,Map<String,V> elms, BiConsumer<V, PacketBuffer> valuewriter) {
+    public static <V> void writeStringMap(FriendlyByteBuf buffer,Map<String,V> elms, BiConsumer<V, FriendlyByteBuf> valuewriter) {
         writeMap(buffer,elms,(p,b)->b.writeUtf(p),valuewriter);
     }
-    public static <V> Map<String,V> readStringMap(PacketBuffer buffer,Map<String,V> map,Function<PacketBuffer, V> valuereader) {
-        return readMap(buffer,map,PacketBuffer::readUtf,valuereader);
+    public static <V> Map<String,V> readStringMap(FriendlyByteBuf buffer,Map<String,V> map,Function<FriendlyByteBuf, V> valuereader) {
+        return readMap(buffer,map,FriendlyByteBuf::readUtf,valuereader);
     }
-    public static <K,V> Map<K,V> readMap(PacketBuffer buffer,Map<K,V> map, Function<PacketBuffer, K> keyreader,Function<PacketBuffer, V> valuereader) {
+    public static <K,V> Map<K,V> readMap(FriendlyByteBuf buffer,Map<K,V> map, Function<FriendlyByteBuf, K> keyreader,Function<FriendlyByteBuf, V> valuereader) {
     	map.clear(); 
     	if (!buffer.readBoolean())
              return map;
@@ -252,8 +252,8 @@ public class SerializeUtil {
         return ja;
     }
 
-    public static <T> ListNBT toNBTList(Collection<T> stacks, Function<T, INBT> mapper) {
-        ListNBT nbt = new ListNBT();
+    public static <T> ListTag toNBTList(Collection<T> stacks, Function<T, Tag> mapper) {
+        ListTag nbt = new ListTag();
         stacks.stream().map(mapper).forEach(nbt::add);
         return nbt;
     }
@@ -281,7 +281,7 @@ public class SerializeUtil {
                 ret.setCount(jo.get("count").getAsInt());
             if (jo.has("nbt"))
                 try {
-                    ret.setTag(JsonToNBT.parseTag(jo.get("nbt").getAsString()));
+                    ret.setTag(TagParser.parseTag(jo.get("nbt").getAsString()));
                 } catch (CommandSyntaxException e) {
                     FHMain.LOGGER.warn(e.getMessage());
                 }

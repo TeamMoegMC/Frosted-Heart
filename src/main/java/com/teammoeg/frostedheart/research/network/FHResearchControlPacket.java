@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -27,8 +27,8 @@ import com.teammoeg.frostedheart.research.data.ResearchData;
 import com.teammoeg.frostedheart.research.data.TeamResearchData;
 import com.teammoeg.frostedheart.research.research.Research;
 
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.fml.network.NetworkEvent;
 
 public class FHResearchControlPacket {
@@ -48,12 +48,12 @@ public class FHResearchControlPacket {
         this.researchID = research.getRId();
     }
 
-    public FHResearchControlPacket(PacketBuffer buffer) {
+    public FHResearchControlPacket(FriendlyByteBuf buffer) {
         researchID = buffer.readVarInt();
         status = Operator.values()[buffer.readVarInt()];
     }
 
-    public void encode(PacketBuffer buffer) {
+    public void encode(FriendlyByteBuf buffer) {
         buffer.writeVarInt(researchID);
         buffer.writeVarInt(status.ordinal());
     }
@@ -62,7 +62,7 @@ public class FHResearchControlPacket {
 
         context.get().enqueueWork(() -> {
             Research r = FHResearch.researches.getById(researchID);
-            ServerPlayerEntity spe = context.get().getSender();
+            ServerPlayer spe = context.get().getSender();
             TeamResearchData trd = ResearchDataAPI.getData(spe);
             switch (status) {
                 case COMMIT_ITEM:

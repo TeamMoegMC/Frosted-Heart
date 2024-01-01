@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -21,7 +21,7 @@ package com.teammoeg.frostedheart;
 
 import java.util.function.Function;
 
-import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.server.level.ServerPlayer;
 
 public enum FHDifficulty {
     Easy(s -> 0.05F),
@@ -29,10 +29,10 @@ public enum FHDifficulty {
     Hard(s -> s.isSprinting() ? 0.036F : 0.024F),
     HardCore(s -> 0F);
 
-    private FHDifficulty(Function<ServerPlayerEntity, Float> self_heat) {
+    private FHDifficulty(Function<ServerPlayer, Float> self_heat) {
         this.self_heat = self_heat;
 
     }
 
-    public final Function<ServerPlayerEntity, Float> self_heat;
+    public final Function<ServerPlayer, Float> self_heat;
 }

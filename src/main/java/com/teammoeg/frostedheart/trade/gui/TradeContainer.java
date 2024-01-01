@@ -39,17 +39,17 @@ import com.teammoeg.frostedheart.trade.policy.snapshot.SellData;
 import com.teammoeg.frostedheart.util.FHUtils;
 import com.teammoeg.frostedheart.util.VillagerDataHolder;
 
-import net.minecraft.entity.merchant.villager.VillagerEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.entity.npc.Villager;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.Container;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.util.Mth;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.network.PacketDistributor;
@@ -57,12 +57,12 @@ import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.SlotItemHandler;
 
-public class TradeContainer extends Container {
+public class TradeContainer extends AbstractContainerMenu {
 	public FHVillagerData data;
 	public PlayerRelationData pld;
 	public RelationList relations;
 	public PolicySnapshot policy;
-	public VillagerEntity ve;
+	public Villager ve;
 	public static final int RELATION_TO_TRADE = -30;
 
 	ItemStackHandler inv = new ItemStackHandler(12) {
@@ -84,7 +84,7 @@ public class TradeContainer extends Container {
 	public class DetectionSlot extends Slot {
 		boolean isSaleable = false;
 
-		public DetectionSlot(IInventory inventoryIn, int index, int xPosition, int yPosition) {
+		public DetectionSlot(Container inventoryIn, int index, int xPosition, int yPosition) {
 			super(inventoryIn, index, xPosition, yPosition);
 			slots.add(this);
 		}
@@ -126,12 +126,12 @@ public class TradeContainer extends Container {
 	public int discountAmount;
 	public int relationMinus;
 
-	public TradeContainer(int id, PlayerInventory inventoryPlayer, PacketBuffer pb) {
+	public TradeContainer(int id, Inventory inventoryPlayer, FriendlyByteBuf pb) {
 		this(id, inventoryPlayer,
-				(VillagerEntity) inventoryPlayer.player.getCommandSenderWorld().getEntity(pb.readVarInt()));
+				(Villager) inventoryPlayer.player.getCommandSenderWorld().getEntity(pb.readVarInt()));
 
 		data = new FHVillagerData(ve);
-		CompoundNBT d = pb.readNbt();
+		CompoundTag d = pb.readNbt();
 		// System.out.println(d);
 		data.deserializeFromRecv(d);
 		pld = new PlayerRelationData();
@@ -148,8 +148,8 @@ public class TradeContainer extends Container {
 		this.recalc();
 	}
 
-	public TradeContainer(int id, PlayerInventory inventoryPlayer,
-			VillagerEntity ve /* ,PlayerRelationData prd,RelationList rel */) {
+	public TradeContainer(int id, Inventory inventoryPlayer,
+			Villager ve /* ,PlayerRelationData prd,RelationList rel */) {
 		super(FHContent.TRADE_GUI.get(), id);
 		// Server does not need such data as server always have access to all data.
 		/*
@@ -205,7 +205,7 @@ public class TradeContainer extends Container {
 	}
 
 	@Override
-	public ItemStack quickMoveStack(PlayerEntity player, int slot) {
+	public ItemStack quickMoveStack(Player player, int slot) {
 		ItemStack itemstack = ItemStack.EMPTY;
 		Slot slotObject = super.slots.get(slot);
 		final int slotCount = 12;
@@ -256,7 +256,7 @@ public class TradeContainer extends Container {
 			if (relation < RELATION_TO_TRADE) {
 				relationMinus = 10000000;
 			} else if (relation < 0 && voffer > 0) {
-				relationMinus = (int) (MathHelper.lerp(MathHelper.clamp(-relation / 30f, 0, 1), 0, 0.2) * voffer);
+				relationMinus = (int) (Mth.lerp(Mth.clamp(-relation / 30f, 0, 1), 0, 0.2) * voffer);
 			}
 			voffer += relationMinus;
 			if (discountRatio > 0) {
@@ -281,7 +281,7 @@ public class TradeContainer extends Container {
 			balance = 0;
 	}
 
-	public void handleBargain(ServerPlayerEntity pe) {
+	public void handleBargain(ServerPlayer pe) {
 		if (relations.sum() < 40)
 			return;
 		recalc();
@@ -301,7 +301,7 @@ public class TradeContainer extends Container {
 		PacketHandler.send(PacketDistributor.PLAYER.with(() -> pe), new BargainResponse(this, succeed));
 	}
 
-	public void commitTrade(ServerPlayerEntity pe) {
+	public void commitTrade(ServerPlayer pe) {
 		recalc();
 		int poffer = 0;
 		if (balance >= 0) {
@@ -350,25 +350,25 @@ public class TradeContainer extends Container {
 			}
 			this.setData(data, pe);
 			PacketHandler.send(PacketDistributor.PLAYER.with(() -> pe), new TradeUpdatePacket(
-					data.serializeForSend(new CompoundNBT()), pld.serialize(new CompoundNBT()), relations, true));
+					data.serializeForSend(new CompoundTag()), pld.serialize(new CompoundTag()), relations, true));
 		}
 	}
 
-	public boolean stillValid(PlayerEntity playerIn) {
+	public boolean stillValid(Player playerIn) {
 		return ve.getTradingPlayer()==playerIn;
 	}
 
 	@Override
-	public void removed(PlayerEntity pPlayer) {
+	public void removed(Player pPlayer) {
 		this.ve.setTradingPlayer(null);
 		if (!pPlayer.isAlive()
-				|| pPlayer instanceof ServerPlayerEntity && ((ServerPlayerEntity) pPlayer).hasDisconnected()) {
+				|| pPlayer instanceof ServerPlayer && ((ServerPlayer) pPlayer).hasDisconnected()) {
 			for (int j = 0; j < inv.getSlots(); ++j) {
 				pPlayer.drop(inv.getStackInSlot(j), false);
 			}
 		} else {
-			PlayerInventory inventory = pPlayer.inventory;
-			if (inventory.player instanceof ServerPlayerEntity) {
+			Inventory inventory = pPlayer.inventory;
+			if (inventory.player instanceof ServerPlayer) {
 				for (int i = 0; i < inv.getSlots(); ++i) {
 					inventory.placeItemBackInInventory(pPlayer.level, inv.getStackInSlot(i));
 				}
@@ -377,7 +377,7 @@ public class TradeContainer extends Container {
 
 	}
 
-	public void setData(FHVillagerData dat, PlayerEntity pe) {
+	public void setData(FHVillagerData dat, Player pe) {
 		data = dat;
 		pld = data.getRelationDataForRead(pe);
 		relations = data.getRelationShip(pe);
@@ -389,7 +389,7 @@ public class TradeContainer extends Container {
 		DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> ClientTradeHandler::updateTrade);
 	}
 
-	public void update(CompoundNBT sdata, CompoundNBT splayer, RelationList rels, boolean isReset) {
+	public void update(CompoundTag sdata, CompoundTag splayer, RelationList rels, boolean isReset) {
 		this.data.deserializeFromRecv(sdata);
 		this.pld.deserialize(splayer);
 		policy = data.getPolicy();

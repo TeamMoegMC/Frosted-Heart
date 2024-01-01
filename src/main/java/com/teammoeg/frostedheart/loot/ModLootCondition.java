@@ -32,13 +32,13 @@ import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.teammoeg.frostedheart.util.SerializeUtil;
 
-import net.minecraft.loot.ILootSerializer;
-import net.minecraft.loot.LootConditionType;
-import net.minecraft.loot.LootContext;
-import net.minecraft.loot.conditions.ILootCondition;
+import net.minecraft.world.level.storage.loot.Serializer;
+import net.minecraft.world.level.storage.loot.predicates.LootItemConditionType;
+import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 
-public class ModLootCondition implements ILootCondition {
-    public static LootConditionType TYPE;
+public class ModLootCondition implements LootItemCondition {
+    public static LootItemConditionType TYPE;
     private Set<String> mods=new HashSet<>();
     public ModLootCondition(String mod) {
     	mods.add(mod);
@@ -55,11 +55,11 @@ public class ModLootCondition implements ILootCondition {
     }
 
     @Override
-    public LootConditionType getType() {
+    public LootItemConditionType getType() {
         return TYPE;
     }
 
-    public static class Serializer implements ILootSerializer<ModLootCondition> {
+    public static class Serializer implements Serializer<ModLootCondition> {
 
         @Override
         public void serialize(JsonObject jsonObject, ModLootCondition cond, JsonSerializationContext serializationContext) {

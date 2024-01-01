@@ -31,15 +31,15 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.teammoeg.frostedheart.util.StructureUtils;
 
-import net.minecraft.block.BlockState;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.tileentity.LockableLootTileEntity;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MutableBoundingBox;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.ISeedReader;
-import net.minecraft.world.IServerWorld;
-import net.minecraft.world.gen.feature.structure.StructurePiece;
+import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraft.world.level.levelgen.structure.StructurePiece;
 
 @Mixin(StructurePiece.class)
 public class MixinStructurePiece {
@@ -48,7 +48,7 @@ public class MixinStructurePiece {
      * @reason auto remake chests
      */
     @Overwrite
-    protected boolean generateChest(IServerWorld worldIn, MutableBoundingBox boundsIn, Random rand, BlockPos posIn,
+    protected boolean generateChest(ServerLevelAccessor worldIn, BoundingBox boundsIn, Random rand, BlockPos posIn,
                                     ResourceLocation resourceLocationIn, @Nullable BlockState p_191080_6_) {
         if (boundsIn.isVecInside(posIn) && !worldIn.getBlockState(posIn).matchesBlock(StructureUtils.getChest())) {
             if (p_191080_6_ == null) {

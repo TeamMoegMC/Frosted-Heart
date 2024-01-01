@@ -27,17 +27,17 @@ import com.teammoeg.frostedheart.FHItems;
 import com.teammoeg.frostedheart.FHMain;
 
 import net.minecraft.data.DataGenerator;
-import net.minecraft.data.TagsProvider;
-import net.minecraft.item.Item;
+import net.minecraft.data.tags.TagsProvider;
+import net.minecraft.world.item.Item;
 import net.minecraft.tags.ItemTags;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.registry.Registry;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.Registry;
 import net.minecraftforge.common.Tags.IOptionalNamedTag;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.registries.ForgeRegistries;
 
-import net.minecraft.data.TagsProvider.Builder;
+import net.minecraft.data.tags.TagsProvider.TagAppender;
 
 public class FHItemTagProvider extends TagsProvider<Item> {
 
@@ -61,11 +61,11 @@ public class FHItemTagProvider extends TagsProvider<Item> {
 	}
 
 
-	private Builder<Item> tag(String s) {
+	private TagAppender<Item> tag(String s) {
 		return this.tag(ItemTags.createOptional(mrl(s)));
 	}
 
-	private Builder<Item> tag(ResourceLocation s) {
+	private TagAppender<Item> tag(ResourceLocation s) {
 		return this.tag(ItemTags.createOptional(s));
 	}
 

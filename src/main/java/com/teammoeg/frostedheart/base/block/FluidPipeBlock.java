@@ -27,29 +27,29 @@ import com.teammoeg.frostedheart.FHContent;
 import com.teammoeg.frostedheart.FHMain;
 import com.teammoeg.frostedheart.content.steamenergy.ISteamEnergyBlock;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.IWaterLoggable;
-import net.minecraft.block.SixWayBlock;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.item.Item;
-import net.minecraft.pathfinding.PathType;
-import net.minecraft.state.properties.BlockStateProperties;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Direction.Axis;
-import net.minecraft.util.Direction.AxisDirection;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockDisplayReader;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.TickPriority;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.SimpleWaterloggedBlock;
+import net.minecraft.world.level.block.PipeBlock;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.pathfinder.PathComputationType;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.core.Direction.AxisDirection;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.TickPriority;
 
-import net.minecraft.block.AbstractBlock.Properties;
+import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
 
-public class FluidPipeBlock<T extends FluidPipeBlock<T>> extends SixWayBlock implements IWaterLoggable {
+public class FluidPipeBlock<T extends FluidPipeBlock<T>> extends PipeBlock implements SimpleWaterloggedBlock {
     Class<T> type;
     public final String name;
     protected int lightOpacity;
@@ -64,7 +64,7 @@ public class FluidPipeBlock<T extends FluidPipeBlock<T>> extends SixWayBlock imp
     }
 
     @Override
-    public int getLightBlock(BlockState state, IBlockReader worldIn, BlockPos pos) {
+    public int getLightBlock(BlockState state, BlockGetter worldIn, BlockPos pos) {
         if (state.isSolidRender(worldIn, pos))
             return lightOpacity;
         else
@@ -102,7 +102,7 @@ public class FluidPipeBlock<T extends FluidPipeBlock<T>> extends SixWayBlock imp
     }
 
     @Nullable
-    private Axis getAxis(IBlockReader world, BlockPos pos, BlockState state) {
+    private Axis getAxis(BlockGetter world, BlockPos pos, BlockState state) {
         if (!type.isInstance(state.getBlock())) return null;
         for (Axis axis : Axis.values()) {
             Direction d1 = Direction.get(AxisDirection.NEGATIVE, axis);
@@ -122,14 +122,14 @@ public class FluidPipeBlock<T extends FluidPipeBlock<T>> extends SixWayBlock imp
     }
 
 
-    public boolean canConnectTo(IWorld world, BlockPos neighbourPos, BlockState neighbour, Direction direction) {
+    public boolean canConnectTo(LevelAccessor world, BlockPos neighbourPos, BlockState neighbour, Direction direction) {
         if (neighbour.getBlock() instanceof ISteamEnergyBlock && ((ISteamEnergyBlock) neighbour.getBlock()).canConnectFrom(world, neighbourPos, neighbour, direction))
             return true;
 
         return false;
     }
 
-    public boolean shouldDrawRim(IWorld world, BlockPos pos, BlockState state,
+    public boolean shouldDrawRim(LevelAccessor world, BlockPos pos, BlockState state,
                                  Direction direction) {
         if (!isOpenAt(state, direction))
             return false;
@@ -154,12 +154,12 @@ public class FluidPipeBlock<T extends FluidPipeBlock<T>> extends SixWayBlock imp
         return state.getValue(PROPERTY_BY_DIRECTION.get(direction));
     }
 
-    public boolean isCornerOrEndPipe(IBlockDisplayReader world, BlockPos pos, BlockState state) {
+    public boolean isCornerOrEndPipe(BlockAndTintGetter world, BlockPos pos, BlockState state) {
         return (type.isInstance(state.getBlock())) && getAxis(world, pos, state) == null
                 && !shouldDrawCasing(world, pos, state);
     }
 
-    public boolean shouldDrawCasing(IBlockDisplayReader world, BlockPos pos, BlockState state) {
+    public boolean shouldDrawCasing(BlockAndTintGetter world, BlockPos pos, BlockState state) {
         if (!type.isInstance(state.getBlock()))
             return false;
         Axis axis = getAxis(world, pos, state);
@@ -171,13 +171,13 @@ public class FluidPipeBlock<T extends FluidPipeBlock<T>> extends SixWayBlock imp
     }
 
     @Override
-    protected void createBlockStateDefinition(net.minecraft.state.StateContainer.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(net.minecraft.world.level.block.state.StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(NORTH, EAST, SOUTH, WEST, UP, DOWN, BlockStateProperties.WATERLOGGED);
         super.createBlockStateDefinition(builder);
     }
 
     @Override
-    public BlockState getStateForPlacement(BlockItemUseContext context) {
+    public BlockState getStateForPlacement(BlockPlaceContext context) {
         FluidState FluidState = context.getLevel()
                 .getFluidState(context.getClickedPos());
         return updateBlockState(defaultBlockState(), context.getNearestLookingDirection(), null, context.getLevel(),
@@ -187,7 +187,7 @@ public class FluidPipeBlock<T extends FluidPipeBlock<T>> extends SixWayBlock imp
 
     @Override
     public BlockState updateShape(BlockState state, Direction direction, BlockState neighbourState,
-                                          IWorld world, BlockPos pos, BlockPos neighbourPos) {
+                                          LevelAccessor world, BlockPos pos, BlockPos neighbourPos) {
         if (state.getValue(BlockStateProperties.WATERLOGGED))
             world.getLiquidTicks()
                     .scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(world));
@@ -198,7 +198,7 @@ public class FluidPipeBlock<T extends FluidPipeBlock<T>> extends SixWayBlock imp
     }
 
     public BlockState updateBlockState(BlockState state, Direction preferredDirection, @Nullable Direction ignore,
-                                       IWorld world, BlockPos pos) {
+                                       LevelAccessor world, BlockPos pos) {
 
         for (Direction d : Direction.values())
             if (d != ignore) {
@@ -214,7 +214,7 @@ public class FluidPipeBlock<T extends FluidPipeBlock<T>> extends SixWayBlock imp
     }
 
     @Override
-    public boolean isPathfindable(BlockState state, IBlockReader worldIn, BlockPos pos, PathType type) {
+    public boolean isPathfindable(BlockState state, BlockGetter worldIn, BlockPos pos, PathComputationType type) {
         return false;
     }
 

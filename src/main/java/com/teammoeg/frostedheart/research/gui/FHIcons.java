@@ -27,7 +27,7 @@ import java.util.function.Consumer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.teammoeg.frostedheart.client.util.GuiUtils;
 import com.teammoeg.frostedheart.research.FHResearch;
 import com.teammoeg.frostedheart.research.JsonSerializerRegistry;
@@ -57,12 +57,12 @@ import dev.ftb.mods.ftblibrary.ui.SimpleTextButton;
 import dev.ftb.mods.ftblibrary.ui.Theme;
 import dev.ftb.mods.ftblibrary.ui.Widget;
 import dev.ftb.mods.ftblibrary.ui.input.MouseButton;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.IItemProvider;
-import net.minecraft.util.JSONUtils;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.level.ItemLike;
+import net.minecraft.util.GsonHelper;
+import net.minecraft.resources.ResourceLocation;
 
 public class FHIcons {
 
@@ -72,7 +72,7 @@ public class FHIcons {
 		}
 
 		@Override
-		public void write(PacketBuffer buffer) {
+		public void write(FriendlyByteBuf buffer) {
 			serializers.writeId(buffer, this);
 		}
 
@@ -98,7 +98,7 @@ public class FHIcons {
 		/**
 		 * @param e
 		 */
-		public static FHNopIcon get(PacketBuffer e) {
+		public static FHNopIcon get(FriendlyByteBuf e) {
 			return INSTANCE;
 		}
 
@@ -111,7 +111,7 @@ public class FHIcons {
 		}
 
 		@Override
-		public void draw(MatrixStack ms, int x, int y, int w, int h) {
+		public void draw(PoseStack ms, int x, int y, int w, int h) {
 		}
 
 	}
@@ -134,8 +134,8 @@ public class FHIcons {
 			init();
 		}
 
-		public FHItemIcon(PacketBuffer buffer) {
-			stack = SerializeUtil.readOptional(buffer, PacketBuffer::readItem).orElse(null);
+		public FHItemIcon(FriendlyByteBuf buffer) {
+			stack = SerializeUtil.readOptional(buffer, FriendlyByteBuf::readItem).orElse(null);
 			init();
 		}
 
@@ -144,7 +144,7 @@ public class FHIcons {
 			init();
 		}
 
-		public FHItemIcon(IItemProvider item2) {
+		public FHItemIcon(ItemLike item2) {
 			this(new ItemStack(item2));
 		}
 
@@ -154,7 +154,7 @@ public class FHIcons {
 		}
 
 		@Override
-		public void draw(MatrixStack matrixStack, int x, int y, int w, int h) {
+		public void draw(PoseStack matrixStack, int x, int y, int w, int h) {
 			nested.draw(matrixStack, x, y, w, h);
 			if (stack != null && stack.getCount() > 1) {
 				matrixStack.pushPose();
@@ -179,9 +179,9 @@ public class FHIcons {
 		}
 
 		@Override
-		public void write(PacketBuffer buffer) {
+		public void write(FriendlyByteBuf buffer) {
 			super.write(buffer);
-			SerializeUtil.writeOptional2(buffer, stack, PacketBuffer::writeItem);
+			SerializeUtil.writeOptional2(buffer, stack, FriendlyByteBuf::writeItem);
 		}
 
 		public ItemStack getStack() {
@@ -200,7 +200,7 @@ public class FHIcons {
 			}
 		}
 
-		public FHCombinedIcon(PacketBuffer buffer) {
+		public FHCombinedIcon(FriendlyByteBuf buffer) {
 			large = FHIcons.readIcon(buffer);
 			small = FHIcons.readIcon(buffer);
 		}
@@ -211,7 +211,7 @@ public class FHIcons {
 		}
 
 		@Override
-		public void draw(MatrixStack ms, int x, int y, int w, int h) {
+		public void draw(PoseStack ms, int x, int y, int w, int h) {
 			GuiHelper.setupDrawing();
 			if (large != null)
 				large.draw(ms, x, y, w, h);
@@ -232,7 +232,7 @@ public class FHIcons {
 		}
 
 		@Override
-		public void write(PacketBuffer buffer) {
+		public void write(FriendlyByteBuf buffer) {
 			super.write(buffer);
 			large.write(buffer);
 			small.write(buffer);
@@ -251,7 +251,7 @@ public class FHIcons {
 			}
 		}
 
-		public FHAnimatedIcon(PacketBuffer buffer) {
+		public FHAnimatedIcon(FriendlyByteBuf buffer) {
 			icons = SerializeUtil.readList(buffer, FHIcons::readIcon);
 		}
 
@@ -266,7 +266,7 @@ public class FHIcons {
 		}
 
 		@Override
-		public void draw(MatrixStack ms, int x, int y, int w, int h) {
+		public void draw(PoseStack ms, int x, int y, int w, int h) {
 			if (icons.size() > 0) {
 				GuiHelper.setupDrawing();
 				icons.get((int) ((System.currentTimeMillis() / 1000) % icons.size())).draw(ms, x, y, w, h);
@@ -280,7 +280,7 @@ public class FHIcons {
 		}
 
 		@Override
-		public void write(PacketBuffer buffer) {
+		public void write(FriendlyByteBuf buffer) {
 			super.write(buffer);
 			SerializeUtil.writeList(buffer, icons, FHIcon::write);
 		}
@@ -293,7 +293,7 @@ public class FHIcons {
 			this(Ingredient.fromJson(elm.getAsJsonObject().get("ingredient")));
 		}
 
-		public FHIngredientIcon(PacketBuffer buffer) {
+		public FHIngredientIcon(FriendlyByteBuf buffer) {
 			this(Ingredient.fromNetwork(buffer));
 
 		}
@@ -312,7 +312,7 @@ public class FHIcons {
 		}
 
 		@Override
-		public void write(PacketBuffer buffer) {
+		public void write(FriendlyByteBuf buffer) {
 			super.write(buffer);
 			igd.toNetwork(buffer);
 		}
@@ -326,7 +326,7 @@ public class FHIcons {
 			this(new ResourceLocation(elm.getAsJsonObject().get("location").getAsString()));
 		}
 
-		public FHTextureIcon(PacketBuffer buffer) {
+		public FHTextureIcon(FriendlyByteBuf buffer) {
 			this(buffer.readResourceLocation());
 		}
 
@@ -336,7 +336,7 @@ public class FHIcons {
 		}
 
 		@Override
-		public void draw(MatrixStack ms, int x, int y, int w, int h) {
+		public void draw(PoseStack ms, int x, int y, int w, int h) {
 			GuiHelper.setupDrawing();
 			nested.draw(ms, x, y, w, h);
 		}
@@ -349,7 +349,7 @@ public class FHIcons {
 		}
 
 		@Override
-		public void write(PacketBuffer buffer) {
+		public void write(FriendlyByteBuf buffer) {
 			super.write(buffer);
 			buffer.writeResourceLocation(rl);
 		}
@@ -364,11 +364,11 @@ public class FHIcons {
 			this(new ResourceLocation(elm.getAsJsonObject().get("location").getAsString()),
 					elm.getAsJsonObject().get("x").getAsInt(), elm.getAsJsonObject().get("y").getAsInt(),
 					elm.getAsJsonObject().get("w").getAsInt(), elm.getAsJsonObject().get("h").getAsInt(),
-					JSONUtils.getAsInt(elm.getAsJsonObject(), "tw", 256),
-					JSONUtils.getAsInt(elm.getAsJsonObject(), "th", 256));
+					GsonHelper.getAsInt(elm.getAsJsonObject(), "tw", 256),
+					GsonHelper.getAsInt(elm.getAsJsonObject(), "th", 256));
 		}
 
-		public FHTextureUVIcon(PacketBuffer buffer) {
+		public FHTextureUVIcon(FriendlyByteBuf buffer) {
 			this(buffer.readResourceLocation(), buffer.readVarInt(), buffer.readVarInt(), buffer.readVarInt(),
 					buffer.readVarInt(), buffer.readVarInt(), buffer.readVarInt());
 		}
@@ -393,7 +393,7 @@ public class FHIcons {
 		}
 
 		@Override
-		public void draw(MatrixStack ms, int x, int y, int w, int h) {
+		public void draw(PoseStack ms, int x, int y, int w, int h) {
 			GuiHelper.setupDrawing();
 			if (nested != null)
 				nested.draw(ms, x, y, w, h);
@@ -413,7 +413,7 @@ public class FHIcons {
 		}
 
 		@Override
-		public void write(PacketBuffer buffer) {
+		public void write(FriendlyByteBuf buffer) {
 			super.write(buffer);
 			buffer.writeResourceLocation(rl);
 			buffer.writeVarInt(x);
@@ -437,12 +437,12 @@ public class FHIcons {
 			this(elm.getAsJsonObject().get("name").getAsString());
 		}
 
-		public FHDelegateIcon(PacketBuffer buffer) {
+		public FHDelegateIcon(FriendlyByteBuf buffer) {
 			this(buffer.readUtf());
 		}
 
 		@Override
-		public void draw(MatrixStack ms, int x, int y, int w, int h) {
+		public void draw(PoseStack ms, int x, int y, int w, int h) {
 			GuiHelper.setupDrawing();
 			TechIcons.internals.get(name).draw(ms, x, y, w, h);
 		}
@@ -455,7 +455,7 @@ public class FHIcons {
 		}
 
 		@Override
-		public void write(PacketBuffer buffer) {
+		public void write(FriendlyByteBuf buffer) {
 			super.write(buffer);
 			buffer.writeUtf(name);
 		}
@@ -473,12 +473,12 @@ public class FHIcons {
 			this(elm.getAsJsonObject().get("text").getAsString());
 		}
 
-		public FHTextIcon(PacketBuffer buffer) {
+		public FHTextIcon(FriendlyByteBuf buffer) {
 			this(buffer.readUtf());
 		}
 
 		@Override
-		public void draw(MatrixStack ms, int x, int y, int w, int h) {
+		public void draw(PoseStack ms, int x, int y, int w, int h) {
 
 			ms.pushPose();
 			ms.translate(x, y, 0);
@@ -501,7 +501,7 @@ public class FHIcons {
 		}
 
 		@Override
-		public void write(PacketBuffer buffer) {
+		public void write(FriendlyByteBuf buffer) {
 			super.write(buffer);
 			buffer.writeUtf(text);
 		}
@@ -687,7 +687,7 @@ public class FHIcons {
 		}
 
 		@Override
-		public void draw(MatrixStack arg0, Theme arg1, int arg2, int arg3, int arg4, int arg5) {
+		public void draw(PoseStack arg0, Theme arg1, int arg2, int arg3, int arg4, int arg5) {
 			super.draw(arg0, arg1, arg2, arg3, arg4, arg5);
 			v.draw(arg0, arg2 + 300, arg3 + 20, 32, 32);
 		}
@@ -710,7 +710,7 @@ public class FHIcons {
 		return new FHItemIcon(item);
 	}
 
-	public static FHIcon getIcon(IItemProvider item) {
+	public static FHIcon getIcon(ItemLike item) {
 		return new FHItemIcon(item);
 	}
 
@@ -779,7 +779,7 @@ public class FHIcons {
 		return FHNopIcon.INSTANCE;
 	}
 
-	public static FHIcon readIcon(PacketBuffer elm) {
+	public static FHIcon readIcon(FriendlyByteBuf elm) {
 		return serializers.readOrDefault(elm, FHNopIcon.INSTANCE);
 	}
 
@@ -794,12 +794,12 @@ public class FHIcons {
 		return getAnimatedIcon(icons);
 	}
 
-	public static FHIcon getIcon(IItemProvider[] items) {
+	public static FHIcon getIcon(ItemLike[] items) {
 		return new FHIngredientIcon(Ingredient.of(items));
 	}
 
-	public static FHIcon getIcon(Collection<IItemProvider> items) {
-		return new FHIngredientIcon(Ingredient.of(items.toArray(new IItemProvider[0])));
+	public static FHIcon getIcon(Collection<ItemLike> items) {
+		return new FHIngredientIcon(Ingredient.of(items.toArray(new ItemLike[0])));
 	}
 
 }

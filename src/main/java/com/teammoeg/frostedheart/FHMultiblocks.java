@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -28,7 +28,7 @@ import com.teammoeg.frostedheart.content.steamenergy.radiator.RadiatorMultiblock
 
 import blusunrize.immersiveengineering.api.multiblocks.MultiblockHandler;
 import blusunrize.immersiveengineering.common.blocks.multiblocks.IETemplateMultiblock;
-import net.minecraft.block.Block;
+import net.minecraft.world.level.block.Block;
 
 public class FHMultiblocks {
     public static IETemplateMultiblock GENERATOR = new T1GeneratorMultiblock();

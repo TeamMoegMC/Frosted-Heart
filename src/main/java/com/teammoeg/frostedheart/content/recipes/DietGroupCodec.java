@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.FriendlyByteBuf;
 import top.theillusivec4.diet.api.IDietGroup;
 import top.theillusivec4.diet.common.group.DietGroups;
 
@@ -80,7 +80,7 @@ public class DietGroupCodec {
         return -1;
     }
 
-    public static void write(PacketBuffer pb, Map<String, Float> f) {
+    public static void write(FriendlyByteBuf pb, Map<String, Float> f) {
         pb.writeVarInt(f.size());
         if (!f.isEmpty())
             f.entrySet().forEach(e -> {
@@ -89,7 +89,7 @@ public class DietGroupCodec {
             });
     }
 
-    public static Map<String, Float> read(PacketBuffer pb) {
+    public static Map<String, Float> read(FriendlyByteBuf pb) {
         int size = pb.readVarInt();
         Map<String, Float> m = new HashMap<>();
         if (size > 0)

@@ -35,27 +35,27 @@ import com.teammoeg.frostedheart.research.ResearchListeners;
 import com.yanny.age.stone.blocks.FlintWorkbenchTileEntity;
 import com.yanny.age.stone.recipes.FlintWorkbenchRecipe;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.util.ActionResultType;
-import net.minecraft.util.NonNullList;
+import net.minecraft.core.NonNullList;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraftforge.items.wrapper.RecipeWrapper;
 
 @Mixin(FlintWorkbenchTileEntity.class)
-public class FlintWorkbenchTileEntityMixin extends TileEntity {
+public class FlintWorkbenchTileEntityMixin extends BlockEntity {
 	@Shadow(remap = false)
 	private NonNullList<ItemStack> stacks;
 	@Shadow(remap = false)
 	private RecipeWrapper inventoryWrapper;
 
-	public FlintWorkbenchTileEntityMixin(TileEntityType<?> tileEntityTypeIn) {
+	public FlintWorkbenchTileEntityMixin(BlockEntityType<?> tileEntityTypeIn) {
 		super(tileEntityTypeIn);
 	}
 
-	PlayerEntity pe;
+	Player pe;
 	/**
 	 * @author khjxiaogu
 	 * @reason Make research can limit flint workbench

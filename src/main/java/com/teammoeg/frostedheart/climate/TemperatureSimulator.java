@@ -26,16 +26,16 @@ import java.util.Random;
 import com.teammoeg.frostedheart.climate.data.BlockTempData;
 import com.teammoeg.frostedheart.climate.data.FHDataManager;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.state.properties.BlockStateProperties;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.shapes.VoxelShapes;
-import net.minecraft.world.chunk.ChunkSection;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
+import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.level.chunk.LevelChunkSection;
+import net.minecraft.server.level.ServerLevel;
 
 /**
  * A simulator built on Alphagem618s' heat conducting model
@@ -46,17 +46,17 @@ import net.minecraft.world.server.ServerWorld;
  * @author Alphagem618
  */
 public class TemperatureSimulator {
-	public ChunkSection[] sections = new ChunkSection[8];// sectors(xz): - -/- +/+ -/+ + and y -/+
+	public LevelChunkSection[] sections = new LevelChunkSection[8];// sectors(xz): - -/- +/+ -/+ + and y -/+
 	public static final int range = 8;// through max range is 8, to avoid some rare issues, set it to 7 to keep count
 										// of sections is 8
 	BlockPos origin;
-	ServerWorld world;
+	ServerLevel world;
 	Random rnd;
 	private static final int n = 4168;
 	private static final int rdiff = 10;
 	private static final float v0 = .4f;
-	private static final VoxelShape EMPTY=VoxelShapes.empty();
-	private static final VoxelShape FULL=VoxelShapes.block();
+	private static final VoxelShape EMPTY=Shapes.empty();
+	private static final VoxelShape FULL=Shapes.block();
 	private double[] qx = new double[n], qy = new double[n], qz = new double[n];// Qpos, position of particle.
 	private static float[] vx = new float[n], vy = new float[n], vz = new float[n];// Vp, speed vector list, this list
 																					// is considered a distributed ball
@@ -71,7 +71,7 @@ public class TemperatureSimulator {
 					if (i == 0 && j == 0 && k == 0)
 						continue; // ignore zero vector
 					float x = i * 1f / rdiff, y = j * 1f / rdiff, z = k * 1f / rdiff;
-					float r = MathHelper.sqrt(x * x + y * y + z * z);
+					float r = Mth.sqrt(x * x + y * y + z * z);
 					if (r > 1)
 						continue; // ignore vectors out of the unit ball
 					vx[o] = x / r * v0; // normalized x
@@ -106,7 +106,7 @@ public class TemperatureSimulator {
 	public Map<BlockState, CachedBlockInfo> info = new HashMap<>();// state to info cache
 	public Map<BlockPos, CachedBlockInfo> posinfo = new HashMap<>();// position to info cache
 
-	public TemperatureSimulator(ServerPlayerEntity player) {
+	public TemperatureSimulator(ServerPlayer player) {
 		int sourceX = (int) player.getX(), sourceY = (int) player.getEyeY(), sourceZ = (int) player.getZ();
 		// System.out.println(sourceX+","+sourceY+","+sourceZ);
 		// these are block position offset
@@ -125,8 +125,8 @@ public class TemperatureSimulator {
 		world = player.getLevel();
 		for (int x = chunkOffsetW; x <= chunkOffsetW+1; x++)
 			for (int z = chunkOffsetN; z <= chunkOffsetN+1; z++) {
-				ChunkSection[] css = world.getChunk(x, z).getSections();
-				for (ChunkSection cs : css) {
+				LevelChunkSection[] css = world.getChunk(x, z).getSections();
+				for (LevelChunkSection cs : css) {
 					if (cs == null)
 						continue;
 					int ynum = cs.bottomBlockY() >> 4;
@@ -168,7 +168,7 @@ public class TemperatureSimulator {
 		if (x >= 16 || y >= 16 || z >= 16 || x < 0 || y < 0 || z < 0) {// out of bounds
 			return Blocks.AIR.defaultBlockState();
 		}
-		ChunkSection current = sections[i];
+		LevelChunkSection current = sections[i];
 		if (current == null)
 			return Blocks.AIR.defaultBlockState();
 		try {
@@ -239,7 +239,7 @@ public class TemperatureSimulator {
 			return true;
 		if (info.shape == EMPTY)
 			return false;
-		return info.shape.isFullWide(MathHelper.frac(x), MathHelper.frac(y), MathHelper.frac(z));
+		return info.shape.isFullWide(Mth.frac(x), Mth.frac(y), Mth.frac(z));
 
 	}
 
@@ -272,7 +272,7 @@ public class TemperatureSimulator {
 				qy[i] = qy[i] + vy[vid[i]]; // move y
 				qz[i] = qz[i] + vz[vid[i]]; // move z
 				heat += getHeat(qx[i], qy[i], qz[i])
-						* MathHelper.lerp(MathHelper.clamp(vy[vid[i]], 0, 0.4) * 2.5, 1, 0.5); // add heat
+						* Mth.lerp(Mth.clamp(vy[vid[i]], 0, 0.4) * 2.5, 1, 0.5); // add heat
 			}
 		}
 		return heat / n;

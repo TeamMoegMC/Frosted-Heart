@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -43,8 +43,8 @@ import com.teammoeg.frostedheart.util.FileUtil;
 import com.teammoeg.frostedheart.util.LazyOptional;
 import com.teammoeg.frostedheart.util.SerializeUtil;
 
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.DistExecutor;
@@ -60,7 +60,7 @@ public class FHResearch {
     private static LazyOptional<List<Research>> allResearches = LazyOptional.of(() -> researches.all());
     public static boolean editor = false;
 
-    public static CompoundNBT save(CompoundNBT cnbt) {
+    public static CompoundTag save(CompoundTag cnbt) {
         cnbt.put("clues", clues.serialize());
         cnbt.put("researches", researches.serialize());
         cnbt.put("effects", effects.serialize());
@@ -98,7 +98,7 @@ public class FHResearch {
         clues.all().forEach(Clue::init);
     }
 
-    public static void load(CompoundNBT cnbt) {
+    public static void load(CompoundTag cnbt) {
         clues.deserialize(cnbt.getList("clues", 8));
         researches.deserialize(cnbt.getList("researches", 8));
         effects.deserialize(cnbt.getList("effects", 8));
@@ -240,7 +240,7 @@ public class FHResearch {
         }
     }
 
-    public static void readAll(PacketBuffer pb) {
+    public static void readAll(FriendlyByteBuf pb) {
         List<Research> rss = SerializeUtil.readList(pb, SpecialResearch::deserialize);
 
         for (Research r : rss) {
@@ -256,7 +256,7 @@ public class FHResearch {
         }
     }
 
-    public static void saveAll(PacketBuffer pb) {
+    public static void saveAll(FriendlyByteBuf pb) {
         SerializeUtil.writeList(pb, getAllResearch(), Research::write);
     }
 
@@ -284,7 +284,7 @@ public class FHResearch {
 	    //FHResearch.saveAll();
 	}
 
-	public static void initFromPacket(CompoundNBT data,List<Research> rs) {
+	public static void initFromPacket(CompoundTag data,List<Research> rs) {
 		ClientResearchData.last=null;
 		ResearchListeners.reload();
 		//no need

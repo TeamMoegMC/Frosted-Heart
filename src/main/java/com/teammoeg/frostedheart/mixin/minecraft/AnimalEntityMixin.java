@@ -30,9 +30,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import com.cannolicatfish.rankine.init.RankineTags;
 import com.teammoeg.frostedheart.util.BreedUtil;
 
-import net.minecraft.entity.AgeableEntity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.passive.AnimalEntity;
+import net.minecraft.world.entity.AgableMob;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.entity.passive.CatEntity;
 import net.minecraft.entity.passive.ChickenEntity;
 import net.minecraft.entity.passive.CowEntity;
@@ -42,14 +42,14 @@ import net.minecraft.entity.passive.RabbitEntity;
 import net.minecraft.entity.passive.SheepEntity;
 import net.minecraft.entity.passive.horse.AbstractHorseEntity;
 import net.minecraft.entity.passive.horse.LlamaEntity;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.world.World;
+import net.minecraft.world.level.Level;
 
-@Mixin({AnimalEntity.class})
-public abstract class AnimalEntityMixin extends AgeableEntity {
+@Mixin({Animal.class})
+public abstract class AnimalEntityMixin extends AgableMob {
 
-    protected AnimalEntityMixin(EntityType<? extends AgeableEntity> type, World worldIn) {
+    protected AnimalEntityMixin(EntityType<? extends AgableMob> type, Level worldIn) {
         super(type, worldIn);
     }
 

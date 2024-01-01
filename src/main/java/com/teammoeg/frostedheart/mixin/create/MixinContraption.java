@@ -44,15 +44,15 @@ import com.simibubi.create.foundation.utility.Iterate;
 import com.teammoeg.frostedheart.util.mixin.ISpeedContraption;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.block.material.PushReaction;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
 import net.minecraft.util.math.shapes.IBooleanFunction;
 import net.minecraft.util.math.shapes.VoxelShapes;
-import net.minecraft.world.IWorld;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.World;
 import net.minecraft.world.gen.feature.template.Template.BlockInfo;
 import net.minecraftforge.common.util.Constants.BlockFlags;
@@ -83,7 +83,7 @@ public abstract class MixinContraption implements ISpeedContraption {
      * @reason no more instabreak
      */
     @Overwrite(remap = false)
-    protected boolean customBlockPlacement(IWorld world, BlockPos targetPos, BlockState state) {
+    protected boolean customBlockPlacement(LevelAccessor world, BlockPos targetPos, BlockState state) {
         BlockState blockState = world.getBlockState(targetPos);
 
         if (sc < 20480)

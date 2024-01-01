@@ -21,7 +21,7 @@ package com.teammoeg.frostedheart.util;
 
 import com.teammoeg.frostedheart.FHMain;
 
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 
 public class FHNBT {
     public static final String FIRST_LOGIN_GIVE_MANUAL = "first";

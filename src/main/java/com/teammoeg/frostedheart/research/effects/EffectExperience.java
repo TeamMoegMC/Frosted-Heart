@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -37,12 +37,12 @@ import com.teammoeg.frostedheart.util.SerializeUtil;
 import net.minecraft.block.Blocks;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Items;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Items;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.IFormattableTextComponent;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Component;
 
 /**
  * Reward the research team executes command
@@ -61,7 +61,7 @@ public class EffectExperience extends Effect {
 		exp=jo.get("experience").getAsInt();
 	}
 
-	public EffectExperience(PacketBuffer pb) {
+	public EffectExperience(FriendlyByteBuf pb) {
 		super(pb);
 		exp=pb.readVarInt();
 	}
@@ -72,7 +72,7 @@ public class EffectExperience extends Effect {
 	}
 
 	@Override
-	public boolean grant(TeamResearchData team, PlayerEntity triggerPlayer, boolean isload) {
+	public boolean grant(TeamResearchData team, Player triggerPlayer, boolean isload) {
 		if (triggerPlayer == null || isload)
 			return false;
 
@@ -93,7 +93,7 @@ public class EffectExperience extends Effect {
 	}
 
 	@Override
-	public void write(PacketBuffer buffer) {
+	public void write(FriendlyByteBuf buffer) {
 		super.write(buffer);
 		buffer.writeVarInt(exp);
 	}
@@ -104,13 +104,13 @@ public class EffectExperience extends Effect {
 	}
 
 	@Override
-	public IFormattableTextComponent getDefaultName() {
+	public MutableComponent getDefaultName() {
 		return GuiUtils.translateGui("effect.exp");
 	}
 
 	@Override
-	public List<ITextComponent> getDefaultTooltip() {
-		List<ITextComponent> tooltip = new ArrayList<>();
+	public List<Component> getDefaultTooltip() {
+		List<Component> tooltip = new ArrayList<>();
 		tooltip.add(GuiUtils.str("+"+exp));
 		return tooltip;
 	}

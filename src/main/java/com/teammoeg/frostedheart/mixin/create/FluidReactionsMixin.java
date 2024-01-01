@@ -28,12 +28,12 @@ import com.simibubi.create.foundation.fluid.FluidHelper;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.fluid.FluidState;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.FluidState;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.tags.FluidTags;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.event.ForgeEventFactory;
 
 @Mixin(FluidReactions.class)
@@ -43,7 +43,7 @@ public class FluidReactionsMixin {
      * @reason make create call forge events
      */
     @Overwrite(remap = false)
-    public static void handlePipeSpillCollision(World world, BlockPos pos, Fluid pipeFluid, FluidState worldFluid) {
+    public static void handlePipeSpillCollision(Level world, BlockPos pos, Fluid pipeFluid, FluidState worldFluid) {
         Fluid pf = FluidHelper.convertToStill(pipeFluid);
         Fluid wf = worldFluid.getFluid();
         if (pf.isIn(FluidTags.WATER) && wf == Fluids.LAVA)

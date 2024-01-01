@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -19,7 +19,7 @@
 
 package com.teammoeg.frostedheart.research.gui.drawdesk.game;
 
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.FriendlyByteBuf;
 
 public class CardPos {
     final int x;
@@ -42,11 +42,11 @@ public class CardPos {
         return new CardPos(x, y);
     }
 
-    public static CardPos valueOf(PacketBuffer pb) {
+    public static CardPos valueOf(FriendlyByteBuf pb) {
         return valueOf(pb.readVarInt(), pb.readVarInt());
     }
 
-    public void write(PacketBuffer pb) {
+    public void write(FriendlyByteBuf pb) {
         pb.writeVarInt(x);
         pb.writeVarInt(y);
     }

@@ -37,11 +37,11 @@ import com.teammoeg.frostedheart.research.data.ResearchVariant;
 import com.teammoeg.frostedheart.util.ReferenceValue;
 
 import blusunrize.immersiveengineering.common.util.Utils;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.core.Direction;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.core.BlockPos;
 import net.minecraftforge.fluids.FluidAttributes;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.IFluidTank;
@@ -78,7 +78,7 @@ public class T2GeneratorTileEntity extends BurnerGeneratorTileEntity<T2Generator
 	int noliquidtick = 0;
 
 	@Override
-	public void readCustomNBT(CompoundNBT nbt, boolean descPacket) {
+	public void readCustomNBT(CompoundTag nbt, boolean descPacket) {
 		super.readCustomNBT(nbt, descPacket);
 		power = nbt.getFloat("steam_power");
 		srangeMod = nbt.getFloat("steam_range");
@@ -90,10 +90,10 @@ public class T2GeneratorTileEntity extends BurnerGeneratorTileEntity<T2Generator
 	}
 
 	@Override
-	public void writeCustomNBT(CompoundNBT nbt, boolean descPacket) {
+	public void writeCustomNBT(CompoundTag nbt, boolean descPacket) {
 		super.writeCustomNBT(nbt, descPacket);
 		nbt.putFloat("steam_power", power);
-		CompoundNBT tankx = new CompoundNBT();
+		CompoundTag tankx = new CompoundTag();
 		tank.writeToNBT(tankx);
 		nbt.putFloat("steam_range", srangeMod);
 		nbt.putFloat("steam_temp", stempMod);
@@ -186,8 +186,8 @@ public class T2GeneratorTileEntity extends BurnerGeneratorTileEntity<T2Generator
 	}
 
 	@Override
-	public AxisAlignedBB getRenderBoundingBox() {
-		return new AxisAlignedBB(worldPosition.getX() - 2, worldPosition.getY() - 2, worldPosition.getZ() - 2, worldPosition.getX() + 2, worldPosition.getY() + 6,
+	public AABB getRenderBoundingBox() {
+		return new AABB(worldPosition.getX() - 2, worldPosition.getY() - 2, worldPosition.getZ() - 2, worldPosition.getX() + 2, worldPosition.getY() + 6,
 				worldPosition.getZ() + 2);
 	}
 
@@ -204,7 +204,7 @@ public class T2GeneratorTileEntity extends BurnerGeneratorTileEntity<T2Generator
 			for (int y = 0; y < 7; ++y)
 				for (int z = 0; z < 3; ++z) {
 					BlockPos actualPos = getBlockPosForPos(new BlockPos(x, y, z));
-					TileEntity te = Utils.getExistingTileEntity(level, actualPos);
+					BlockEntity te = Utils.getExistingTileEntity(level, actualPos);
 					if (te instanceof T2GeneratorTileEntity)
 						consumer.accept((T2GeneratorTileEntity) te);
 				}
@@ -240,7 +240,7 @@ public class T2GeneratorTileEntity extends BurnerGeneratorTileEntity<T2Generator
 	@Override
 	public SteamEnergyNetwork getNetwork() {
 		BlockPos actualPos = getBlockPosForPos(networkTile);
-		TileEntity te = Utils.getExistingTileEntity(level, actualPos);
+		BlockEntity te = Utils.getExistingTileEntity(level, actualPos);
 		if (te instanceof T2GeneratorTileEntity) {
 			if (((T2GeneratorTileEntity) te).sen != null) {
 				sen = ((T2GeneratorTileEntity) te).sen;

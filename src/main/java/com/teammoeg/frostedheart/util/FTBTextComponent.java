@@ -20,31 +20,31 @@
 package com.teammoeg.frostedheart.util;
 
 import dev.ftb.mods.ftblibrary.util.ClientTextComponentUtils;
-import net.minecraft.util.IReorderingProcessor;
-import net.minecraft.util.text.IFormattableTextComponent;
-import net.minecraft.util.text.TextComponent;
+import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.BaseComponent;
 
-public class FTBTextComponent extends TextComponent {
+public class FTBTextComponent extends BaseComponent {
 	String comp;
 
 	public FTBTextComponent(String comp) {
 		super();
 		this.comp = comp;
 	}
-	IFormattableTextComponent it;
-	protected IFormattableTextComponent intern() {
+	MutableComponent it;
+	protected MutableComponent intern() {
 		if(it==null)
-			it=(IFormattableTextComponent) ClientTextComponentUtils.parse(comp);
+			it=(MutableComponent) ClientTextComponentUtils.parse(comp);
 		return it;
 	}
 	@Override
-	public TextComponent plainCopy() {
+	public BaseComponent plainCopy() {
 		return new FTBTextComponent(comp);
 	}
 
 
 	@Override
-	public IReorderingProcessor getVisualOrderText() {
+	public FormattedCharSequence getVisualOrderText() {
 		return intern().getVisualOrderText();
 	}
 

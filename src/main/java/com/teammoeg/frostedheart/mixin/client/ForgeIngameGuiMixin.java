@@ -22,18 +22,18 @@ package com.teammoeg.frostedheart.mixin.client;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.teammoeg.frostedheart.client.hud.FrostedHud;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.IngameGui;
+import net.minecraft.client.gui.Gui;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.client.gui.ForgeIngameGui;
 
 @Mixin(ForgeIngameGui.class)
-public class ForgeIngameGuiMixin extends IngameGui {
+public class ForgeIngameGuiMixin extends Gui {
 
     public ForgeIngameGuiMixin(Minecraft mcIn) {
         super(mcIn);
@@ -44,7 +44,7 @@ public class ForgeIngameGuiMixin extends IngameGui {
      * @reason change text position
      */
     @Overwrite(remap = false)
-    public void renderRecordOverlay(int width, int height, float partialTicks, MatrixStack mStack) {
+    public void renderRecordOverlay(int width, int height, float partialTicks, PoseStack mStack) {
         if (overlayMessageTime > 0) {
             mc.getProfiler().startSection("overlayMessage");
             float hue = overlayMessageTime - partialTicks;

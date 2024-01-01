@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -19,8 +19,8 @@
 
 package com.teammoeg.frostedheart.climate;
 
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerLevel;
 
 /**
  * An anti command and sleep clock source
@@ -32,7 +32,7 @@ public class WorldClockSource {
     public WorldClockSource() {
     }
 
-    public void update(ServerWorld w) {
+    public void update(ServerLevel w) {
         update(w.getDayTime());
     }
 
@@ -71,17 +71,17 @@ public class WorldClockSource {
         return secs;
     }
 
-    public CompoundNBT serialize(CompoundNBT cnbt) {
+    public CompoundTag serialize(CompoundTag cnbt) {
         cnbt.putLong("secs", secs);
         cnbt.putLong("last", lastdaytime);
         return cnbt;
     }
 
-    public CompoundNBT serialize() {
-        return serialize(new CompoundNBT());
+    public CompoundTag serialize() {
+        return serialize(new CompoundTag());
     }
 
-    public void deserialize(CompoundNBT cnbt) {
+    public void deserialize(CompoundTag cnbt) {
         secs = cnbt.getLong("secs");
         lastdaytime = cnbt.getLong("last");
     }

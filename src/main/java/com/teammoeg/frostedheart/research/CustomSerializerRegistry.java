@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -29,27 +29,27 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.datafixers.util.Pair;
 
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.FriendlyByteBuf;
 
 public class CustomSerializerRegistry<T, U> {
 	protected Map<Class<? extends T>, Pair<Integer, String>> typeInfo = new HashMap<>();
-	protected List<Function<PacketBuffer, T>> fromPacket = new ArrayList<>();
+	protected List<Function<FriendlyByteBuf, T>> fromPacket = new ArrayList<>();
 
-	public void register(Class<? extends T> cls, String type, U json, Function<PacketBuffer, T> packet) {
+	public void register(Class<? extends T> cls, String type, U json, Function<FriendlyByteBuf, T> packet) {
 		putSerializer(type, json);
 		int id = fromPacket.size();
 		fromPacket.add(packet);
 		typeInfo.put(cls, Pair.of(id, type));
 	}
 
-	public T read(PacketBuffer pb) {
+	public T read(FriendlyByteBuf pb) {
 		int id = pb.readVarInt();
 		if (id < 0 || id >= fromPacket.size())
 			throw new IllegalArgumentException("Packet Error");
 		return fromPacket.get(id).apply(pb);
 	}
 
-	public T readOrDefault(PacketBuffer pb, T def) {
+	public T readOrDefault(FriendlyByteBuf pb, T def) {
 		int id = pb.readVarInt();
 		if (id < 0 || id >= fromPacket.size())
 			return def;
@@ -70,7 +70,7 @@ public class CustomSerializerRegistry<T, U> {
 		return info.getSecond();
 	}
 
-	public void writeId(PacketBuffer pb, T obj) {
+	public void writeId(FriendlyByteBuf pb, T obj) {
 		pb.writeVarInt(idOf(obj));
 	}
 

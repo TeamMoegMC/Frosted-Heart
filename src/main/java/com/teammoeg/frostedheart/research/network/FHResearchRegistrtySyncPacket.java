@@ -28,28 +28,28 @@ import com.teammoeg.frostedheart.research.SpecialResearch;
 import com.teammoeg.frostedheart.research.research.Research;
 import com.teammoeg.frostedheart.util.SerializeUtil;
 
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.network.NetworkEvent;
 
 // send when player join
 public class FHResearchRegistrtySyncPacket {
-    private final CompoundNBT data;
+    private final CompoundTag data;
     List<Research> rss;
 
     public FHResearchRegistrtySyncPacket() {
-        this.data = FHResearch.save(new CompoundNBT());
+        this.data = FHResearch.save(new CompoundTag());
 
     }
 
-    public FHResearchRegistrtySyncPacket(PacketBuffer buffer) {
+    public FHResearchRegistrtySyncPacket(FriendlyByteBuf buffer) {
         data = buffer.readNbt();
         rss = SerializeUtil.readList(buffer,SpecialResearch::deserialize);
     }
 
-    public void encode(PacketBuffer buffer) {
+    public void encode(FriendlyByteBuf buffer) {
         buffer.writeNbt(data);
         FHResearch.saveAll(buffer);
     }

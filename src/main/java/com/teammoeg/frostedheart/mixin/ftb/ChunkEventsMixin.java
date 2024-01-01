@@ -34,7 +34,7 @@ import dev.ftb.mods.ftbchunks.data.FTBChunksTeamData;
 import dev.ftb.mods.ftbchunks.net.SendChunkPacket;
 import dev.ftb.mods.ftbchunks.net.SendManyChunksPacket;
 import dev.ftb.mods.ftbteams.event.PlayerJoinedPartyTeamEvent;
-import net.minecraft.command.CommandSource;
+import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.Util;
 import net.minecraft.world.World;
@@ -46,7 +46,7 @@ public class ChunkEventsMixin {
 	}
 	@Overwrite(remap=false)
 	private void playerJoinedParty(PlayerJoinedPartyTeamEvent event) {
-		CommandSource sourceStack = event.getTeam().manager.server.getCommandSource();
+		CommandSourceStack sourceStack = event.getTeam().manager.server.getCommandSource();
 		FTBChunksTeamData oldData = FTBChunksAPI.getManager().getData(event.getPreviousTeam());
 		FTBChunksTeamData newData = FTBChunksAPI.getManager().getData(event.getTeam());
 		newData.updateLimits(event.getPlayer());

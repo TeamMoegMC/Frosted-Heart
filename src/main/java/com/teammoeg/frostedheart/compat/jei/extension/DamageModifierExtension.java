@@ -26,8 +26,8 @@ import com.teammoeg.frostedheart.content.recipes.ModifyDamageRecipe;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.ingredients.IIngredients;
 import mezz.jei.api.recipe.category.extensions.vanilla.crafting.ICraftingCategoryExtension;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.resources.ResourceLocation;
 
 public class DamageModifierExtension implements ICraftingCategoryExtension {
     ModifyDamageRecipe fuel;

@@ -30,11 +30,11 @@ import com.teammoeg.frostedheart.research.gui.FHIcons;
 import com.teammoeg.frostedheart.research.gui.FHIcons.FHIcon;
 import com.teammoeg.frostedheart.research.gui.TechIcons;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.text.IFormattableTextComponent;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 
 /**
  * Effect on numerical stats of the team's machines or abilities
@@ -62,7 +62,7 @@ public class EffectStats extends Effect {
             isPercentage = jo.get("percent").getAsBoolean();
     }
 
-    public EffectStats(PacketBuffer pb) {
+    public EffectStats(FriendlyByteBuf pb) {
         super(pb);
         vars = pb.readUtf();
         val = pb.readDouble();
@@ -80,7 +80,7 @@ public class EffectStats extends Effect {
     }
 
     @Override
-    public boolean grant(TeamResearchData team, PlayerEntity triggerPlayer, boolean isload) {
+    public boolean grant(TeamResearchData team, Player triggerPlayer, boolean isload) {
         if (isload) return false;
         double var = team.getVariants().getDouble(vars);
         if (isPercentage)
@@ -113,7 +113,7 @@ public class EffectStats extends Effect {
     }
 
     @Override
-    public void write(PacketBuffer buffer) {
+    public void write(FriendlyByteBuf buffer) {
         super.write(buffer);
         buffer.writeUtf(vars);
         buffer.writeDouble(val);
@@ -126,13 +126,13 @@ public class EffectStats extends Effect {
     }
 
     @Override
-    public IFormattableTextComponent getDefaultName() {
+    public MutableComponent getDefaultName() {
         return GuiUtils.translateGui("effect.stats");
     }
 
     @Override
-    public List<ITextComponent> getDefaultTooltip() {
-        List<ITextComponent> tooltip = new ArrayList<>();
+    public List<Component> getDefaultTooltip() {
+        List<Component> tooltip = new ArrayList<>();
         tooltip.add(GuiUtils.translateGui("effect.stats." + vars));
         String vtext;
         if (isPercentage) {
@@ -140,9 +140,9 @@ public class EffectStats extends Effect {
         } else
             vtext = NumberFormat.getInstance().format(val);
         if (val > 0) {
-            tooltip.add(new StringTextComponent("+" + vtext));
+            tooltip.add(new TextComponent("+" + vtext));
         } else
-            tooltip.add(new StringTextComponent(vtext));
+            tooltip.add(new TextComponent(vtext));
         return tooltip;
     }
 

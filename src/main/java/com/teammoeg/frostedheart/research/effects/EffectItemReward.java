@@ -30,12 +30,12 @@ import com.teammoeg.frostedheart.research.gui.FHIcons.FHIcon;
 import com.teammoeg.frostedheart.util.FHUtils;
 import com.teammoeg.frostedheart.util.SerializeUtil;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.text.IFormattableTextComponent;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 
 /**
  * Reward the research team item rewards
@@ -58,9 +58,9 @@ public class EffectItemReward extends Effect {
         rewards = SerializeUtil.parseJsonElmList(jo.get("rewards"), SerializeUtil::fromJson);
     }
 
-    public EffectItemReward(PacketBuffer pb) {
+    public EffectItemReward(FriendlyByteBuf pb) {
         super(pb);
-        rewards = SerializeUtil.readList(pb, PacketBuffer::readItem);
+        rewards = SerializeUtil.readList(pb, FriendlyByteBuf::readItem);
     }
 
     @Override
@@ -73,7 +73,7 @@ public class EffectItemReward extends Effect {
     }
 
     @Override
-    public boolean grant(TeamResearchData team, PlayerEntity triggerPlayer, boolean isload) {
+    public boolean grant(TeamResearchData team, Player triggerPlayer, boolean isload) {
         if (triggerPlayer == null || isload) return false;
         for (ItemStack s : rewards) {
             FHUtils.giveItem(triggerPlayer, s.copy());
@@ -98,9 +98,9 @@ public class EffectItemReward extends Effect {
     }
 
     @Override
-    public void write(PacketBuffer buffer) {
+    public void write(FriendlyByteBuf buffer) {
         super.write(buffer);
-        SerializeUtil.writeList2(buffer, rewards, PacketBuffer::writeItem);
+        SerializeUtil.writeList2(buffer, rewards, FriendlyByteBuf::writeItem);
     }
 
     @Override
@@ -112,18 +112,18 @@ public class EffectItemReward extends Effect {
     }
 
     @Override
-    public IFormattableTextComponent getDefaultName() {
+    public MutableComponent getDefaultName() {
         return GuiUtils.translateGui("effect.item_reward");
     }
 
     @Override
-    public List<ITextComponent> getDefaultTooltip() {
-        List<ITextComponent> tooltip = new ArrayList<>();
+    public List<Component> getDefaultTooltip() {
+        List<Component> tooltip = new ArrayList<>();
         for (ItemStack stack : rewards) {
             if (stack.getCount() == 1)
                 tooltip.add(stack.getHoverName());
             else
-                tooltip.add(((IFormattableTextComponent) stack.getHoverName()).append(new StringTextComponent(" x " + stack.getCount())));
+                tooltip.add(((MutableComponent) stack.getHoverName()).append(new TextComponent(" x " + stack.getCount())));
         }
         return tooltip;
     }

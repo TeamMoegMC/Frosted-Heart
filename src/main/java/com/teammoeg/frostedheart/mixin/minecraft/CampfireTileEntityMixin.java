@@ -30,14 +30,14 @@ import com.teammoeg.frostedheart.util.mixin.ICampfireExtra;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.CampfireBlock;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tileentity.CampfireTileEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.world.level.block.entity.CampfireBlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvents;
 
-@Mixin(CampfireTileEntity.class)
-public abstract class CampfireTileEntityMixin extends TileEntity implements ICampfireExtra {
+@Mixin(CampfireBlockEntity.class)
+public abstract class CampfireTileEntityMixin extends BlockEntity implements ICampfireExtra {
     public int lifeTime = 0;
 
     @Override
@@ -55,7 +55,7 @@ public abstract class CampfireTileEntityMixin extends TileEntity implements ICam
         lifeTime = set;
     }
 
-    public CampfireTileEntityMixin(TileEntityType<?> tileEntityTypeIn) {
+    public CampfireTileEntityMixin(BlockEntityType<?> tileEntityTypeIn) {
         super(tileEntityTypeIn.CAMPFIRE);
     }
 

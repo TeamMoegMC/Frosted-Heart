@@ -1,19 +1,20 @@
 /*
- *  Copyright (c) 2021. TeamMoeg
+ * Copyright (c) 2021-2024 TeamMoeg
  *
- *  This file is part of Energy Level Transition.
+ * This file is part of Frosted Heart.
  *
- *  Energy Level Transition is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, version 3.
+ * Frosted Heart is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3.
  *
- *  Energy Level Transition is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * Frosted Heart is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with Energy Level Transition.  If not, see <https://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 package com.teammoeg.frostedheart.research.research;
@@ -24,8 +25,8 @@ import java.util.Map;
 import com.teammoeg.frostedheart.FHMain;
 import com.teammoeg.frostedheart.client.util.GuiUtils;
 
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.chat.TranslatableComponent;
 
 public enum ResearchCategory {
 
@@ -35,8 +36,8 @@ public enum ResearchCategory {
     ARS("ars"),
     EXPLORATION("exploration");
     private ResourceLocation id;
-    private TranslationTextComponent name;
-    private TranslationTextComponent desc;
+    private TranslatableComponent name;
+    private TranslatableComponent desc;
     private ResourceLocation icon;
 	public static Map<ResourceLocation, ResearchCategory> ALL = new HashMap<>();
 	static {
@@ -56,11 +57,11 @@ public enum ResearchCategory {
         return icon;
     }
 
-    public TranslationTextComponent getDesc() {
+    public TranslatableComponent getDesc() {
         return desc;
     }
 
-    public TranslationTextComponent getName() {
+    public TranslatableComponent getName() {
         return name;
     }
 

@@ -29,21 +29,21 @@ import org.spongepowered.asm.mixin.Shadow;
 import com.teammoeg.frostedheart.research.ResearchListeners;
 
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.item.crafting.IRecipeType;
-import net.minecraft.item.crafting.RecipeManager;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.Util;
-import net.minecraft.world.World;
+import net.minecraft.Util;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.common.ForgeHooks;
 
 @Mixin(RecipeManager.class)
 public abstract class RecipeManagerMixin {
 	@Overwrite
-	public <C extends IInventory, T extends IRecipe<C>> Optional<T> getRecipe(IRecipeType<T> recipeTypeIn,
-			C inventoryIn, World worldIn) {
-		if(recipeTypeIn==IRecipeType.CRAFTING&&ForgeHooks.getCraftingPlayer()!=null) {
+	public <C extends Container, T extends Recipe<C>> Optional<T> getRecipe(RecipeType<T> recipeTypeIn,
+			C inventoryIn, Level worldIn) {
+		if(recipeTypeIn==RecipeType.CRAFTING&&ForgeHooks.getCraftingPlayer()!=null) {
 			return this.getRecipes(recipeTypeIn).values().stream().flatMap((recipe) -> {
 				return Util.streamOptional(recipeTypeIn.matches(recipe, worldIn, inventoryIn));
 			}).filter(t->ResearchListeners.canUseRecipe(ForgeHooks.getCraftingPlayer(), t)).findFirst();

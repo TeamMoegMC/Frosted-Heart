@@ -29,13 +29,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import blusunrize.immersiveengineering.api.energy.immersiveflux.FluxStorageAdvanced;
 import blusunrize.immersiveengineering.common.util.EnergyHelper;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tileentity.ITickableTileEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.block.entity.TickableBlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.core.Direction;
+import net.minecraft.core.BlockPos;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.CapabilityEnergy;
@@ -44,12 +44,12 @@ import net.minecraftforge.fluids.IFluidTank;
 import wile.engineersdecor.blocks.EdFluidFunnel.FluidFunnelTileEntity;
 
 @Mixin(FluidFunnelTileEntity.class)
-public abstract class EdFluidFunnelHandler extends TileEntity
-		implements ITickableTileEntity, ICapabilityProvider, IFluidTank,IEnergyStorage {
+public abstract class EdFluidFunnelHandler extends BlockEntity
+		implements TickableBlockEntity, ICapabilityProvider, IFluidTank,IEnergyStorage {
 
 	public FluxStorageAdvanced energyStorage = new FluxStorageAdvanced(1000);
 
-	public EdFluidFunnelHandler(TileEntityType<?> tileEntityTypeIn) {
+	public EdFluidFunnelHandler(BlockEntityType<?> tileEntityTypeIn) {
 		super(tileEntityTypeIn);
 	}
 
@@ -66,12 +66,12 @@ public abstract class EdFluidFunnelHandler extends TileEntity
 
 
 	@Inject(at = @At("HEAD"), method = "readnbt", remap = false)
-	public void fh$readnbt(CompoundNBT nbt, CallbackInfo cbi) {
+	public void fh$readnbt(CompoundTag nbt, CallbackInfo cbi) {
 		energyStorage.readFromNBT(nbt);
 	}
 
 	@Inject(at = @At("HEAD"), method = "writenbt", remap = false)
-	public void fh$writenbt(CompoundNBT nbt, CallbackInfo cbi) {
+	public void fh$writenbt(CompoundTag nbt, CallbackInfo cbi) {
 		energyStorage.writeToNBT(nbt);
 	}
 

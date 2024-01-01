@@ -24,8 +24,8 @@ import com.teammoeg.frostedheart.FHEffects;
 import com.teammoeg.frostedheart.climate.IWarmKeepingEquipment;
 import com.teammoeg.frostedheart.util.FHUtils;
 
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.ItemStack;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.ItemStack;
 
 public class ArmorTempData extends JsonDataHolder implements IWarmKeepingEquipment {
 
@@ -34,7 +34,7 @@ public class ArmorTempData extends JsonDataHolder implements IWarmKeepingEquipme
     }
 
     @Override
-    public float getFactor(ServerPlayerEntity pe, ItemStack stack) {
+    public float getFactor(ServerPlayer pe, ItemStack stack) {
         float base = this.getFloatOrDefault("factor", 0F);
         if (pe == null) return base;
         if (pe.isOnFire())

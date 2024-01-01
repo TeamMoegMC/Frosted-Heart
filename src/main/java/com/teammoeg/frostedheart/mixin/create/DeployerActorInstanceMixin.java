@@ -36,10 +36,10 @@ import com.simibubi.create.foundation.utility.VecHelper;
 import com.simibubi.create.foundation.utility.worldWrappers.PlacementSimulationWorld;
 import com.teammoeg.frostedheart.util.mixin.ISpeedContraption;
 
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.core.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
+import net.minecraft.world.phys.Vec3;
 
 @Mixin(DeployerActorInstance.class)
 public abstract class DeployerActorInstanceMixin extends ActorInstance {
@@ -72,18 +72,18 @@ public abstract class DeployerActorInstanceMixin extends ActorInstance {
             Contraption cont = context.contraption;
             //TODO: change to ModifyConstant
             if (cont instanceof ISpeedContraption) {
-                factor = MathHelper.sin(AnimationTickHolder.getRenderTime() * .5f) * .05f + .45f;
+                factor = Mth.sin(AnimationTickHolder.getRenderTime() * .5f) * .05f + .45f;
             } else
-                factor = MathHelper.sin(AnimationTickHolder.getRenderTime() * .5f) * .25f + .25f;
+                factor = Mth.sin(AnimationTickHolder.getRenderTime() * .5f) * .25f + .25f;
         } else {
-            Vector3d center = VecHelper.getCenterOf(new BlockPos(context.position));
+            Vec3 center = VecHelper.getCenterOf(new BlockPos(context.position));
             double distance = context.position.distanceTo(center);
             double nextDistance = context.position.add(context.motion)
                     .distanceTo(center);
-            factor = .5f - MathHelper.clamp(MathHelper.lerp(AnimationTickHolder.getPartialTicks(), distance, nextDistance), 0, 1);
+            factor = .5f - Mth.clamp(Mth.lerp(AnimationTickHolder.getPartialTicks(), distance, nextDistance), 0, 1);
         }
 
-        Vector3d offset = Vector3d.copy(facing.getDirectionVec()).scale(factor);
+        Vec3 offset = Vec3.copy(facing.getDirectionVec()).scale(factor);
 
         MatrixStack ms = new MatrixStack();
         MatrixTransformStack msr = MatrixTransformStack.of(ms);

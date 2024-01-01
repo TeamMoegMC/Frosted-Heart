@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -21,7 +21,7 @@ package com.teammoeg.frostedheart.climate;
 
 import java.util.Arrays;
 
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.CompoundTag;
 
 public class DayTemperatureData {
     int[] hourData = new int[24];
@@ -48,8 +48,8 @@ public class DayTemperatureData {
         hourData[h] = Float.floatToRawIntBits(temp);
     }
 
-    public CompoundNBT serialize() {
-        CompoundNBT cnbt = new CompoundNBT();
+    public CompoundTag serialize() {
+        CompoundTag cnbt = new CompoundTag();
         cnbt.putIntArray("data", hourData);
         cnbt.putFloat("humidity", dayHumidity);
         cnbt.putFloat("noise", dayNoise);
@@ -57,7 +57,7 @@ public class DayTemperatureData {
         return cnbt;
     }
 
-    public void deserialize(CompoundNBT cnbt) {
+    public void deserialize(CompoundTag cnbt) {
         int[] iar = cnbt.getIntArray("data");
         for (int i = 0; i < iar.length; i++)
             hourData[i] = iar[i];
@@ -66,7 +66,7 @@ public class DayTemperatureData {
         day = cnbt.getLong("day");
     }
 
-    public static DayTemperatureData read(CompoundNBT data) {
+    public static DayTemperatureData read(CompoundTag data) {
         DayTemperatureData dtd = new DayTemperatureData();
         dtd.deserialize(data);
         return dtd;

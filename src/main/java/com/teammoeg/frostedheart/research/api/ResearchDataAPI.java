@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -26,25 +26,25 @@ import com.teammoeg.frostedheart.research.data.ResearchVariant;
 import com.teammoeg.frostedheart.research.data.TeamResearchData;
 
 import dev.ftb.mods.ftbteams.FTBTeamsAPI;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.nbt.CompoundTag;
 
 public class ResearchDataAPI {
 
     private ResearchDataAPI() {
     }
 
-    public static TeamResearchData getData(PlayerEntity id) {
-    	if(id instanceof ServerPlayerEntity)
-    		return FHResearchDataManager.INSTANCE.getData(FTBTeamsAPI.getPlayerTeam((ServerPlayerEntity)id).getId());
+    public static TeamResearchData getData(Player id) {
+    	if(id instanceof ServerPlayer)
+    		return FHResearchDataManager.INSTANCE.getData(FTBTeamsAPI.getPlayerTeam((ServerPlayer)id).getId());
     	return TeamResearchData.getClientInstance();
 
     }
 
-    public static boolean isResearchComplete(PlayerEntity id,String research) {
-    	if(id instanceof ServerPlayerEntity)
-    		return FHResearchDataManager.INSTANCE.getData(FTBTeamsAPI.getPlayerTeam((ServerPlayerEntity)id).getId()).getData(research).isCompleted();
+    public static boolean isResearchComplete(Player id,String research) {
+    	if(id instanceof ServerPlayer)
+    		return FHResearchDataManager.INSTANCE.getData(FTBTeamsAPI.getPlayerTeam((ServerPlayer)id).getId()).getData(research).isCompleted();
     	return TeamResearchData.getClientInstance().getData(research).isCompleted();
     }
     public static TeamResearchData getData(UUID id) {
@@ -52,42 +52,42 @@ public class ResearchDataAPI {
 
     }
 
-    public static CompoundNBT getVariants(PlayerEntity id) {
-    	if(id instanceof ServerPlayerEntity)
-        return FHResearchDataManager.INSTANCE.getData(FTBTeamsAPI.getPlayerTeam((ServerPlayerEntity)id).getId()).getVariants();
+    public static CompoundTag getVariants(Player id) {
+    	if(id instanceof ServerPlayer)
+        return FHResearchDataManager.INSTANCE.getData(FTBTeamsAPI.getPlayerTeam((ServerPlayer)id).getId()).getVariants();
     	return TeamResearchData.getClientInstance().getVariants();
 
     }
     
-    public static CompoundNBT getVariants(UUID id) {
+    public static CompoundTag getVariants(UUID id) {
         return FHResearchDataManager.INSTANCE.getData(id).getVariants();
 
     }
-    public static long getVariantLong(PlayerEntity id,ResearchVariant name) {
-    	if(id instanceof ServerPlayerEntity)
-        return getVariantLong(FTBTeamsAPI.getPlayerTeam((ServerPlayerEntity)id).getId(),name);
+    public static long getVariantLong(Player id,ResearchVariant name) {
+    	if(id instanceof ServerPlayer)
+        return getVariantLong(FTBTeamsAPI.getPlayerTeam((ServerPlayer)id).getId(),name);
     	return TeamResearchData.getClientInstance().getVariants().getLong(name.getToken());
 
     }
     public static long getVariantLong(UUID id,ResearchVariant name) {
         return getVariants(id).getLong(name.getToken());
     }
-    public static double getVariantDouble(PlayerEntity id,ResearchVariant name) {
-    	if(id instanceof ServerPlayerEntity)
-        return getVariantDouble(FTBTeamsAPI.getPlayerTeam((ServerPlayerEntity)id).getId(),name);
+    public static double getVariantDouble(Player id,ResearchVariant name) {
+    	if(id instanceof ServerPlayer)
+        return getVariantDouble(FTBTeamsAPI.getPlayerTeam((ServerPlayer)id).getId(),name);
     	return TeamResearchData.getClientInstance().getVariants().getDouble(name.getToken());
 
     }
     public static double getVariantDouble(UUID id,ResearchVariant name) {
         return getVariants(id).getDouble(name.getToken());
     }
-    public static void putVariantLong(ServerPlayerEntity id,ResearchVariant name,long val) {
+    public static void putVariantLong(ServerPlayer id,ResearchVariant name,long val) {
         putVariantLong(FTBTeamsAPI.getPlayerTeam(id).getId(),name,val);
     }
     public static void putVariantLong(UUID id,ResearchVariant name,long val) {
         getVariants(id).putLong(name.getToken(),val);
     }
-    public static void putVariantDouble(ServerPlayerEntity id,ResearchVariant name,double val) {
+    public static void putVariantDouble(ServerPlayer id,ResearchVariant name,double val) {
     	putVariantDouble(FTBTeamsAPI.getPlayerTeam(id).getId(),name,val);
     }
     public static void putVariantDouble(UUID id,ResearchVariant name,double val) {

@@ -26,10 +26,10 @@ import com.teammoeg.frostedheart.research.data.TeamResearchData;
 
 import blusunrize.immersiveengineering.api.crafting.IngredientWithSize;
 import dev.ftb.mods.ftbteams.data.Team;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 
 public class ItemClue extends Clue {
     boolean consume;
@@ -47,7 +47,7 @@ public class ItemClue extends Clue {
             consume = jo.get("consume").getAsBoolean();
     }
 
-    public ItemClue(PacketBuffer pb) {
+    public ItemClue(FriendlyByteBuf pb) {
         super(pb);
         stack = IngredientWithSize.read(pb);
         consume = pb.readBoolean();
@@ -58,7 +58,7 @@ public class ItemClue extends Clue {
     }
 
     @Override
-    public ITextComponent getName() {
+    public Component getName() {
         if (name != null && !name.isEmpty())
             return super.getName();
         if(consume)
@@ -76,7 +76,7 @@ public class ItemClue extends Clue {
     }
 
     @Override
-    public void write(PacketBuffer buffer) {
+    public void write(FriendlyByteBuf buffer) {
         super.write(buffer);
         stack.write(buffer);
         buffer.writeBoolean(consume);
@@ -111,14 +111,14 @@ public class ItemClue extends Clue {
 
 
     @Override
-    public ITextComponent getDescription() {
-        ITextComponent itc = super.getDescription();
+    public Component getDescription() {
+        Component itc = super.getDescription();
         if (itc != null||stack == null)
             return itc;
         if (stack.hasNoMatchingItems())
             return null;
         return stack.getMatchingStacks()[0].getHoverName().plainCopy()
-                .append(new StringTextComponent(" x" + stack.getCount()));
+                .append(new TextComponent(" x" + stack.getCount()));
     }
 	@Override
 	public String getBrief() {

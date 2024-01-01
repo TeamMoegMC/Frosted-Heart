@@ -22,7 +22,7 @@ package com.teammoeg.frostedheart.content.generator.t1;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.teammoeg.frostedheart.client.util.GuiUtils;
 import com.teammoeg.frostedheart.network.PacketHandler;
 
@@ -30,16 +30,16 @@ import blusunrize.immersiveengineering.client.ClientUtils;
 import blusunrize.immersiveengineering.client.gui.IEContainerScreen;
 import blusunrize.immersiveengineering.client.gui.elements.GuiButtonBoolean;
 import blusunrize.immersiveengineering.common.network.MessageTileSync;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.chat.Component;
 
 public class T1GeneratorScreen extends IEContainerScreen<T1GeneratorContainer> {
     private static final ResourceLocation TEXTURE = GuiUtils.makeTextureLocation("generator_t1");
     private T1GeneratorTileEntity tile;
 
-    public T1GeneratorScreen(T1GeneratorContainer container, PlayerInventory inv, ITextComponent title) {
+    public T1GeneratorScreen(T1GeneratorContainer container, Inventory inv, Component title) {
         super(container, inv, title);
         this.tile = container.tile;
         clearIntArray(tile.guiData);
@@ -51,7 +51,7 @@ public class T1GeneratorScreen extends IEContainerScreen<T1GeneratorContainer> {
         this.buttons.clear();
         this.addButton(new GuiButtonBoolean(leftPos + 56, topPos + 35, 19, 10, "", tile.isWorking(), TEXTURE, 0, 245, 0,
                 btn -> {
-                    CompoundNBT tag = new CompoundNBT();
+                    CompoundTag tag = new CompoundTag();
                     tile.setWorking(!btn.getState());
                     tag.putBoolean("isWorking", tile.isWorking());
                     PacketHandler.sendToServer(new MessageTileSync(tile.master(), tag));
@@ -59,7 +59,7 @@ public class T1GeneratorScreen extends IEContainerScreen<T1GeneratorContainer> {
                 }));
         this.addButton(new GuiButtonBoolean(leftPos + 101, topPos + 35, 19, 10, "", tile.isOverdrive(), TEXTURE, 0, 245, 0,
                 btn -> {
-                    CompoundNBT tag = new CompoundNBT();
+                    CompoundTag tag = new CompoundTag();
                     tile.setOverdrive(!btn.getState());
                     tag.putBoolean("isOverdrive", tile.isOverdrive());
                     PacketHandler.sendToServer(new MessageTileSync(tile.master(), tag));
@@ -68,9 +68,9 @@ public class T1GeneratorScreen extends IEContainerScreen<T1GeneratorContainer> {
     }
 
     @Override
-    public void render(MatrixStack transform, int mouseX, int mouseY, float partial) {
+    public void render(PoseStack transform, int mouseX, int mouseY, float partial) {
         super.render(transform, mouseX, mouseY, partial);
-        List<ITextComponent> tooltip = new ArrayList<>();
+        List<Component> tooltip = new ArrayList<>();
 
         if (isMouseIn(mouseX, mouseY, 57, 36, 19, 10)) {
             if (tile.isWorking()) {
@@ -102,7 +102,7 @@ public class T1GeneratorScreen extends IEContainerScreen<T1GeneratorContainer> {
     }
 
     @Override
-    protected void renderBg(MatrixStack transform, float partial, int x, int y) {
+    protected void renderBg(PoseStack transform, float partial, int x, int y) {
         ClientUtils.bindTexture(TEXTURE);
         this.blit(transform, leftPos, topPos, 0, 0, imageWidth, imageHeight);
 

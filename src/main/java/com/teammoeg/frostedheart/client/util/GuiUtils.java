@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 TeamMoeg
+ * Copyright (c) 2021-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -14,6 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 package com.teammoeg.frostedheart.client.util;
@@ -22,10 +23,10 @@ import com.teammoeg.frostedheart.FHConfig;
 import com.teammoeg.frostedheart.FHMain;
 import com.teammoeg.frostedheart.climate.TemperatureCore;
 
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 
 public class GuiUtils {
 
@@ -33,40 +34,40 @@ public class GuiUtils {
         return FHMain.rl("textures/gui/" + name + ".png");
     }
 
-    public static StringTextComponent str(String s) {
-        return new StringTextComponent(s);
+    public static TextComponent str(String s) {
+        return new TextComponent(s);
     }
 
-    public static TranslationTextComponent translateGui(String name, Object... args) {
-        return new TranslationTextComponent("gui." + FHMain.MODID + "." + name, args);
+    public static TranslatableComponent translateGui(String name, Object... args) {
+        return new TranslatableComponent("gui." + FHMain.MODID + "." + name, args);
     }
 
-    public static TranslationTextComponent translateTooltip(String name, Object... args) {
-        return new TranslationTextComponent("tooltip." + FHMain.MODID + "." + name, args);
+    public static TranslatableComponent translateTooltip(String name, Object... args) {
+        return new TranslatableComponent("tooltip." + FHMain.MODID + "." + name, args);
     }
 
-    public static TranslationTextComponent translateMessage(String name, Object... args) {
-        return new TranslationTextComponent("message." + FHMain.MODID + "." + name, args);
+    public static TranslatableComponent translateMessage(String name, Object... args) {
+        return new TranslatableComponent("message." + FHMain.MODID + "." + name, args);
     }
 
-    public static TranslationTextComponent translateJeiCategory(String name, Object... args) {
-        return new TranslationTextComponent("gui.jei.category." + FHMain.MODID + "." + name, args);
+    public static TranslatableComponent translateJeiCategory(String name, Object... args) {
+        return new TranslatableComponent("gui.jei.category." + FHMain.MODID + "." + name, args);
     }
 
-    public static TranslationTextComponent translateResearchLevel(String name, Object... args) {
-        return new TranslationTextComponent("research.level." + FHMain.MODID + "." + name, args);
+    public static TranslatableComponent translateResearchLevel(String name, Object... args) {
+        return new TranslatableComponent("research.level." + FHMain.MODID + "." + name, args);
     }
 
-    public static TranslationTextComponent translateResearchCategoryName(String name, Object... args) {
-        return new TranslationTextComponent("research.category." + FHMain.MODID + "." + name, args);
+    public static TranslatableComponent translateResearchCategoryName(String name, Object... args) {
+        return new TranslatableComponent("research.category." + FHMain.MODID + "." + name, args);
     }
 
-    public static TranslationTextComponent translateResearchCategoryDesc(String name, Object... args) {
-        return new TranslationTextComponent("research.category.desc." + FHMain.MODID + "." + name, args);
+    public static TranslatableComponent translateResearchCategoryDesc(String name, Object... args) {
+        return new TranslatableComponent("research.category.desc." + FHMain.MODID + "." + name, args);
     }
 
-    public static ITextComponent translate(String string) {
-        return new TranslationTextComponent(string);
+    public static Component translate(String string) {
+        return new TranslatableComponent(string);
     }
     public static String toTemperatureIntString(float celsus) {
     	celsus=Math.max(-273.15f, celsus);

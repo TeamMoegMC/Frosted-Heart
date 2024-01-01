@@ -25,15 +25,15 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 
 import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.SpawnLocationHelper;
+import net.minecraft.server.level.PlayerRespawnLogic;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.biome.Biome;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.gen.Heightmap;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.server.level.ServerLevel;
 
-@Mixin(SpawnLocationHelper.class)
+@Mixin(PlayerRespawnLogic.class)
 public class SpawnLocationHelperMixin {
 	/**
 	 * @author khjxiaogu
@@ -41,9 +41,9 @@ public class SpawnLocationHelperMixin {
 	 * */
 	@Overwrite
 	@Nullable
-	public static BlockPos func_241092_a_(ServerWorld p_241092_0_, int p_241092_1_, int p_241092_2_,
+	public static BlockPos func_241092_a_(ServerLevel p_241092_0_, int p_241092_1_, int p_241092_2_,
 			boolean p_241092_3_) {
-		BlockPos.Mutable blockpos$mutable = new BlockPos.Mutable(p_241092_1_, 0, p_241092_2_);
+		BlockPos.MutableBlockPos blockpos$mutable = new BlockPos.MutableBlockPos(p_241092_1_, 0, p_241092_2_);
 		Biome biome = p_241092_0_.getBiome(blockpos$mutable);
 		boolean flag = p_241092_0_.getDimensionType().getHasCeiling();
 		BlockState blockstate = biome.getGenerationSettings().getSurfaceBuilderConfig().getTop();

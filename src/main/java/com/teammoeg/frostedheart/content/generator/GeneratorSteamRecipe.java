@@ -30,16 +30,16 @@ import com.teammoeg.frostedheart.FHMultiblocks;
 import blusunrize.immersiveengineering.api.crafting.FluidTagInput;
 import blusunrize.immersiveengineering.api.crafting.IERecipeSerializer;
 import blusunrize.immersiveengineering.api.crafting.IESerializableRecipe;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipeType;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.JSONUtils;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.util.GsonHelper;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fml.RegistryObject;
 
 public class GeneratorSteamRecipe extends IESerializableRecipe {
-    public static IRecipeType<GeneratorSteamRecipe> TYPE;
+    public static RecipeType<GeneratorSteamRecipe> TYPE;
     public static RegistryObject<IERecipeSerializer<GeneratorSteamRecipe>> SERIALIZER;
 
     public GeneratorSteamRecipe(ResourceLocation id, FluidTagInput input,
@@ -84,16 +84,16 @@ public class GeneratorSteamRecipe extends IESerializableRecipe {
 
         @Override
         public GeneratorSteamRecipe readFromJson(ResourceLocation recipeId, JsonObject json) {
-            FluidTagInput input = FluidTagInput.deserialize(JSONUtils.getAsJsonObject(json, "input"));
-            float power = JSONUtils.getAsFloat(json, "energy");
-            float tempMod = JSONUtils.getAsFloat(json, "temp_multiplier");
-            float rangeMod = JSONUtils.getAsFloat(json, "range_multiplier");
+            FluidTagInput input = FluidTagInput.deserialize(GsonHelper.getAsJsonObject(json, "input"));
+            float power = GsonHelper.getAsFloat(json, "energy");
+            float tempMod = GsonHelper.getAsFloat(json, "temp_multiplier");
+            float rangeMod = GsonHelper.getAsFloat(json, "range_multiplier");
             return new GeneratorSteamRecipe(recipeId, input, power, tempMod, rangeMod);
         }
 
         @Nullable
         @Override
-        public GeneratorSteamRecipe fromNetwork(ResourceLocation recipeId, PacketBuffer buffer) {
+        public GeneratorSteamRecipe fromNetwork(ResourceLocation recipeId, FriendlyByteBuf buffer) {
             FluidTagInput input = FluidTagInput.read(buffer);
             float power = buffer.readFloat();
             float tempMod = buffer.readFloat();
@@ -102,7 +102,7 @@ public class GeneratorSteamRecipe extends IESerializableRecipe {
         }
 
         @Override
-        public void toNetwork(PacketBuffer buffer, GeneratorSteamRecipe recipe) {
+        public void toNetwork(FriendlyByteBuf buffer, GeneratorSteamRecipe recipe) {
             recipe.input.write(buffer);
             buffer.writeFloat(recipe.power);
             buffer.writeFloat(recipe.tempMod);

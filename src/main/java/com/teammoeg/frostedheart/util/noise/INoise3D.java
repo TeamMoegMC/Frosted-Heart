@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 TeamMoeg
+ * Copyright (c) 2021-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -14,13 +14,14 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 package com.teammoeg.frostedheart.util.noise;
 
 import com.teammoeg.frostedheart.util.FloatUnaryFunction;
 
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.Mth;
 
 /**
  * Wrapper for a 3D Noise Layer
@@ -139,7 +140,7 @@ public interface INoise3D {
     }
 
     default INoise3D flattened(float min, float max) {
-        return (x, y, z) -> MathHelper.clamp(INoise3D.this.noise(x, y, z), min, max);
+        return (x, y, z) -> Mth.clamp(INoise3D.this.noise(x, y, z), min, max);
     }
 
     default INoise3D add(INoise3D other) {

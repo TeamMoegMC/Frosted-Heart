@@ -26,11 +26,11 @@ import com.teammoeg.frostedheart.research.ResearchListeners;
 import com.teammoeg.frostedheart.research.data.TeamResearchData;
 
 import dev.ftb.mods.ftbteams.data.Team;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.chat.Component;
 import net.minecraftforge.registries.ForgeRegistries;
 
 public class KillClue extends ListenerClue {
@@ -46,7 +46,7 @@ public class KillClue extends ListenerClue {
         type = ForgeRegistries.ENTITIES.getValue(new ResourceLocation(jo.get("entity").getAsString()));
     }
 
-    public KillClue(PacketBuffer pb) {
+    public KillClue(FriendlyByteBuf pb) {
         super(pb);
         type = pb.readRegistryIdUnsafe(ForgeRegistries.ENTITIES);
     }
@@ -56,15 +56,15 @@ public class KillClue extends ListenerClue {
     }
 
     @Override
-    public ITextComponent getName() {
+    public Component getName() {
         if (name != null && !name.isEmpty())
             return super.getName();
         return GuiUtils.translate("clue." + FHMain.MODID + ".kill");
     }
 
     @Override
-    public ITextComponent getDescription() {
-        ITextComponent itc = super.getDescription();
+    public Component getDescription() {
+        Component itc = super.getDescription();
         if (itc != null || type == null) return itc;
         return type.getDescription();
     }
@@ -101,7 +101,7 @@ public class KillClue extends ListenerClue {
 
 
     @Override
-    public void write(PacketBuffer buffer) {
+    public void write(FriendlyByteBuf buffer) {
         super.write(buffer);
         buffer.writeRegistryIdUnsafe(ForgeRegistries.ENTITIES, type);
     }

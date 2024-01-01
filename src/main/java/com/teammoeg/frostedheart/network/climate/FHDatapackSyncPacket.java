@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 TeamMoeg
+ * Copyright (c) 2021-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -14,6 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 package com.teammoeg.frostedheart.network.climate;
@@ -23,7 +24,7 @@ import java.util.function.Supplier;
 import com.teammoeg.frostedheart.climate.data.DataEntry;
 import com.teammoeg.frostedheart.climate.data.FHDataManager;
 
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.fml.network.NetworkEvent;
 
 public class FHDatapackSyncPacket {
@@ -33,18 +34,18 @@ public class FHDatapackSyncPacket {
         entries = FHDataManager.save();
     }
 
-    public FHDatapackSyncPacket(PacketBuffer buffer) {
+    public FHDatapackSyncPacket(FriendlyByteBuf buffer) {
         decode(buffer);
     }
 
-    public void decode(PacketBuffer buffer) {
+    public void decode(FriendlyByteBuf buffer) {
         entries = new DataEntry[buffer.readVarInt()];
         for (int i = 0; i < entries.length; i++) {
             entries[i] = new DataEntry(buffer);
         }
     }
 
-    public void encode(PacketBuffer buffer) {
+    public void encode(FriendlyByteBuf buffer) {
         buffer.writeVarInt(entries.length);
         for (DataEntry de : entries)
             de.encode(buffer);

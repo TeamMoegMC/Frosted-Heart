@@ -30,11 +30,11 @@ import com.google.gson.JsonParser;
 import com.teammoeg.frostedheart.climate.ITempAdjustFood;
 import com.teammoeg.frostedheart.climate.IWarmKeepingEquipment;
 
-import net.minecraft.block.Block;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraftforge.fluids.FluidStack;
 
 public class FHDataManager {
@@ -191,7 +191,7 @@ public class FHDataManager {
         return 0F;
     }
 
-    public static Float getWorldTemp(World w) {
+    public static Float getWorldTemp(Level w) {
         WorldTempData data = FHDataManager.<WorldTempData>get(FHDataType.World).get(w.dimension().location());
         if (data != null)
             return data.getTemp();

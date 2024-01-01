@@ -24,9 +24,9 @@ import com.teammoeg.frostedheart.content.steamenergy.INetworkConsumer;
 import com.teammoeg.frostedheart.content.steamenergy.SteamNetworkConsumer;
 import com.teammoeg.frostedheart.content.steamenergy.SteamNetworkHolder;
 
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.Direction;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.core.Direction;
 
 public class HeatIncubatorTileEntity extends IncubatorTileEntity implements INetworkConsumer {
 	SteamNetworkConsumer network = new SteamNetworkConsumer(80,5);
@@ -87,14 +87,14 @@ public class HeatIncubatorTileEntity extends IncubatorTileEntity implements INet
 
 
 	@Override
-	public void readCustomNBT(CompoundNBT compound, boolean client) {
+	public void readCustomNBT(CompoundTag compound, boolean client) {
 		super.readCustomNBT(compound, client);
 		network.load(compound);
 	}
 
 
 	@Override
-	public void writeCustomNBT(CompoundNBT compound, boolean client) {
+	public void writeCustomNBT(CompoundTag compound, boolean client) {
 		super.writeCustomNBT(compound, client);
 		network.save(compound);
 	}

@@ -24,13 +24,13 @@ import com.teammoeg.frostedheart.base.block.FHBlockInterfaces;
 
 import blusunrize.immersiveengineering.common.blocks.IEBaseTileEntity;
 import blusunrize.immersiveengineering.common.util.Utils;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tileentity.ITickableTileEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.block.entity.TickableBlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.core.Direction;
+import net.minecraft.core.BlockPos;
 
-public class HeatPipeTileEntity extends IEBaseTileEntity implements EnergyNetworkProvider, ITickableTileEntity, FHBlockInterfaces.IActiveState, INetworkConsumer {
+public class HeatPipeTileEntity extends IEBaseTileEntity implements EnergyNetworkProvider, TickableBlockEntity, FHBlockInterfaces.IActiveState, INetworkConsumer {
     private SteamNetworkHolder network = new SteamNetworkHolder();
     private boolean isPathFinding;
     private boolean justPropagated;
@@ -40,12 +40,12 @@ public class HeatPipeTileEntity extends IEBaseTileEntity implements EnergyNetwor
     }
 
     @Override
-    public void readCustomNBT(CompoundNBT nbt, boolean descPacket) {
+    public void readCustomNBT(CompoundTag nbt, boolean descPacket) {
         if (descPacket) return;
     }
 
     @Override
-    public void writeCustomNBT(CompoundNBT nbt, boolean descPacket) {
+    public void writeCustomNBT(CompoundTag nbt, boolean descPacket) {
         if (descPacket) return;
     }
 
@@ -67,7 +67,7 @@ public class HeatPipeTileEntity extends IEBaseTileEntity implements EnergyNetwor
             for (Direction d : Direction.values()) {
                 if (from == d) continue;
                 BlockPos n = this.getBlockPos().relative(d);
-                TileEntity te = Utils.getExistingTileEntity(this.getLevel(), n);
+                BlockEntity te = Utils.getExistingTileEntity(this.getLevel(), n);
                 if (te instanceof INetworkConsumer) {
                 		((INetworkConsumer) te).tryConnectAt(d.getOpposite(), lengthx + 1);
                 }
@@ -80,7 +80,7 @@ public class HeatPipeTileEntity extends IEBaseTileEntity implements EnergyNetwor
 
     public boolean connect(Direction to, int ndist) {
         if (justPropagated) return true;
-        TileEntity te = Utils.getExistingTileEntity(this.getLevel(), this.getBlockPos().relative(to));
+        BlockEntity te = Utils.getExistingTileEntity(this.getLevel(), this.getBlockPos().relative(to));
         if (te instanceof EnergyNetworkProvider) {
             SteamEnergyNetwork newNetwork = ((EnergyNetworkProvider) te).getNetwork();
             justPropagated = true;

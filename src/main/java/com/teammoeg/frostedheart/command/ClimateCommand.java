@@ -25,36 +25,36 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.teammoeg.frostedheart.FHMain;
 import com.teammoeg.frostedheart.climate.ClimateData;
 
-import net.minecraft.command.CommandSource;
-import net.minecraft.command.Commands;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.ChatFormatting;
 
 public class ClimateCommand {
-    public static void register(CommandDispatcher<CommandSource> dispatcher) {
-        LiteralArgumentBuilder<CommandSource> get = Commands.literal("get")
+    public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
+        LiteralArgumentBuilder<CommandSourceStack> get = Commands.literal("get")
                 .executes((ct) -> {
                 	try {
-                           ct.getSource().sendSuccess(new StringTextComponent(String.valueOf(ClimateData.get(ct.getSource().getLevel()))),true);
+                           ct.getSource().sendSuccess(new TextComponent(String.valueOf(ClimateData.get(ct.getSource().getLevel()))),true);
                 	}catch(Exception ex) {
                 		ex.printStackTrace();
                 	}
                             return Command.SINGLE_SUCCESS;
                         });
-        LiteralArgumentBuilder<CommandSource> rebuild = Commands.literal("rebuild")
+        LiteralArgumentBuilder<CommandSourceStack> rebuild = Commands.literal("rebuild")
                 .executes((ct) -> {
                 	
                     ClimateData.get(ct.getSource().getLevel()).resetTempEvent(ct.getSource().getLevel());
-                    ct.getSource().sendSuccess(new StringTextComponent("Succeed!").withStyle(TextFormatting.GREEN), false);
+                    ct.getSource().sendSuccess(new TextComponent("Succeed!").withStyle(ChatFormatting.GREEN), false);
                     return Command.SINGLE_SUCCESS;
         });
-        LiteralArgumentBuilder<CommandSource> init = Commands.literal("init")
+        LiteralArgumentBuilder<CommandSourceStack> init = Commands.literal("init")
         .executes((ct) -> {
             ClimateData.get(ct.getSource().getLevel()).addInitTempEvent(ct.getSource().getLevel());
-            ct.getSource().sendSuccess(new StringTextComponent("Succeed!").withStyle(TextFormatting.GREEN), false);
+            ct.getSource().sendSuccess(new TextComponent("Succeed!").withStyle(ChatFormatting.GREEN), false);
             return Command.SINGLE_SUCCESS;
         });
-        LiteralArgumentBuilder<CommandSource> reset = Commands.literal("resetVanilla")
+        LiteralArgumentBuilder<CommandSourceStack> reset = Commands.literal("resetVanilla")
                 .executes((ct) -> {
                 	ct.getSource().getLevel().serverLevelData.setThunderTime(0);
                 	ct.getSource().getLevel().serverLevelData.setRainTime(0);

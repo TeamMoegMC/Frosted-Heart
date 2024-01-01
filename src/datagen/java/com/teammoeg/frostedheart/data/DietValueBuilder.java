@@ -26,11 +26,11 @@ import com.google.gson.JsonObject;
 import com.teammoeg.frostedheart.content.recipes.DietGroupCodec;
 import com.teammoeg.frostedheart.content.recipes.DietValueRecipe;
 
-import net.minecraft.data.IFinishedRecipe;
-import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.data.recipes.FinishedRecipe;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.resources.ResourceLocation;
 
-public class DietValueBuilder implements IFinishedRecipe {
+public class DietValueBuilder implements FinishedRecipe {
 	final Map<String,Float> groups=new HashMap<>();
 	public ResourceLocation out;
 	public ResourceLocation rl;
@@ -67,7 +67,7 @@ public class DietValueBuilder implements IFinishedRecipe {
 		return null;
 	}
 	@Override
-	public IRecipeSerializer<?> getType() {
+	public RecipeSerializer<?> getType() {
 		return DietValueRecipe.SERIALIZER.get();
 	}
 

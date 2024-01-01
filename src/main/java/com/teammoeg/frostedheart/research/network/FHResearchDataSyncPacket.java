@@ -26,30 +26,30 @@ import com.teammoeg.frostedheart.compat.jei.JEICompat;
 import com.teammoeg.frostedheart.research.data.FHResearchDataManager;
 import com.teammoeg.frostedheart.research.data.TeamResearchData;
 
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.network.NetworkEvent;
 
 // send when player join
 public class FHResearchDataSyncPacket {
-    private final CompoundNBT data;
+    private final CompoundTag data;
 
     public FHResearchDataSyncPacket(UUID team) {
         this.data = FHResearchDataManager.INSTANCE.getData(team).serialize(true);
     }
 
-    public FHResearchDataSyncPacket(CompoundNBT data) {
+    public FHResearchDataSyncPacket(CompoundTag data) {
 		super();
 		this.data = data;
 	}
 
-	public FHResearchDataSyncPacket(PacketBuffer buffer) {
+	public FHResearchDataSyncPacket(FriendlyByteBuf buffer) {
         data = buffer.readNbt();
     }
 
-    public void encode(PacketBuffer buffer) {
+    public void encode(FriendlyByteBuf buffer) {
         buffer.writeNbt(data);
     }
 

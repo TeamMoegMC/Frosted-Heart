@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -22,8 +22,8 @@ package com.teammoeg.frostedheart.research;
 import com.teammoeg.frostedheart.FHMain;
 import com.teammoeg.frostedheart.client.util.GuiUtils;
 
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.chat.TranslatableComponent;
 
 public enum ResearchLevel {
     DRAWING_DESK("drawing_desk"),
@@ -33,7 +33,7 @@ public enum ResearchLevel {
     COMPUTING_MATRIX("computing_matrix");
 
     ResourceLocation icon;
-    TranslationTextComponent name;
+    TranslatableComponent name;
 
     ResearchLevel(String levelName) {
         icon = FHMain.rl("textures/gui/research/level/" + levelName);
@@ -44,7 +44,7 @@ public enum ResearchLevel {
         return icon;
     }
 
-    public TranslationTextComponent getName() {
+    public TranslatableComponent getName() {
         return name;
     }
 }

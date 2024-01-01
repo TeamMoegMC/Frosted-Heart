@@ -23,22 +23,22 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Random;
 
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.item.crafting.SmokingRecipe;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.SmokingRecipe;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.fml.RegistryObject;
 
 public class SmokingDefrostRecipe extends SmokingRecipe implements DefrostRecipe {
 
-    public static RegistryObject<IRecipeSerializer<SmokingDefrostRecipe>> SERIALIZER;
+    public static RegistryObject<RecipeSerializer<SmokingDefrostRecipe>> SERIALIZER;
     public static Map<ResourceLocation, DefrostRecipe> recipeList = Collections.emptyMap();
 
     @Override
-    public IRecipeSerializer<?> getSerializer() {
+    public RecipeSerializer<?> getSerializer() {
         return SERIALIZER.get();
     }
 
@@ -63,7 +63,7 @@ public class SmokingDefrostRecipe extends SmokingRecipe implements DefrostRecipe
 
 
     @Override
-    public ItemStack assemble(IInventory inv) {
+    public ItemStack assemble(Container inv) {
         if (iss.length <= 0) return ItemStack.EMPTY;
         return iss[recipeRNG.nextInt(getIss().length)].copy();
     }
@@ -87,7 +87,7 @@ public class SmokingDefrostRecipe extends SmokingRecipe implements DefrostRecipe
         }
 
         @Override
-        public void toNetwork(PacketBuffer buffer, SmokingDefrostRecipe recipe) {
+        public void toNetwork(FriendlyByteBuf buffer, SmokingDefrostRecipe recipe) {
             super.toNetwork(buffer, recipe);
             buffer.writeFloat(recipe.getExperience());
             buffer.writeVarInt(recipe.getCookingTime());

@@ -26,7 +26,7 @@ import com.teammoeg.frostedheart.research.data.ResearchData;
 import com.teammoeg.frostedheart.util.Calculator;
 import com.teammoeg.frostedheart.util.Writeable;
 
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.FriendlyByteBuf;
 
 public class ExpResearchNumber implements IResearchNumber, Writeable {
 	Calculator.Node calc;
@@ -36,7 +36,7 @@ public class ExpResearchNumber implements IResearchNumber, Writeable {
 		this.exp = exp;
 		calc=Calculator.eval(exp);
 	}
-	public ExpResearchNumber(PacketBuffer buffer) {
+	public ExpResearchNumber(FriendlyByteBuf buffer) {
 		this(buffer.readUtf());
 	}
 	public ExpResearchNumber(JsonObject buffer) {
@@ -48,7 +48,7 @@ public class ExpResearchNumber implements IResearchNumber, Writeable {
 	}
 
 	@Override
-	public void write(PacketBuffer buffer) {
+	public void write(FriendlyByteBuf buffer) {
 		buffer.writeUtf(exp);
 	}
 

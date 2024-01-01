@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -23,8 +23,8 @@ import com.google.gson.JsonObject;
 import com.teammoeg.frostedheart.FHMain;
 import com.teammoeg.frostedheart.client.util.GuiUtils;
 
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
 
 public class MinigameClue extends CustomClue {
     private int level = 0;
@@ -38,7 +38,7 @@ public class MinigameClue extends CustomClue {
         setLevel(jo.get("level").getAsInt());
     }
 
-    public MinigameClue(PacketBuffer pb) {
+    public MinigameClue(FriendlyByteBuf pb) {
         super(pb);
         setLevel(pb.readVarInt());
     }
@@ -48,7 +48,7 @@ public class MinigameClue extends CustomClue {
     }
 
     @Override
-    public ITextComponent getName() {
+    public Component getName() {
         if (name != null && !name.isEmpty())
             return super.getName();
         return GuiUtils.translate("clue." + FHMain.MODID + ".minigame.t"+level);
@@ -68,7 +68,7 @@ public class MinigameClue extends CustomClue {
     }
 
     @Override
-    public void write(PacketBuffer buffer) {
+    public void write(FriendlyByteBuf buffer) {
         super.write(buffer);
         buffer.writeVarInt(getLevel());
 

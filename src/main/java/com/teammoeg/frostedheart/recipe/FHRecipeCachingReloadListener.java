@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 TeamMoeg
+ * Copyright (c) 2021-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -14,6 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 package com.teammoeg.frostedheart.recipe;
@@ -22,19 +23,19 @@ import javax.annotation.Nonnull;
 
 import com.teammoeg.frostedheart.research.ResearchListeners;
 
-import net.minecraft.resources.DataPackRegistries;
-import net.minecraft.resources.IResourceManager;
-import net.minecraft.resources.IResourceManagerReloadListener;
+import net.minecraft.server.ServerResources;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 
-public class FHRecipeCachingReloadListener implements IResourceManagerReloadListener {
-    private final DataPackRegistries dataPackRegistries;
+public class FHRecipeCachingReloadListener implements ResourceManagerReloadListener {
+    private final ServerResources dataPackRegistries;
 
-    public FHRecipeCachingReloadListener(DataPackRegistries dataPackRegistries) {
+    public FHRecipeCachingReloadListener(ServerResources dataPackRegistries) {
         this.dataPackRegistries = dataPackRegistries;
     }
 
     @Override
-    public void onResourceManagerReload(@Nonnull IResourceManager resourceManager) {
+    public void onResourceManagerReload(@Nonnull ResourceManager resourceManager) {
         FHRecipeReloadListener.buildRecipeLists(dataPackRegistries.getRecipeManager());
         ResearchListeners.ServerReload();
     }

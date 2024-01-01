@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.teammoeg.frostedheart.client.util.GuiUtils;
 import com.teammoeg.frostedheart.research.FHResearch;
 import com.teammoeg.frostedheart.research.gui.TechIcons;
@@ -42,7 +42,7 @@ import dev.ftb.mods.ftblibrary.ui.Panel;
 import dev.ftb.mods.ftblibrary.ui.Theme;
 import dev.ftb.mods.ftblibrary.ui.input.MouseButton;
 import dev.ftb.mods.ftblibrary.util.TooltipList;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.ChatFormatting;
 
 public class ResearchHierarchyPanel extends Panel {
 	public static class ResearchHierarchyLine extends ThickLine {
@@ -57,7 +57,7 @@ public class ResearchHierarchyPanel extends Panel {
 		}
 
 		@Override
-		public void draw(MatrixStack matrixStack, int x, int y) {
+		public void draw(PoseStack matrixStack, int x, int y) {
 			if (doShow())
 				color = TechIcons.text;
 			else
@@ -78,7 +78,7 @@ public class ResearchHierarchyPanel extends Panel {
 		}
 
 		@Override
-		public void draw(MatrixStack matrixStack, int x, int y) {
+		public void draw(PoseStack matrixStack, int x, int y) {
 			if (doShow())
 				color = TechIcons.text;
 			else
@@ -300,7 +300,7 @@ public class ResearchHierarchyPanel extends Panel {
 	}
 
 	@Override
-	public void drawOffsetBackground(MatrixStack matrixStack, Theme theme, int x, int y, int w, int h) {
+	public void drawOffsetBackground(PoseStack matrixStack, Theme theme, int x, int y, int w, int h) {
 		// theme.drawPanelBackground(matrixStack, x, y, w, h);
 		GuiHelper.setupDrawing();
 		for (ThickLine l : lines)
@@ -308,7 +308,7 @@ public class ResearchHierarchyPanel extends Panel {
 	}
 
 	@Override
-	public void draw(MatrixStack matrixStack, Theme theme, int x, int y, int w, int h) {
+	public void draw(PoseStack matrixStack, Theme theme, int x, int y, int w, int h) {
 		super.draw(matrixStack, theme, x, y, w, h);
 		theme.drawString(matrixStack, GuiUtils.translateGui("research_hierarchy"), x + 3, y + 3, TechIcons.text, 0);
 		TechIcons.HLINE_L.draw(matrixStack, x + 1, y + 13, 80, 3);
@@ -335,19 +335,19 @@ public class ResearchHierarchyPanel extends Panel {
 
 		@Override
 		public void addMouseOverText(TooltipList list) {
-			list.add(research.getName().withStyle(TextFormatting.BOLD));
+			list.add(research.getName().withStyle(ChatFormatting.BOLD));
 			if (!research.isUnlocked()) {
-				list.add(GuiUtils.translateTooltip("research_is_locked").withStyle(TextFormatting.RED));
+				list.add(GuiUtils.translateTooltip("research_is_locked").withStyle(ChatFormatting.RED));
 				for (Research parent : research.getParents()) {
 					if (!parent.isCompleted()) {
-						list.add(parent.getName().withStyle(TextFormatting.GRAY));
+						list.add(parent.getName().withStyle(ChatFormatting.GRAY));
 					}
 				}
 			}
 		}
 
 		@Override
-		public void draw(MatrixStack matrixStack, Theme theme, int x, int y, int w, int h) {
+		public void draw(PoseStack matrixStack, Theme theme, int x, int y, int w, int h) {
 			// this.drawBackground(matrixStack, theme, x, y, w, h);
 			GuiHelper.setupDrawing();
 			TechIcons.LSLOT.draw(matrixStack, x, y, w, h);
@@ -389,19 +389,19 @@ public class ResearchHierarchyPanel extends Panel {
 
 		@Override
 		public void addMouseOverText(TooltipList list) {
-			list.add(research.getName().withStyle(TextFormatting.BOLD));
+			list.add(research.getName().withStyle(ChatFormatting.BOLD));
 			if ((parent == null && !research.isUnlocked()) || (parent != null && !parent.isUnlocked())) {
-				list.add(GuiUtils.translateTooltip("research_is_locked").withStyle(TextFormatting.RED));
+				list.add(GuiUtils.translateTooltip("research_is_locked").withStyle(ChatFormatting.RED));
 				for (Research parent : research.getParents()) {
 					if (!parent.isCompleted()) {
-						list.add(parent.getName().withStyle(TextFormatting.GRAY));
+						list.add(parent.getName().withStyle(ChatFormatting.GRAY));
 					}
 				}
 			}
 		}
 
 		@Override
-		public void draw(MatrixStack matrixStack, Theme theme, int x, int y, int w, int h) {
+		public void draw(PoseStack matrixStack, Theme theme, int x, int y, int w, int h) {
 			GuiHelper.setupDrawing();
 			TechIcons.SLOT.draw(matrixStack, x, y, w, h);
 			if (FHResearch.editor || research.isShowable()) {

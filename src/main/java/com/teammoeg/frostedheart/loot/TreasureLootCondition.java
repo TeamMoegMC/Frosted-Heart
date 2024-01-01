@@ -26,19 +26,19 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 
 import blusunrize.immersiveengineering.common.util.Utils;
-import net.minecraft.loot.ILootSerializer;
-import net.minecraft.loot.LootConditionType;
-import net.minecraft.loot.LootContext;
-import net.minecraft.loot.LootParameterSets;
+import net.minecraft.world.level.storage.loot.Serializer;
+import net.minecraft.world.level.storage.loot.predicates.LootItemConditionType;
+import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.loot.LootParameters;
-import net.minecraft.loot.conditions.ILootCondition;
+import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import net.minecraft.tileentity.LockableLootTileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 
-public class TreasureLootCondition implements ILootCondition {
-    public static LootConditionType TYPE;
+public class TreasureLootCondition implements LootItemCondition {
+    public static LootItemConditionType TYPE;
 
     public TreasureLootCondition() {
     }
@@ -46,15 +46,15 @@ public class TreasureLootCondition implements ILootCondition {
     @SuppressWarnings("resource")
     @Override
     public boolean test(LootContext t) {
-        return t.getLootTable(t.getQueriedLootTableId()).getParamSet()==LootParameterSets.CHEST;
+        return t.getLootTable(t.getQueriedLootTableId()).getParamSet()==LootContextParamSets.CHEST;
     }
 
     @Override
-    public LootConditionType getType() {
+    public LootItemConditionType getType() {
         return TYPE;
     }
 
-    public static class Serializer implements ILootSerializer<TreasureLootCondition> {
+    public static class Serializer implements Serializer<TreasureLootCondition> {
 
         @Override
         public void serialize(JsonObject jsonObject, TreasureLootCondition matchTagCondition, JsonSerializationContext serializationContext) {

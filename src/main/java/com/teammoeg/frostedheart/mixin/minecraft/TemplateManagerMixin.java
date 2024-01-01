@@ -29,14 +29,14 @@ import org.spongepowered.asm.mixin.Shadow;
 
 import com.teammoeg.frostedheart.util.StructureUtils;
 
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.gen.feature.template.Template;
-import net.minecraft.world.gen.feature.template.TemplateManager;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureManager;
 
-@Mixin(TemplateManager.class)
+@Mixin(StructureManager.class)
 public abstract class TemplateManagerMixin {
     @Shadow
-    private Map<ResourceLocation, Template> templates;
+    private Map<ResourceLocation, StructureTemplate> templates;
 
     /**
      * @author khjxiaogu
@@ -44,9 +44,9 @@ public abstract class TemplateManagerMixin {
      */
     @Overwrite
     @Nullable
-    public Template getTemplate(ResourceLocation p_200219_1_) {
+    public StructureTemplate getTemplate(ResourceLocation p_200219_1_) {
         return this.templates.computeIfAbsent(p_200219_1_, (p_209204_1_) -> {
-            Template template = this.loadTemplateFile(p_209204_1_);
+            StructureTemplate template = this.loadTemplateFile(p_209204_1_);
 
             if (template != null) {
                 StructureUtils.handlePalette(((TemplateAccess) template).getBlocks());
@@ -63,9 +63,9 @@ public abstract class TemplateManagerMixin {
 
     @Shadow
     @Nullable
-    abstract Template loadTemplateResource(ResourceLocation p_209201_1_);
+    abstract StructureTemplate loadTemplateResource(ResourceLocation p_209201_1_);
 
     @Shadow
     @Nullable
-    abstract Template loadTemplateFile(ResourceLocation locationIn);
+    abstract StructureTemplate loadTemplateFile(ResourceLocation locationIn);
 }

@@ -27,12 +27,12 @@ import com.teammoeg.frostedheart.research.gui.ResearchGui;
 import dev.ftb.mods.ftblibrary.ui.BaseScreen;
 import dev.ftb.mods.ftblibrary.ui.IScreenWrapper;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.player.ClientPlayerEntity;
-import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.particles.ParticleTypes;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 
 public class ClientUtils {
     public static float spgamma;
@@ -42,11 +42,11 @@ public class ClientUtils {
         return Minecraft.getInstance();
     }
 
-    public static World getWorld() {
+    public static Level getWorld() {
         return Minecraft.getInstance().level;
     }
 
-    public static ClientPlayerEntity getPlayer() {
+    public static LocalPlayer getPlayer() {
         return Minecraft.getInstance().player;
     }
 
@@ -61,19 +61,19 @@ public class ClientUtils {
         mc().getLanguageManager();
     }
 
-    public static void spawnSmokeParticles(World worldIn, BlockPos pos) {
+    public static void spawnSmokeParticles(Level worldIn, BlockPos pos) {
         Random random = worldIn.getRandom();
         worldIn.addAlwaysVisibleParticle(ParticleTypes.CAMPFIRE_SIGNAL_SMOKE, true, pos.getX() + 0.5D + random.nextDouble() / 3.0D * (random.nextBoolean() ? 1 : -1), pos.getY() + random.nextDouble() + random.nextDouble(), pos.getZ() + 0.5D + random.nextDouble() / 3.0D * (random.nextBoolean() ? 1 : -1), 0.0D, 0.05D, 0.0D);
         worldIn.addParticle(ParticleTypes.SMOKE, pos.getX() + 0.25D + random.nextDouble() / 2.0D * (random.nextBoolean() ? 1 : -1), pos.getY() + 0.4D, pos.getZ() + 0.25D + random.nextDouble() / 2.0D * (random.nextBoolean() ? 1 : -1), 0.002D, 0.01D, 0.0D);
     }
 
-    public static void spawnSteamParticles(World worldIn, BlockPos pos) {
+    public static void spawnSteamParticles(Level worldIn, BlockPos pos) {
         Random random = worldIn.getRandom();
         worldIn.addAlwaysVisibleParticle(FHParticleTypes.STEAM.get(), true, pos.getX() + 0.5D + random.nextDouble() / 3.0D * (random.nextBoolean() ? 1 : -1), pos.getY() + 0.5D + random.nextDouble() + random.nextDouble(), pos.getZ() + 0.5D + random.nextDouble() / 3.0D * (random.nextBoolean() ? 1 : -1), 0.0D, 0.12D, 0.0D);
         worldIn.addParticle(FHParticleTypes.STEAM.get(), pos.getX() + 0.5D + random.nextDouble() / 2.0D * (random.nextBoolean() ? 1 : -1), pos.getY() + 0.4D, pos.getZ() + 0.5D + random.nextDouble() / 2.0D * (random.nextBoolean() ? 1 : -1), 0.0D, 0.05D, 0.0D);
     }
 
-    public static void spawnFireParticles(World worldIn, BlockPos pos) {
+    public static void spawnFireParticles(Level worldIn, BlockPos pos) {
         Random random = worldIn.getRandom();
         // Upward flame
         worldIn.addParticle(ParticleTypes.FLAME, pos.getX() + 0.25D + random.nextDouble() / 2.0D * (random.nextBoolean() ? 1 : -1), pos.getY() + 0.4D, pos.getZ() + 0.25D + random.nextDouble() / 2.0D * (random.nextBoolean() ? 1 : -1), 0.0D, 0.01D, 0.0D);
@@ -84,7 +84,7 @@ public class ClientUtils {
         worldIn.addParticle(ParticleTypes.FLAME, pos.getX() + 0.25D + random.nextDouble() / 2.0D * (random.nextBoolean() ? 1 : -1), pos.getY() + 0.4D, pos.getZ() + 0.25D + random.nextDouble() / 2.0D * (random.nextBoolean() ? 1 : -1), 0.0D, 0D, -0.01D);
     }
 
-    public static void spawnT2FireParticles(World worldIn, BlockPos pos) {
+    public static void spawnT2FireParticles(Level worldIn, BlockPos pos) {
         Random random = worldIn.getRandom();
         // Upward flame
         worldIn.addParticle(ParticleTypes.FLAME, pos.getX() + 0.5D + random.nextDouble() / 2.0D * (random.nextBoolean() ? 1 : -1), pos.getY() + 0.4D, pos.getZ() + 0.5D + random.nextDouble() / 2.0D * (random.nextBoolean() ? 1 : -1), 0.0D, 0.01D, 0.0D);

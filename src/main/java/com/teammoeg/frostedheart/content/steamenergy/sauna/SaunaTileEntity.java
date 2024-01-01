@@ -45,24 +45,24 @@ import blusunrize.immersiveengineering.common.util.inventory.IIEInventory;
 import dev.ftb.mods.ftbteams.FTBTeamsAPI;
 import dev.ftb.mods.ftbteams.FTBTeamsCommon;
 import dev.ftb.mods.ftbteams.data.Team;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.inventory.ItemStackHelper;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.nbt.NBTUtil;
-import net.minecraft.potion.Effect;
-import net.minecraft.potion.EffectInstance;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtUtils;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.tileentity.ITickableTileEntity;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.entity.TickableBlockEntity;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.core.Direction;
+import net.minecraft.core.NonNullList;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.LazyOptional;
@@ -71,7 +71,7 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
 public class SaunaTileEntity extends IEBaseTileEntity implements
-        INetworkConsumer, ITickableTileEntity, FHBlockInterfaces.IActiveState, IIEInventory, IInteractionObjectIE {
+        INetworkConsumer, TickableBlockEntity, FHBlockInterfaces.IActiveState, IIEInventory, IInteractionObjectIE {
 
     private static final float POWER_CAP = 400;
     private static final float REFILL_THRESHOLD = 200;
@@ -83,7 +83,7 @@ public class SaunaTileEntity extends IEBaseTileEntity implements
     private float power = 0;
     private int remainTime = 0;
     private int maxTime = 0;
-    private Effect effect = null;
+    private MobEffect effect = null;
     private int effectDuration = 0;
     private int effectAmplifier = 0;
     private boolean refilling = false;
@@ -113,9 +113,9 @@ public class SaunaTileEntity extends IEBaseTileEntity implements
         return remainTime > 0 && effect != null;
     }
 
-    public EffectInstance getEffectInstance() {
+    public MobEffectInstance getEffectInstance() {
         if (effect != null) {
-            return new EffectInstance(effect, effectDuration, effectAmplifier, true, true);
+            return new MobEffectInstance(effect, effectDuration, effectAmplifier, true, true);
         } else {
             return null;
         }
@@ -126,12 +126,12 @@ public class SaunaTileEntity extends IEBaseTileEntity implements
     }
 
     @Override
-    public void readCustomNBT(CompoundNBT nbt, boolean descPacket) {
+    public void readCustomNBT(CompoundTag nbt, boolean descPacket) {
         power = nbt.getFloat("power");
         remainTime = nbt.getInt("time");
         maxTime = nbt.getInt("maxTime");
         if (nbt.contains("effect")) {
-            effect = Effect.byId(nbt.getInt("effect"));
+            effect = MobEffect.byId(nbt.getInt("effect"));
             effectDuration = nbt.getInt("duration");
             effectAmplifier = nbt.getInt("amplifier");
         } else {
@@ -141,23 +141,23 @@ public class SaunaTileEntity extends IEBaseTileEntity implements
         }
         refilling = nbt.getBoolean("refilling");
         formed = nbt.getBoolean("formed");
-        ListNBT floorNBT = nbt.getList("floor", Constants.NBT.TAG_COMPOUND);
+        ListTag floorNBT = nbt.getList("floor", Constants.NBT.TAG_COMPOUND);
         floor.clear();
         for (int i = 0; i < floorNBT.size(); i++) {
-            BlockPos pos = NBTUtil.readBlockPos(floorNBT.getCompound(i));
+            BlockPos pos = NbtUtils.readBlockPos(floorNBT.getCompound(i));
             floor.add(pos);
         }
         this.inventory = NonNullList.withSize(1, ItemStack.EMPTY);
-        ItemStackHelper.loadAllItems(nbt, this.inventory);
+        ContainerHelper.loadAllItems(nbt, this.inventory);
     }
 
     @Override
-    public void writeCustomNBT(CompoundNBT nbt, boolean descPacket) {
+    public void writeCustomNBT(CompoundTag nbt, boolean descPacket) {
         nbt.putFloat("power", power);
         nbt.putInt("time", remainTime);
         nbt.putInt("maxTime", maxTime);
         if (effect != null) {
-            nbt.putInt("effect", Effect.getId(effect));
+            nbt.putInt("effect", MobEffect.getId(effect));
             nbt.putInt("effectDuration", effectDuration);
             nbt.putInt("effectAmplifier", effectAmplifier);
         } else {
@@ -167,12 +167,12 @@ public class SaunaTileEntity extends IEBaseTileEntity implements
         }
         nbt.putBoolean("refilling", refilling);
         nbt.putBoolean("formed", formed);
-        ListNBT floorNBT = new ListNBT();
+        ListTag floorNBT = new ListTag();
         for (BlockPos pos : floor) {
-            CompoundNBT posNBT = NBTUtil.writeBlockPos(pos);
+            CompoundTag posNBT = NbtUtils.writeBlockPos(pos);
             floorNBT.add(posNBT);
         }
-        ItemStackHelper.saveAllItems(nbt, this.inventory);
+        ContainerHelper.saveAllItems(nbt, this.inventory);
         nbt.put("floor", floorNBT);
     }
 
@@ -249,9 +249,9 @@ public class SaunaTileEntity extends IEBaseTileEntity implements
                 setChanged();
                 this.markContainingBlockForUpdate(null);
 
-                for (PlayerEntity p : this.getLevel().players()) {
+                for (Player p : this.getLevel().players()) {
                     if (floor.contains(p.blockPosition().below())||floor.contains(p.blockPosition())) {
-                        grantEffects((ServerPlayerEntity) p);
+                        grantEffects((ServerPlayer) p);
                     }
                 }
             }
@@ -262,19 +262,19 @@ public class SaunaTileEntity extends IEBaseTileEntity implements
         }
     }
 
-    public ActionResultType onClick(PlayerEntity player) {
+    public InteractionResult onClick(Player player) {
         if (!player.level.isClientSide) {
             if (formed) {
                 // player.sendStatusMessage(GuiUtils.translateMessage("structure_formed"), true);
-                NetworkHooks.openGui((ServerPlayerEntity) player, this, this.getBlockPos());
+                NetworkHooks.openGui((ServerPlayer) player, this, this.getBlockPos());
             } else {
                 player.displayClientMessage(GuiUtils.translateMessage("structure_not_formed"), true);
             }
         }
-        return ActionResultType.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
 
-    private void grantEffects(ServerPlayerEntity p) {
+    private void grantEffects(ServerPlayer p) {
         // add effect only if armor is not equipped
         if (p.getArmorCoverPercentage() > 0.0F) {
             return;
@@ -285,7 +285,7 @@ public class SaunaTileEntity extends IEBaseTileEntity implements
         if(t==null||!t.getId().equals(owner))return;
         // add wet effect
         if (level.getGameTime() % 200L == 0L) {
-            p.addEffect(new EffectInstance(FHEffects.WET, 200, 0, true, false));
+            p.addEffect(new MobEffectInstance(FHEffects.WET, 200, 0, true, false));
         }
         
         // add sauna effect
@@ -293,7 +293,7 @@ public class SaunaTileEntity extends IEBaseTileEntity implements
             // initial reward
             EnergyCore.addEnergy(p, 1000);
             // whole day reward
-            p.addEffect(new EffectInstance(FHEffects.SAUNA, 23000, 0, true, false));
+            p.addEffect(new MobEffectInstance(FHEffects.SAUNA, 23000, 0, true, false));
         }
         // add temperature
         float lenvtemp = TemperatureCore.getEnvTemperature(p);//get a smooth change in display
@@ -306,10 +306,10 @@ public class SaunaTileEntity extends IEBaseTileEntity implements
     }
 
     private boolean dist(BlockPos crn, BlockPos orig) {
-        return MathHelper.abs(crn.getX() - orig.getX()) <= RANGE && MathHelper.abs(crn.getZ() - orig.getZ()) <= RANGE;
+        return Mth.abs(crn.getX() - orig.getX()) <= RANGE && Mth.abs(crn.getZ() - orig.getZ()) <= RANGE;
     }
 
-    private void findNext(World l, BlockPos crn, BlockPos orig, Set<BlockPos> poss, Set<BlockPos> edges) {
+    private void findNext(Level l, BlockPos crn, BlockPos orig, Set<BlockPos> poss, Set<BlockPos> edges) {
         if (dist(crn, orig)) {
             if (poss.add(crn)) {
                 for (Direction dir : HORIZONTALS) {
@@ -386,12 +386,12 @@ public class SaunaTileEntity extends IEBaseTileEntity implements
     }
 
     @Override
-    public boolean canUseGui(PlayerEntity playerEntity) {
+    public boolean canUseGui(Player playerEntity) {
         return true;
     }
 
     @Override
-    public void receiveMessageFromServer(CompoundNBT message) {
+    public void receiveMessageFromServer(CompoundTag message) {
         super.receiveMessageFromServer(message);
     }
 }

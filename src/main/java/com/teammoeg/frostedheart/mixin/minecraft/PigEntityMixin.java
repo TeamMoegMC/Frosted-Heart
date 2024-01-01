@@ -27,18 +27,18 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.teammoeg.frostedheart.util.mixin.IFeedStore;
 
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.passive.AnimalEntity;
-import net.minecraft.entity.passive.PigEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
-import net.minecraft.world.World;
-@Mixin(PigEntity.class)
-public abstract class PigEntityMixin extends AnimalEntity implements IFeedStore{
-	protected PigEntityMixin(EntityType<? extends AnimalEntity> type, World worldIn) {
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.animal.Animal;
+import net.minecraft.world.entity.animal.Pig;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.level.Level;
+@Mixin(Pig.class)
+public abstract class PigEntityMixin extends Animal implements IFeedStore{
+	protected PigEntityMixin(EntityType<? extends Animal> type, Level worldIn) {
 		super(type, worldIn);
 	}
 
@@ -47,19 +47,19 @@ public abstract class PigEntityMixin extends AnimalEntity implements IFeedStore{
 
 
 	@Inject(at = @At("HEAD"), method = "writeAdditional")
-	public void fh$writeAdditional(CompoundNBT compound, CallbackInfo cbi) {
+	public void fh$writeAdditional(CompoundTag compound, CallbackInfo cbi) {
 		compound.putByte("feed_stored", feeded);
 
 	}
 
 	@Inject(at = @At("HEAD"), method = "writeAdditional")
-	public void fh$readAdditional(CompoundNBT compound, CallbackInfo cbi) {
+	public void fh$readAdditional(CompoundTag compound, CallbackInfo cbi) {
 		feeded = compound.getByte("feed_stored");
 	}
 
 
 	@Inject(at=@At("HEAD"),method="getEntityInteractionResult",cancellable=true)
-	public void fh$getEntityInteractionResult(PlayerEntity playerIn, Hand hand,CallbackInfoReturnable<ActionResultType> cbi) {
+	public void fh$getEntityInteractionResult(Player playerIn, InteractionHand hand,CallbackInfoReturnable<InteractionResult> cbi) {
 		ItemStack itemstack = playerIn.getHeldItem(hand);
 
 		if (!itemstack.isEmpty() && isBreedingItem(itemstack)) {

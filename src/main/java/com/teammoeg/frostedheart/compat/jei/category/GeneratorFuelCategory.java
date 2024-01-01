@@ -21,7 +21,7 @@ package com.teammoeg.frostedheart.compat.jei.category;
 
 import java.util.Arrays;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.teammoeg.frostedheart.FHMain;
 import com.teammoeg.frostedheart.FHMultiblocks;
 import com.teammoeg.frostedheart.client.util.ClientUtils;
@@ -36,9 +36,9 @@ import mezz.jei.api.gui.ingredient.IGuiItemStackGroup;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.ingredients.IIngredients;
 import mezz.jei.api.recipe.category.IRecipeCategory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.chat.TranslatableComponent;
 
 public class GeneratorFuelCategory implements IRecipeCategory<GeneratorRecipe> {
     public static ResourceLocation UID = new ResourceLocation(FHMain.MODID, "generator_fuel");
@@ -68,11 +68,11 @@ public class GeneratorFuelCategory implements IRecipeCategory<GeneratorRecipe> {
 
 
     public String getTitle() {
-        return (new TranslationTextComponent("gui.jei.category." + FHMain.MODID + ".generator_fuel").getString());
+        return (new TranslatableComponent("gui.jei.category." + FHMain.MODID + ".generator_fuel").getString());
     }
 
     @Override
-    public void draw(GeneratorRecipe recipe, MatrixStack transform, double mouseX, double mouseY) {
+    public void draw(GeneratorRecipe recipe, PoseStack transform, double mouseX, double mouseY) {
         FIRE.draw(transform, 60, 30);
         SWITCH.draw(transform, 32, 32);
         String burnTime = String.valueOf(recipe.time) + " ticks";

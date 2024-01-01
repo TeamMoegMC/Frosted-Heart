@@ -21,16 +21,16 @@ package com.teammoeg.frostedheart.util;
 
 import com.teammoeg.frostedheart.FHMain;
 
-import net.minecraft.block.Block;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.tags.ITag;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.tags.Tag;
+import net.minecraft.resources.ResourceLocation;
 
 public class FHTags {
     public static final class Blocks {
-        public static final ITag.INamedTag<Block> ALWAYS_BREAKABLE = create("always_breakable");
+        public static final Tag.Named<Block> ALWAYS_BREAKABLE = create("always_breakable");
 
-        private static ITag.INamedTag<Block> create(String id) {
+        private static Tag.Named<Block> create(String id) {
             return BlockTags.bind(new ResourceLocation(FHMain.MODID, id).toString());
         }
     }

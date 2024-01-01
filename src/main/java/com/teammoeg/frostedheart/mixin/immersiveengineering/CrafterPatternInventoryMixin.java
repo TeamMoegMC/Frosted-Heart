@@ -32,16 +32,16 @@ import blusunrize.immersiveengineering.common.blocks.metal.AssemblerTileEntity;
 import blusunrize.immersiveengineering.common.blocks.metal.AssemblerTileEntity.CrafterPatternInventory;
 import blusunrize.immersiveengineering.common.util.Utils;
 import net.minecraft.inventory.CraftingInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.util.NonNullList;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.core.NonNullList;
 
 @Mixin(CrafterPatternInventory.class)
 public class CrafterPatternInventoryMixin {
     @Shadow(remap = false)
     NonNullList<ItemStack> inv;
     @Shadow(remap = false)
-    IRecipe recipe;
+    Recipe recipe;
     @Shadow(remap = false)
     AssemblerTileEntity tile;
 

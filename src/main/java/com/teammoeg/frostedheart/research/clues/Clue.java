@@ -34,9 +34,9 @@ import com.teammoeg.frostedheart.research.research.Research;
 import com.teammoeg.frostedheart.util.Writeable;
 
 import dev.ftb.mods.ftbteams.data.Team;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.network.PacketDistributor;
@@ -86,7 +86,7 @@ public abstract class Clue extends AutoIDItem implements Writeable {
         	this.required=jo.get("required").getAsBoolean();
     }
 
-    public Clue(PacketBuffer pb) {
+    public Clue(FriendlyByteBuf pb) {
         super();
         this.name = pb.readUtf();
         this.desc = pb.readUtf();
@@ -134,7 +134,7 @@ public abstract class Clue extends AutoIDItem implements Writeable {
      */
     public void sendProgressPacket(Team team) {
         FHClueProgressSyncPacket packet = new FHClueProgressSyncPacket(team.getId(), this);
-        for (ServerPlayerEntity spe : team.getOnlineMembers())
+        for (ServerPlayer spe : team.getOnlineMembers())
             PacketHandler.send(PacketDistributor.PLAYER.with(() -> spe), packet);
     }
 
@@ -153,19 +153,19 @@ public abstract class Clue extends AutoIDItem implements Writeable {
      */
     public abstract void end(Team team);
 
-    public ITextComponent getName() {
+    public Component getName() {
         return FHTextUtil.get(name, "clue", () -> this.getLId() + ".name");
     }
 
-    public ITextComponent getDescription() {
+    public Component getDescription() {
         return FHTextUtil.getOptional(desc, "clue", () -> this.getLId() + ".desc");
     }
     public String getDescriptionString() {
-    	ITextComponent tc=getDescription();
+    	Component tc=getDescription();
 
     	return tc!=null?tc.getString():"";
     }
-    public ITextComponent getHint() {
+    public Component getHint() {
         return FHTextUtil.getOptional(hint, "clue", () -> this.getLId() + ".hint");
     }
 
@@ -189,7 +189,7 @@ public abstract class Clue extends AutoIDItem implements Writeable {
     public abstract String getId();
 
     @Override
-    public void write(PacketBuffer buffer) {
+    public void write(FriendlyByteBuf buffer) {
         Clues.writeId(this, buffer);
         buffer.writeUtf(name);
         buffer.writeUtf(desc);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 TeamMoeg
+ * Copyright (c) 2021-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -14,13 +14,14 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 package com.teammoeg.frostedheart.client.util;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 
-import net.minecraft.client.gui.AbstractGui;
+import net.minecraft.client.gui.GuiComponent;
 
 public class UV extends Rect {
 
@@ -41,60 +42,60 @@ public class UV extends Rect {
     }
 
     //normal blit add point
-    public void blit(AbstractGui gui, MatrixStack s, int lx, int ly, Point loc) {
+    public void blit(GuiComponent gui, PoseStack s, int lx, int ly, Point loc) {
         blit(gui, s, lx + loc.getX(), ly + loc.getY());
     }
 
     //normal blit add point with custom texture size
-    public void blit(AbstractGui gui, MatrixStack s, int lx, int ly, Point loc, int textureW, int textureH) {
+    public void blit(GuiComponent gui, PoseStack s, int lx, int ly, Point loc, int textureW, int textureH) {
         blit(gui, s, lx + loc.getX(), ly + loc.getY(), textureW, textureH);
     }
 
     //blit with width transition add point
-    public void blit(AbstractGui gui, MatrixStack s, int lx, int ly, Point loc, int w) {
+    public void blit(GuiComponent gui, PoseStack s, int lx, int ly, Point loc, int w) {
         blit(gui, s, lx + loc.getX(), ly + loc.getY(), w);
     }
 
     //normal blit
-    public void blit(AbstractGui gui, MatrixStack s, int lx, int ly) {
+    public void blit(GuiComponent gui, PoseStack s, int lx, int ly) {
         gui.blit(s, lx, ly, x, y, w, h);
     }
 
     // normal blit with custom texture size
-    public void blit(AbstractGui gui, MatrixStack s, int lx, int ly, int textureW, int textureH) {
-        AbstractGui.blit(s, lx, ly, x, y, w, h, textureW, textureH);
+    public void blit(GuiComponent gui, PoseStack s, int lx, int ly, int textureW, int textureH) {
+        GuiComponent.blit(s, lx, ly, x, y, w, h, textureW, textureH);
     }
 
     //blit with width transition
-    public void blit(AbstractGui gui, MatrixStack s, int lx, int ly, int w) {
+    public void blit(GuiComponent gui, PoseStack s, int lx, int ly, int w) {
         gui.blit(s, lx, ly, x, y, w, h);
     }
     // blit with height transition
-    public void blitHeightTransition(AbstractGui gui, MatrixStack s, int lx, int ly, int h) {
+    public void blitHeightTransition(GuiComponent gui, PoseStack s, int lx, int ly, int h) {
         gui.blit(s, lx, ly, x, y, w, h);
     }
     //blit with width transition and  custom texture size
-    public void blit(AbstractGui gui, MatrixStack s, int lx, int ly, int w, int textureW, int textureH) {
+    public void blit(GuiComponent gui, PoseStack s, int lx, int ly, int w, int textureW, int textureH) {
         gui.blit(s, lx, ly, x, y, w, h, textureW, textureH);
     }
 
     //blit add point
-    public void blit(MatrixStack s, int lx, int ly, Point loc, int p3, int p4) {
+    public void blit(PoseStack s, int lx, int ly, Point loc, int p3, int p4) {
         blit(s, lx + loc.getX(), ly + loc.getY(), p3, p4);
     }
 
     //normal blit
-    public void blit(MatrixStack s, int lx, int ly, int p3, int p4) {
-        AbstractGui.blit(s, lx, ly, x, y, w, h, p3, p4);
+    public void blit(PoseStack s, int lx, int ly, int p3, int p4) {
+        GuiComponent.blit(s, lx, ly, x, y, w, h, p3, p4);
     }
 
     //blit with atlas and add point
-    public void blit(MatrixStack s, int lx, int ly, Point loc, int mx, int my, int p3, int p4) {
+    public void blit(PoseStack s, int lx, int ly, Point loc, int mx, int my, int p3, int p4) {
         blit(s, lx + loc.getX(), ly + loc.getY(), mx, my, p3, p4);
     }
 
     //blit with atlas
-    public void blit(MatrixStack s, int lx, int ly, int mx, int my, int p3, int p4) {
-        AbstractGui.blit(s, lx, ly, x + mx * w, y + my * h, w, h, p3, p4);
+    public void blit(PoseStack s, int lx, int ly, int mx, int my, int p3, int p4) {
+        GuiComponent.blit(s, lx, ly, x + mx * w, y + my * h, w, h, p3, p4);
     }
 }

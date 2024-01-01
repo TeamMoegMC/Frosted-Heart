@@ -23,23 +23,23 @@ import com.teammoeg.frostedheart.FHContent;
 import com.teammoeg.frostedheart.FHMain;
 
 import blusunrize.immersiveengineering.common.util.Utils;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.UseAction;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.RayTraceContext;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.UseAnim;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.core.NonNullList;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.world.level.Level;
 
-import net.minecraft.item.Item.Properties;
+import net.minecraft.world.item.Item.Properties;
 
 public class HeatDebugItem extends Item {
     public HeatDebugItem(String name) {
@@ -53,33 +53,33 @@ public class HeatDebugItem extends Item {
         return 1;
     }
 
-    public UseAction getUseAnimation(ItemStack stack) {
-        return UseAction.NONE;
+    public UseAnim getUseAnimation(ItemStack stack) {
+        return UseAnim.NONE;
     }
 
     //Dont add to creative tag
     @Override
-    public void fillItemCategory(ItemGroup group, NonNullList<ItemStack> items) {
+    public void fillItemCategory(CreativeModeTab group, NonNullList<ItemStack> items) {
     }
 
-    public ActionResult<ItemStack> use(World worldIn, PlayerEntity playerIn, Hand handIn) {
+    public InteractionResultHolder<ItemStack> use(Level worldIn, Player playerIn, InteractionHand handIn) {
     	
-        RayTraceResult raytraceresult = getPlayerPOVHitResult(worldIn, playerIn, RayTraceContext.FluidMode.SOURCE_ONLY);
+        HitResult raytraceresult = getPlayerPOVHitResult(worldIn, playerIn, ClipContext.Fluid.SOURCE_ONLY);
         ItemStack itemstack = playerIn.getItemInHand(handIn);
-        if(worldIn.isClientSide)return ActionResult.success(itemstack);
-        if (raytraceresult.getType() == RayTraceResult.Type.BLOCK) {
-            BlockPos blockpos = ((BlockRayTraceResult) raytraceresult).getBlockPos();
-            TileEntity te = Utils.getExistingTileEntity(worldIn, blockpos);
+        if(worldIn.isClientSide)return InteractionResultHolder.success(itemstack);
+        if (raytraceresult.getType() == HitResult.Type.BLOCK) {
+            BlockPos blockpos = ((BlockHitResult) raytraceresult).getBlockPos();
+            BlockEntity te = Utils.getExistingTileEntity(worldIn, blockpos);
             if (te instanceof HeatController) {
-                playerIn.sendMessage(new StringTextComponent("HeatProvider network=" + ((HeatController) te).getNetwork()), playerIn.getUUID());
+                playerIn.sendMessage(new TextComponent("HeatProvider network=" + ((HeatController) te).getNetwork()), playerIn.getUUID());
             } else if (te instanceof EnergyNetworkProvider) {
-                playerIn.sendMessage(new StringTextComponent("EnergyNetworkProvider network=" + ((EnergyNetworkProvider) te).getNetwork()), playerIn.getUUID());
+                playerIn.sendMessage(new TextComponent("EnergyNetworkProvider network=" + ((EnergyNetworkProvider) te).getNetwork()), playerIn.getUUID());
             } else if (te instanceof INetworkConsumer) {
             	if(((INetworkConsumer) te).getHolder()!=null)
-            		playerIn.sendMessage(new StringTextComponent("EnergyNetworkConsumer data=" + ((INetworkConsumer) te).getHolder()), playerIn.getUUID());
+            		playerIn.sendMessage(new TextComponent("EnergyNetworkConsumer data=" + ((INetworkConsumer) te).getHolder()), playerIn.getUUID());
             }
-            return ActionResult.success(itemstack);
+            return InteractionResultHolder.success(itemstack);
         }
-        return ActionResult.fail(itemstack);
+        return InteractionResultHolder.fail(itemstack);
     }
 }

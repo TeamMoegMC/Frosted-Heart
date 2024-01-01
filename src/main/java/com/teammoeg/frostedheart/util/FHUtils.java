@@ -31,32 +31,32 @@ import com.teammoeg.frostedheart.climate.WorldClimate;
 import com.teammoeg.frostedheart.climate.chunkdata.ChunkData;
 
 import blusunrize.immersiveengineering.api.crafting.IngredientWithSize;
-import net.minecraft.block.BlockState;
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.ILivingEntityData;
-import net.minecraft.entity.MobEntity;
-import net.minecraft.entity.SpawnReason;
-import net.minecraft.entity.item.ItemEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.potion.EffectInstance;
-import net.minecraft.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.SpawnGroupData;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.tags.ItemTags;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.IWorldReader;
-import net.minecraft.world.World;
-import net.minecraft.world.gen.Heightmap;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
+import net.minecraft.core.Registry;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.crafting.NBTIngredient;
 
@@ -70,11 +70,11 @@ public class FHUtils {
     public static <T> T notNull() {
         return null;
     }
-    public static void applyEffectTo(EffectInstance effectinstance,PlayerEntity playerentity) {
+    public static void applyEffectTo(MobEffectInstance effectinstance,Player playerentity) {
     	if (effectinstance.getEffect().isInstantenous()) {
             effectinstance.getEffect().applyInstantenousEffect(playerentity, playerentity, playerentity, effectinstance.getAmplifier(), 1.0D);
          } else {
-        	 playerentity.addEffect(new EffectInstance(effectinstance));
+        	 playerentity.addEffect(new MobEffectInstance(effectinstance));
          }
     }
     public static Ingredient createIngredient(ItemStack is) {
@@ -95,7 +95,7 @@ public class FHUtils {
         return Ingredient.of(ItemTags.getAllTags().getTag(tag));
     }
 
-    public static void giveItem(PlayerEntity pe, ItemStack is) {
+    public static void giveItem(Player pe, ItemStack is) {
         if (!pe.addItem(is))
             pe.level.addFreshEntity(new ItemEntity(pe.level, pe.blockPosition().getX(), pe.blockPosition().getY(), pe.blockPosition().getZ(), is));
     }
@@ -112,28 +112,28 @@ public class FHUtils {
         };
     }
 
-    public static boolean isRainingAt(BlockPos pos, World world) {
+    public static boolean isRainingAt(BlockPos pos, Level world) {
         if (!world.isRaining()) {
             return false;
         } else if (!world.canSeeSky(pos)) {
             return false;
-        } else if (world.getHeightmapPos(Heightmap.Type.MOTION_BLOCKING, pos).getY() > pos.getY()) {
+        } else if (world.getHeightmapPos(Heightmap.Types.MOTION_BLOCKING, pos).getY() > pos.getY()) {
             return false;
         } else {
             return true;
         }
     }
 
-    public static void canBigTreeGenerate(World w, BlockPos p, Random r, CallbackInfoReturnable<Boolean> cr) {
+    public static void canBigTreeGenerate(Level w, BlockPos p, Random r, CallbackInfoReturnable<Boolean> cr) {
         if (!canBigTreeGenerate(w, p, r))
             cr.setReturnValue(false);
     }
 
-    public static boolean canTreeGenerate(World w, BlockPos p, Random r,int chance) {
+    public static boolean canTreeGenerate(Level w, BlockPos p, Random r,int chance) {
         return r.nextInt(chance) == 0;
 
     }
-    public static boolean canTreeGrow(World w, BlockPos p, Random r) {
+    public static boolean canTreeGrow(Level w, BlockPos p, Random r) {
         float temp=ChunkData.getTemperature(w, p);
         if(temp<=-6)
         	return false;
@@ -141,36 +141,36 @@ public class FHUtils {
         	return false;
         if(temp>0)
         	return true;
-    	return r.nextInt(Math.max(1,MathHelper.ceil(-temp/2))) == 0;
+    	return r.nextInt(Math.max(1,Mth.ceil(-temp/2))) == 0;
     }
-    public static boolean canNetherTreeGrow(IBlockReader w, BlockPos p) {
-    	if(!(w instanceof IWorld)) {
+    public static boolean canNetherTreeGrow(BlockGetter w, BlockPos p) {
+    	if(!(w instanceof LevelAccessor)) {
     		return false;
     	}
-        float temp=ChunkData.getTemperature((IWorld) w, p);
+        float temp=ChunkData.getTemperature((LevelAccessor) w, p);
         if(temp<=300)
         	return false;
         if(temp>300+WorldClimate.VANILLA_PLANT_GROW_TEMPERATURE_MAX)
         	return false;
         return true;
     }
-    public static boolean canBigTreeGenerate(World w, BlockPos p, Random r) {
+    public static boolean canBigTreeGenerate(Level w, BlockPos p, Random r) {
 
         return canTreeGenerate(w,p,r,7);
 
     }
 
-    public static void spawnMob(ServerWorld world, BlockPos blockpos, CompoundNBT nbt, ResourceLocation type) {
-        if (World.isInSpawnableBounds(blockpos)) {
-            CompoundNBT compoundnbt = nbt.copy();
+    public static void spawnMob(ServerLevel world, BlockPos blockpos, CompoundTag nbt, ResourceLocation type) {
+        if (Level.isInSpawnableBounds(blockpos)) {
+            CompoundTag compoundnbt = nbt.copy();
             compoundnbt.putString("id", type.toString());
             Entity entity = EntityType.loadEntityRecursive(compoundnbt, world, (p_218914_1_) -> {
                 p_218914_1_.moveTo(blockpos.getX(), blockpos.getY(), blockpos.getZ(), p_218914_1_.yRot, p_218914_1_.xRot);
                 return p_218914_1_;
             });
             if (entity != null) {
-                if (entity instanceof MobEntity) {
-                    ((MobEntity) entity).finalizeSpawn(world, world.getCurrentDifficultyAt(entity.blockPosition()), SpawnReason.NATURAL, (ILivingEntityData) null, (CompoundNBT) null);
+                if (entity instanceof Mob) {
+                    ((Mob) entity).finalizeSpawn(world, world.getCurrentDifficultyAt(entity.blockPosition()), MobSpawnType.NATURAL, (SpawnGroupData) null, (CompoundTag) null);
                 }
                 if (!world.tryAddFreshEntityWithPassengers(entity)) {
                     return;
@@ -179,27 +179,27 @@ public class FHUtils {
         }
     }
 
-    public static int getEnchantmentLevel(Enchantment enchID, CompoundNBT tags) {
+    public static int getEnchantmentLevel(Enchantment enchID, CompoundTag tags) {
         ResourceLocation resourcelocation = Registry.ENCHANTMENT.getKey(enchID);
-        ListNBT listnbt = tags.getList("Enchantments", 10);
+        ListTag listnbt = tags.getList("Enchantments", 10);
 
         for (int i = 0; i < listnbt.size(); ++i) {
-            CompoundNBT compoundnbt = listnbt.getCompound(i);
+            CompoundTag compoundnbt = listnbt.getCompound(i);
             ResourceLocation resourcelocation1 = ResourceLocation.tryParse(compoundnbt.getString("id"));
             if (resourcelocation1 != null && resourcelocation1.equals(resourcelocation)) {
-                return MathHelper.clamp(compoundnbt.getInt("lvl"), 0, 255);
+                return Mth.clamp(compoundnbt.getInt("lvl"), 0, 255);
             }
         }
 
         return 0;
     }
 
-    public static EffectInstance noHeal(EffectInstance ei) {
+    public static MobEffectInstance noHeal(MobEffectInstance ei) {
         ei.setCurativeItems(ImmutableList.of());
         return ei;
     }
 
-    public static boolean canGrassSurvive(IWorldReader world, BlockPos pos) {
+    public static boolean canGrassSurvive(LevelReader world, BlockPos pos) {
         float t = ChunkData.getTemperature(world, pos);
         return t >= WorldClimate.HEMP_GROW_TEMPERATURE && t <= WorldClimate.VANILLA_PLANT_GROW_TEMPERATURE_MAX;
     }

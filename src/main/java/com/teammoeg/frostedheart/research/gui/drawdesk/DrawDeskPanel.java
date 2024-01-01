@@ -19,7 +19,7 @@
 
 package com.teammoeg.frostedheart.research.gui.drawdesk;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.teammoeg.frostedheart.client.util.ClientUtils;
 import com.teammoeg.frostedheart.client.util.GuiUtils;
 import com.teammoeg.frostedheart.network.PacketHandler;
@@ -108,7 +108,7 @@ public class DrawDeskPanel extends Panel {
             }
 
             @Override
-            public void draw(MatrixStack matrixStack, Theme theme, int x, int y, int w, int h) {
+            public void draw(PoseStack matrixStack, Theme theme, int x, int y, int w, int h) {
                 if (isMouseOver()||!ResearchListeners.canExamine(dd.getTile().getInventory().get(DrawingDeskTileEntity.EXAMINE_SLOT)))
                     DrawDeskIcons.EXAMINE.draw(matrixStack, x, y, w, h);
             }
@@ -131,7 +131,7 @@ public class DrawDeskPanel extends Panel {
     }
 
     @Override
-    public void drawBackground(MatrixStack matrixStack, Theme theme, int x, int y, int w, int h) {
+    public void drawBackground(PoseStack matrixStack, Theme theme, int x, int y, int w, int h) {
         DrawDeskIcons.Background.draw(matrixStack, x, y, w, h);
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -19,7 +19,7 @@
 
 package com.teammoeg.frostedheart.research.gui.drawdesk;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.teammoeg.frostedheart.research.gui.ResearchGui;
 import com.teammoeg.frostedheart.research.gui.editor.EditDialog;
 import com.teammoeg.frostedheart.research.gui.tech.ResearchPanel;
@@ -103,7 +103,7 @@ public class DrawDeskScreen extends BaseScreen implements ResearchGui {
     }
 
     @Override
-    public void drawBackground(MatrixStack matrixStack, Theme theme, int x, int y, int w, int h) {
+    public void drawBackground(PoseStack matrixStack, Theme theme, int x, int y, int w, int h) {
     }
 
     public EditDialog getDialog() {

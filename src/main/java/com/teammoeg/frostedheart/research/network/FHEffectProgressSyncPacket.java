@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 TeamMoeg
+ * Copyright (c) 2021-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -14,6 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 package com.teammoeg.frostedheart.research.network;
@@ -26,7 +27,7 @@ import com.teammoeg.frostedheart.research.data.FHResearchDataManager;
 import com.teammoeg.frostedheart.research.data.TeamResearchData;
 import com.teammoeg.frostedheart.research.effects.Effect;
 
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.fml.network.NetworkEvent;
 
 // send when player join
@@ -40,13 +41,13 @@ public class FHEffectProgressSyncPacket {
         this.id = rs.getRId();
     }
 
-    public FHEffectProgressSyncPacket(PacketBuffer buffer) {
+    public FHEffectProgressSyncPacket(FriendlyByteBuf buffer) {
         data = buffer.readBoolean();
         id = buffer.readVarInt();
     }
 
 
-    public void encode(PacketBuffer buffer) {
+    public void encode(FriendlyByteBuf buffer) {
         buffer.writeBoolean(data);
         buffer.writeVarInt(id);
     }

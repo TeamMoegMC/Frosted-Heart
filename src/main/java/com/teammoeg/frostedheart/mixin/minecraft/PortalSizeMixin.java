@@ -24,9 +24,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import net.minecraft.block.PortalSize;
+import net.minecraft.world.level.portal.PortalShape;
 
-@Mixin(PortalSize.class)
+@Mixin(PortalShape.class)
 public class PortalSizeMixin {
     /**
      * @author yuesha-yc

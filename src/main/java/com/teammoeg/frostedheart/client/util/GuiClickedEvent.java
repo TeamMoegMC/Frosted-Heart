@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -19,9 +19,9 @@
 
 package com.teammoeg.frostedheart.client.util;
 
-import net.minecraft.client.gui.IGuiEventListener;
+import net.minecraft.client.gui.components.events.GuiEventListener;
 
-public class GuiClickedEvent implements IGuiEventListener {
+public class GuiClickedEvent implements GuiEventListener {
     int x1;
     int y1;
     int x2;

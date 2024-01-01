@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -29,7 +29,7 @@ import static com.teammoeg.frostedheart.climate.WorldClimate.WARM_PERIOD_PEAK;
 
 import java.util.Random;
 
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.CompoundTag;
 
 /**
  * A temperature event defined by a set of timestamps and temperature parameters.
@@ -61,7 +61,7 @@ public class TempEvent {
         this.calmEndTime = calmEndTime;
     }
 
-    public CompoundNBT serialize(CompoundNBT cnbt) {
+    public CompoundTag serialize(CompoundTag cnbt) {
         cnbt.putLong("startTime", startTime);
         cnbt.putLong("peakTime", peakTime);
         cnbt.putFloat("peakTemp", peakTemp);
@@ -73,7 +73,7 @@ public class TempEvent {
         return cnbt;
     }
 
-    public void deserialize(CompoundNBT cnbt) {
+    public void deserialize(CompoundTag cnbt) {
         startTime = cnbt.getLong("startTime");
         peakTime = cnbt.getLong("peakTime");
         peakTemp = cnbt.getFloat("peakTemp");

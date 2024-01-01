@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -22,14 +22,14 @@ package com.teammoeg.frostedheart.research.gui;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.teammoeg.frostedheart.FHMain;
 
 import dev.ftb.mods.ftblibrary.icon.Color4I;
 import dev.ftb.mods.ftblibrary.icon.Icon;
 import dev.ftb.mods.ftblibrary.icon.ImageIcon;
 import dev.ftb.mods.ftblibrary.icon.PartIcon;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 
 public class TechIcons {
     public static final ImageIcon ALL = (ImageIcon) Icon
@@ -77,7 +77,7 @@ public class TechIcons {
     public TechIcons() {
     }
 
-    public static void drawTexturedRect(MatrixStack matrixStack, int x, int y, int w, int h, boolean hl) {
+    public static void drawTexturedRect(PoseStack matrixStack, int x, int y, int w, int h, boolean hl) {
         int vw = w / 4;
         int vwr = w % 4;
         int vh = h / 4;

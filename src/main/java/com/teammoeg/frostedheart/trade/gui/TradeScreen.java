@@ -21,7 +21,7 @@ package com.teammoeg.frostedheart.trade.gui;
 
 import java.util.Iterator;
 import java.util.Map.Entry;
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.teammoeg.frostedheart.client.util.ClientUtils;
 import com.teammoeg.frostedheart.client.util.GuiUtils;
 import com.teammoeg.frostedheart.network.PacketHandler;
@@ -41,12 +41,12 @@ import dev.ftb.mods.ftblibrary.ui.BaseScreen;
 import dev.ftb.mods.ftblibrary.ui.Theme;
 import dev.ftb.mods.ftblibrary.ui.Widget;
 import dev.ftb.mods.ftblibrary.ui.input.MouseButton;
-import net.minecraft.client.gui.screen.inventory.InventoryScreen;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.text.IFormattableTextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.client.gui.screens.inventory.InventoryScreen;
+import net.minecraft.util.Mth;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.TranslatableComponent;
 
 public class TradeScreen extends BaseScreen {
 	TradeContainer cx;
@@ -104,15 +104,15 @@ public class TradeScreen extends BaseScreen {
 		rels.setTooltip(c -> {
 			int relation = cx.relations.sum();
 			if (relation < TradeContainer.RELATION_TO_TRADE && !cx.order.isEmpty()) {
-				c.add(GuiUtils.translateGui("trade.unwilling").withStyle(TextFormatting.DARK_RED));
+				c.add(GuiUtils.translateGui("trade.unwilling").withStyle(ChatFormatting.DARK_RED));
 				return;
 			}
 			if (cx.discountAmount != 0)
 				c.add(GuiUtils.translateGui("trade.discount").append(GuiUtils
-						.str(" -" + (int) Math.ceil(cx.discountAmount / 10f)).withStyle(TextFormatting.GREEN)));
+						.str(" -" + (int) Math.ceil(cx.discountAmount / 10f)).withStyle(ChatFormatting.GREEN)));
 			if (cx.relationMinus > 0)
 				c.add(GuiUtils.translateGui("trade.bad_relation").append(
-						GuiUtils.str(" " + (int) Math.ceil(cx.relationMinus / 10f)).withStyle(TextFormatting.RED)));
+						GuiUtils.str(" " + (int) Math.ceil(cx.relationMinus / 10f)).withStyle(ChatFormatting.RED)));
 
 		});
 		rels.setPos(110, 108);
@@ -187,7 +187,7 @@ public class TradeScreen extends BaseScreen {
 					else if (btn == MouseButton.RIGHT) {
 						int remain = sd.getStore() - cnt;
 						if (remain > 0) {
-							cnt += MathHelper.ceil(remain / 2f);
+							cnt += Mth.ceil(remain / 2f);
 						}
 					}
 					cnt = Math.min(sd.getStore(), cnt);
@@ -271,7 +271,7 @@ public class TradeScreen extends BaseScreen {
 					FakeSlot slot = slots[j++];
 					if (cur.getStore() == 0) {
 						slot.setOverlay(TradeIcons.NOBUY, 7, 6);
-						slot.setTooltip(c->c.add(GuiUtils.translateGui("trade.not_needed_now").withStyle(TextFormatting.RED)));
+						slot.setTooltip(c->c.add(GuiUtils.translateGui("trade.not_needed_now").withStyle(ChatFormatting.RED)));
 					} else {
 						slot.resetOverlay();
 						slot.setTooltip(null);
@@ -293,18 +293,18 @@ public class TradeScreen extends BaseScreen {
 					if (sd.getStore() == 0) {
 						if (sd.canRestock(cx.data)) {
 							slot.setOverlay(TradeIcons.STOCKOUT, 7, 6);
-							slot.setTooltip(c->c.add(GuiUtils.translateGui("trade.no_stock").withStyle(TextFormatting.RED)));
+							slot.setTooltip(c->c.add(GuiUtils.translateGui("trade.no_stock").withStyle(ChatFormatting.RED)));
 						}else {
 							slot.setOverlay(TradeIcons.NORESTOCK, 7, 6);
-							slot.setTooltip(c->c.add(GuiUtils.translateGui("trade.not_restocking").withStyle(TextFormatting.RED)));
+							slot.setTooltip(c->c.add(GuiUtils.translateGui("trade.not_restocking").withStyle(ChatFormatting.RED)));
 						}
 					} else {
 						if (sd.isFullStock()) {
 							slot.setOverlay(TradeIcons.FULL,7, 6);
-							slot.setTooltip(c->c.add(GuiUtils.translateGui("trade.full_stock").withStyle(TextFormatting.GREEN)));
+							slot.setTooltip(c->c.add(GuiUtils.translateGui("trade.full_stock").withStyle(ChatFormatting.GREEN)));
 						}else if (sd.canRestock(cx.data)){
 							slot.setOverlay(TradeIcons.RESTOCKS, 7, 6);
-							slot.setTooltip(c->c.add(GuiUtils.translateGui("trade.restocking").withStyle(TextFormatting.YELLOW)));
+							slot.setTooltip(c->c.add(GuiUtils.translateGui("trade.restocking").withStyle(ChatFormatting.YELLOW)));
 						}else {
 							slot.resetOverlay();
 							slot.setTooltip(c->c.add(GuiUtils.translateGui("trade.not_restocking")));
@@ -319,7 +319,7 @@ public class TradeScreen extends BaseScreen {
 	}
 
 	@Override
-	public void drawBackground(MatrixStack matrixStack, Theme theme, int x, int y, int w, int h) {
+	public void drawBackground(PoseStack matrixStack, Theme theme, int x, int y, int w, int h) {
 		TradeIcons.MAIN.draw(matrixStack, x, y, w, h);
 		TradeIcons.REL.draw(matrixStack, x + 133, y + 18, 54, 5);
 		int repos = cx.relations.sum();
@@ -363,7 +363,7 @@ public class TradeScreen extends BaseScreen {
 		super.add(vptf);
 
 		RTextField vltf = new RTextField(this).addFlags(Theme.CENTERED | Theme.SHADOW).setMaxWidth(56).setMinWidth(56)
-				.setMaxLine(1).setText(new TranslationTextComponent("merchant.level." + (cx.data.getTradeLevel() + 1)));
+				.setMaxLine(1).setText(new TranslatableComponent("merchant.level." + (cx.data.getTradeLevel() + 1)));
 		vltf.setPos(132, 34);
 		super.add(vltf);
 
@@ -375,14 +375,14 @@ public class TradeScreen extends BaseScreen {
 		ToolTipWidget ttw = new ToolTipWidget(this, list -> {
 			int tot = cx.relations.sum();
 			list.add(GuiUtils.translateGui("trade.relation").append(GuiUtils.str(tot > 0 ? " +" + tot : "" + tot)
-					.withStyle(tot > 0 ? TextFormatting.GREEN : TextFormatting.RED)));
+					.withStyle(tot > 0 ? ChatFormatting.GREEN : ChatFormatting.RED)));
 
 			for (RelationModifier m : RelationModifier.values()) {
 				int rel = cx.relations.get(m);
 				if (rel == 0)
 					continue;
-				IFormattableTextComponent tx = new StringTextComponent(rel > 0 ? " +" + rel : " " + rel)
-						.withStyle(rel > 0 ? TextFormatting.GREEN : TextFormatting.RED);
+				MutableComponent tx = new TextComponent(rel > 0 ? " +" + rel : " " + rel)
+						.withStyle(rel > 0 ? ChatFormatting.GREEN : ChatFormatting.RED);
 				list.add(m.getDesc().append(tx));
 
 			}
@@ -397,7 +397,7 @@ public class TradeScreen extends BaseScreen {
 	}
 
 	@Override
-	public void drawForeground(MatrixStack matrixStack, Theme theme, int x, int y, int w, int h) {
+	public void drawForeground(PoseStack matrixStack, Theme theme, int x, int y, int w, int h) {
 		super.drawForeground(matrixStack, theme, x, y, w, h);
 		for (DetectionSlot ds : cx.slots) {
 			if (ds.isSaleable) {

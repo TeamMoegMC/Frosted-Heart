@@ -27,36 +27,36 @@ import javax.annotation.Nullable;
 import com.teammoeg.frostedheart.FHTileTypes;
 import com.teammoeg.frostedheart.base.block.FHBaseBlock;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.state.StateContainer.Builder;
-import net.minecraft.state.properties.BlockStateProperties;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.StateDefinition.Builder;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.core.Direction;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.Level;
 
-import net.minecraft.block.AbstractBlock.Properties;
+import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
 
 public class DebugHeaterBlock extends FHBaseBlock implements ISteamEnergyBlock {
     public DebugHeaterBlock(String name, Properties blockProps,
-                            BiFunction<Block, net.minecraft.item.Item.Properties, Item> createItemBlock) {
+                            BiFunction<Block, net.minecraft.world.item.Item.Properties, Item> createItemBlock) {
         super(name, blockProps, createItemBlock);
     }
 
 
     @Nullable
     @Override
-    public TileEntity createTileEntity(@Nonnull BlockState state, @Nonnull IBlockReader world) {
+    public BlockEntity createTileEntity(@Nonnull BlockState state, @Nonnull BlockGetter world) {
         return FHTileTypes.DEBUGHEATER.get().create();
     }
 
@@ -67,17 +67,17 @@ public class DebugHeaterBlock extends FHBaseBlock implements ISteamEnergyBlock {
     }
 
     @Override
-    public ActionResultType use(BlockState state, World world, BlockPos pos, PlayerEntity player,
-                                             Hand hand, BlockRayTraceResult hit) {
-        ActionResultType superResult = super.use(state, world, pos, player, hand, hit);
+    public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player,
+                                             InteractionHand hand, BlockHitResult hit) {
+        InteractionResult superResult = super.use(state, world, pos, player, hand, hit);
         if (superResult.consumesAction() || player.isShiftKeyDown())
             return superResult;
         ItemStack item = player.getItemInHand(hand);
         if (item.getItem().equals(Item.byBlock(this))) {
             state = state.cycle(BlockStateProperties.LEVEL_FLOWING);
             world.setBlockAndUpdate(pos, state);
-            player.displayClientMessage(new StringTextComponent(String.valueOf(state.getValue(BlockStateProperties.LEVEL_FLOWING))), true);
-            return ActionResultType.SUCCESS;
+            player.displayClientMessage(new TextComponent(String.valueOf(state.getValue(BlockStateProperties.LEVEL_FLOWING))), true);
+            return InteractionResult.SUCCESS;
         }
         return superResult;
     }
@@ -90,7 +90,7 @@ public class DebugHeaterBlock extends FHBaseBlock implements ISteamEnergyBlock {
 
 
     @Override
-    public boolean canConnectFrom(IWorld world, BlockPos pos, BlockState state, Direction dir) {
+    public boolean canConnectFrom(LevelAccessor world, BlockPos pos, BlockState state, Direction dir) {
         return true;
     }
 }

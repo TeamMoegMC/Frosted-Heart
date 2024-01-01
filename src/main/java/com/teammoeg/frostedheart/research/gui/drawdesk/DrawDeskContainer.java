@@ -23,11 +23,11 @@ import com.teammoeg.frostedheart.research.machines.DrawingDeskTileEntity;
 
 import blusunrize.immersiveengineering.common.gui.IEBaseContainer;
 import blusunrize.immersiveengineering.common.gui.IESlot;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.Container;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 
 public class DrawDeskContainer extends IEBaseContainer<DrawingDeskTileEntity> {
     interface Enabled {
@@ -35,7 +35,7 @@ public class DrawDeskContainer extends IEBaseContainer<DrawingDeskTileEntity> {
     }
 
     public static class EnableIESlot extends IESlot implements Enabled {
-        public EnableIESlot(Container containerMenu, IInventory inv, int id, int x, int y) {
+        public EnableIESlot(AbstractContainerMenu containerMenu, Container inv, int id, int x, int y) {
             super(containerMenu, inv, id, x, y);
         }
 
@@ -51,7 +51,7 @@ public class DrawDeskContainer extends IEBaseContainer<DrawingDeskTileEntity> {
     }
 
     public static class EnableSlot extends Slot implements Enabled {
-        public EnableSlot(IInventory inventoryIn, int index, int xPosition, int yPosition) {
+        public EnableSlot(Container inventoryIn, int index, int xPosition, int yPosition) {
             super(inventoryIn, index, xPosition, yPosition);
         }
 
@@ -66,7 +66,7 @@ public class DrawDeskContainer extends IEBaseContainer<DrawingDeskTileEntity> {
         }
     }
 
-    public DrawDeskContainer(int id, PlayerInventory inventoryPlayer, DrawingDeskTileEntity tile) {
+    public DrawDeskContainer(int id, Inventory inventoryPlayer, DrawingDeskTileEntity tile) {
         super(tile, id);
        
         this.addSlot(new EnableIESlot(this, this.inv,DrawingDeskTileEntity.PAPER_SLOT, 114, 161) {// paper

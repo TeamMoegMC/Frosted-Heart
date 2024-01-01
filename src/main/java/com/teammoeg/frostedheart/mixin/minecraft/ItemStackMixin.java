@@ -29,9 +29,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import com.teammoeg.frostedheart.content.recipes.DismantleInnerRecipe;
 import com.teammoeg.frostedheart.util.FHUtils;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 
 @Mixin(ItemStack.class)
 public class ItemStackMixin {
@@ -40,7 +40,7 @@ public class ItemStackMixin {
             ordinal = 0), method = "damageItem")
     public void FH$InnerItemBreak(int amount, LivingEntity entityIn, Consumer onBroken, CallbackInfo cbi) {
         ItemStack item = DismantleInnerRecipe.tryDismantle((ItemStack) (Object) this);
-        if (!item.isEmpty() && entityIn instanceof PlayerEntity)
-            FHUtils.giveItem((PlayerEntity) entityIn, item);
+        if (!item.isEmpty() && entityIn instanceof Player)
+            FHUtils.giveItem((Player) entityIn, item);
     }
 }

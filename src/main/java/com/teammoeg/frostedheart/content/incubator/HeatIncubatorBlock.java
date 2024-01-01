@@ -21,14 +21,14 @@ package com.teammoeg.frostedheart.content.incubator;
 
 import com.teammoeg.frostedheart.content.steamenergy.ISteamEnergyBlock;
 
-import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.fml.RegistryObject;
 
-import net.minecraft.block.AbstractBlock.Properties;
+import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
 
 public class HeatIncubatorBlock extends IncubatorBlock implements ISteamEnergyBlock {
 
-	public HeatIncubatorBlock(String name, Properties p, RegistryObject<TileEntityType<?>> incubator2) {
+	public HeatIncubatorBlock(String name, Properties p, RegistryObject<BlockEntityType<?>> incubator2) {
 		super(name, p, incubator2);
 	}
 

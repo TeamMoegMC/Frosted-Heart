@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.simibubi.create.compat.jei.EmptyBackground;
 import com.simibubi.create.foundation.gui.AllGuiTextures;
 import com.teammoeg.frostedheart.FHBlocks;
@@ -38,12 +38,12 @@ import mezz.jei.api.gui.ingredient.IGuiItemStackGroup;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.ingredients.IIngredients;
 import mezz.jei.api.recipe.category.IRecipeCategory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.state.properties.BlockStateProperties;
-import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 
 public class SaunaCategory implements IRecipeCategory<SaunaRecipe> {
     public static ResourceLocation UID = new ResourceLocation(FHMain.MODID, "sauna");
@@ -68,11 +68,11 @@ public class SaunaCategory implements IRecipeCategory<SaunaRecipe> {
 
 
     public String getTitle() {
-        return (new TranslationTextComponent("gui.jei.category." + FHMain.MODID + ".sauna").getString());
+        return (new TranslatableComponent("gui.jei.category." + FHMain.MODID + ".sauna").getString());
     }
 
     @Override
-    public void draw(SaunaRecipe recipe, MatrixStack transform, double mouseX, double mouseY) {
+    public void draw(SaunaRecipe recipe, PoseStack transform, double mouseX, double mouseY) {
         AllGuiTextures.JEI_SLOT.draw(transform, 43, 4);
         AllGuiTextures.JEI_DOWN_ARROW.draw(transform, 67, 7);
         AllGuiTextures.JEI_SHADOW.draw(transform, 72 - 17, 42 + 13);
@@ -108,8 +108,8 @@ public class SaunaCategory implements IRecipeCategory<SaunaRecipe> {
     }
 
     @Override
-    public List<ITextComponent> getTooltipStrings(SaunaRecipe recipe, double mouseX, double mouseY) {
-        List<ITextComponent> tooltip = new ArrayList<>();
+    public List<Component> getTooltipStrings(SaunaRecipe recipe, double mouseX, double mouseY) {
+        List<Component> tooltip = new ArrayList<>();
         if (isMouseIn(mouseX, mouseY, 43+18, 4+18, 36, 36)) {
             tooltip.add(recipe.effect.getDisplayName());
         }

@@ -32,9 +32,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import com.teammoeg.frostedheart.FHConfig;
 import com.teammoeg.frostedheart.FHMain;
 
-import net.minecraft.network.login.server.SDisconnectLoginPacket;
+import net.minecraft.network.protocol.login.ClientboundLoginDisconnectPacket;
 import net.minecraft.network.play.server.SDisconnectPacket;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraftforge.fml.network.FMLHandshakeHandler;
 import net.minecraftforge.fml.network.FMLHandshakeMessages;
 import net.minecraftforge.fml.network.NetworkEvent;
@@ -48,9 +48,9 @@ public class FMLHandshakeAntiCheatMixin {
 		for(String s:FHConfig.COMMON.blackmods.get()) {
 			if(cli.contains(s)) {
 				FHMain.LOGGER.warn("Rejected Connection: Blacklisted mods ");
-				StringTextComponent t=new StringTextComponent("警告：你有被认为是作弊的mod。");
+				TextComponent t=new TextComponent("警告：你有被认为是作弊的mod。");
 				c.get().getNetworkManager()
-				.sendPacket(new SDisconnectLoginPacket(t), (p_211391_2_) -> {
+				.sendPacket(new ClientboundLoginDisconnectPacket(t), (p_211391_2_) -> {
 					c.get().getNetworkManager().closeChannel(t);
                  });
 				

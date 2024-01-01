@@ -19,11 +19,11 @@
 
 package com.teammoeg.frostedheart.client.util;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.AbstractGui;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.resources.ResourceLocation;
 
 public class TexturedUV extends UV {
     ResourceLocation texture;
@@ -39,25 +39,25 @@ public class TexturedUV extends UV {
     }
 
     //blit with texture bind at IngameGui add point
-    public void blit(Minecraft mc, MatrixStack s, int lx, int ly, Point loc) {
+    public void blit(Minecraft mc, PoseStack s, int lx, int ly, Point loc) {
         mc.getTextureManager().bind(texture);
         super.blit(mc.gui, s, lx, ly, loc);
     }
 
     //blit with texture bind at IngameGui
-    public void blit(Minecraft mc, MatrixStack s, int lx, int ly) {
+    public void blit(Minecraft mc, PoseStack s, int lx, int ly) {
         mc.getTextureManager().bind(texture);
         super.blit(mc.gui, s, lx, ly);
     }
 
     //blit with texture bind add point
-    public void blit(Minecraft mc, AbstractGui gui, MatrixStack s, int lx, int ly, Point loc) {
+    public void blit(Minecraft mc, GuiComponent gui, PoseStack s, int lx, int ly, Point loc) {
         mc.getTextureManager().bind(texture);
         super.blit(gui, s, lx, ly, loc);
     }
 
     //blit with texture bind
-    public void blit(Minecraft mc, AbstractGui gui, MatrixStack s, int lx, int ly) {
+    public void blit(Minecraft mc, GuiComponent gui, PoseStack s, int lx, int ly) {
         mc.getTextureManager().bind(texture);
         super.blit(gui, s, lx, ly);
     }

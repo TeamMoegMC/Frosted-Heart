@@ -35,12 +35,12 @@ import com.simibubi.create.compat.jei.CreateJEI;
 import com.simibubi.create.compat.jei.category.CreateRecipeCategory;
 import com.teammoeg.frostedheart.compat.jei.JEICompat;
 
-import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.item.crafting.ShapedRecipe;
-import net.minecraft.item.crafting.ShapelessRecipe;
-import net.minecraft.util.NonNullList;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.ShapedRecipe;
+import net.minecraft.world.item.crafting.ShapelessRecipe;
+import net.minecraft.core.NonNullList;
 
 @Mixin(targets = "com.simibubi.create.compat.jei.CreateJEI$CategoryBuilder", remap = false)
 public abstract class CreateJEIMixin {
@@ -48,14 +48,14 @@ public abstract class CreateJEIMixin {
     private CreateRecipeCategory category;
     private static final List<String> hidden = Arrays.asList("automatic_packing", "automatic_shapeless");
 
-    private static final IRecipe<?> fh$convert(ShapelessRecipe r) {
+    private static final Recipe<?> fh$convert(ShapelessRecipe r) {
         NonNullList<Ingredient> i = r.getIngredients();
         NonNullList<Ingredient> outcopy = NonNullList.create();
         outcopy.addAll(i);
         if (outcopy.size() > 3)
             while (outcopy.size() % 3 != 0)
                 outcopy.add(Ingredient.EMPTY);
-        IRecipe<?> packed=new ShapedRecipe(r.getId(), r.getGroup(), Math.min(i.size(), 3), Math.max(1, (outcopy.size() + 2) / 3), outcopy, r.getRecipeOutput());
+        Recipe<?> packed=new ShapedRecipe(r.getId(), r.getGroup(), Math.min(i.size(), 3), Math.max(1, (outcopy.size() + 2) / 3), outcopy, r.getRecipeOutput());
         JEICompat.overrides.put(r.getId(),packed);
         return packed;
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -21,7 +21,7 @@ package com.teammoeg.frostedheart.research.api;
 
 import com.teammoeg.frostedheart.research.data.TeamResearchData;
 
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -38,7 +38,7 @@ public class ClientResearchDataAPI {
     }
 
     @OnlyIn(Dist.CLIENT)
-    public static CompoundNBT getVariants() {
+    public static CompoundTag getVariants() {
         return TeamResearchData.getClientInstance().getVariants();
 
     }

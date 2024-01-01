@@ -1,8 +1,27 @@
+/*
+ * Copyright (c) 2024 TeamMoeg
+ *
+ * This file is part of Frosted Heart.
+ *
+ * Frosted Heart is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3.
+ *
+ * Frosted Heart is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
 package com.teammoeg.frostedheart.util;
 
 import java.util.function.Supplier;
 
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.CompoundTag;
 
 public class LazyTickWorker {
 	public int tMax;
@@ -36,23 +55,23 @@ public class LazyTickWorker {
 	public void enqueue() {
 		tCur=tMax;
 	}
-	public void read(CompoundNBT cnbt) {
+	public void read(CompoundTag cnbt) {
 		if(!isStaticMax)
 			tMax=cnbt.getInt("max");
 		tCur=cnbt.getInt("cur");
 	}
-	public void read(CompoundNBT cnbt,String key) {
+	public void read(CompoundTag cnbt,String key) {
 		if(!isStaticMax)
 			tMax=cnbt.getInt(key+"max");
 		tCur=cnbt.getInt(key);
 	}
-	public CompoundNBT write(CompoundNBT cnbt) {
+	public CompoundTag write(CompoundTag cnbt) {
 		if(!isStaticMax)
 			cnbt.putInt("max", tMax);;
 		cnbt.putInt("cur",tCur);
 		return cnbt;
 	}
-	public CompoundNBT write(CompoundNBT cnbt,String key) {
+	public CompoundTag write(CompoundTag cnbt,String key) {
 		if(!isStaticMax)
 			cnbt.putInt(key+"max", tMax);
 		cnbt.putInt(key,tCur);

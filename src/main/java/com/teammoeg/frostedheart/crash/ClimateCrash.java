@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -19,7 +19,7 @@
 
 package com.teammoeg.frostedheart.crash;
 
-import net.minecraft.util.math.ChunkPos;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraftforge.fml.common.ICrashCallable;
 
 public class ClimateCrash implements ICrashCallable {

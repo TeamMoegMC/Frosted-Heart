@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -42,10 +42,10 @@ import com.teammoeg.frostedheart.util.LazyOptional;
 
 import dev.ftb.mods.ftbteams.FTBTeamsAPI;
 import dev.ftb.mods.ftbteams.data.Team;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.INBT;
-import net.minecraft.nbt.ListNBT;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.nbt.ListTag;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.Constants.NBT;
@@ -76,7 +76,7 @@ public class TeamResearchData {
     int activeResearchId = 0;
     
     /** The variants.<br> */
-    CompoundNBT variants = new CompoundNBT();
+    CompoundTag variants = new CompoundTag();
     private Supplier<Team> team;
     
     /** The crafting.<br> */
@@ -289,7 +289,7 @@ public class TeamResearchData {
                 this.activeResearchId = r.getRId();
                 FHChangeActiveResearchPacket packet = new FHChangeActiveResearchPacket(r);
                 getTeam().ifPresent(t -> {
-                    for (ServerPlayerEntity spe : t.getOnlineMembers())
+                    for (ServerPlayer spe : t.getOnlineMembers())
                         PacketHandler.send(PacketDistributor.PLAYER.with(() -> spe), packet);
                 });
                 getTeam().ifPresent(t -> {
@@ -317,7 +317,7 @@ public class TeamResearchData {
         if(sync) {
 	        FHChangeActiveResearchPacket packet = new FHChangeActiveResearchPacket();
 	        getTeam().ifPresent(t -> {
-	            for (ServerPlayerEntity spe : t.getOnlineMembers())
+	            for (ServerPlayer spe : t.getOnlineMembers())
 	                PacketHandler.send(PacketDistributor.PLAYER.with(() -> spe), packet);
 	        });
         }
@@ -398,7 +398,7 @@ public class TeamResearchData {
      * @param e the e<br>
      * @param player the player, only useful when player manually click "claim awards" or do similar things.<br>
      */
-    public void grantEffect(Effect e,@Nullable ServerPlayerEntity player) {
+    public void grantEffect(Effect e,@Nullable ServerPlayer player) {
         int id = e.getRId();
         ensureEffect(id);
         if(id>0)
@@ -432,13 +432,13 @@ public class TeamResearchData {
      * @param updatePacket the update packet<br>
      * @return returns serialize
      */
-    public CompoundNBT serialize(boolean updatePacket) {
-        CompoundNBT nbt = new CompoundNBT();
+    public CompoundTag serialize(boolean updatePacket) {
+        CompoundTag nbt = new CompoundTag();
         nbt.putLongArray("clues", clueComplete.toLongArray());
         nbt.putLongArray("effects",grantedEffects.toLongArray());
         nbt.put("vars", variants);
-        ListNBT rs = new ListNBT();
-        rdata.stream().map(e -> e != null ? e.serialize() : new CompoundNBT()).forEach(e -> rs.add(e));
+        ListTag rs = new ListTag();
+        rdata.stream().map(e -> e != null ? e.serialize() : new CompoundTag()).forEach(e -> rs.add(e));
         nbt.put("researches", rs);
         nbt.putInt("active", activeResearchId);
         // these data does not send to client
@@ -459,7 +459,7 @@ public class TeamResearchData {
      *
      * @return variants<br>
      */
-    public CompoundNBT getVariants() {
+    public CompoundTag getVariants() {
         return variants;
     }
     public void sendUpdate() {
@@ -479,7 +479,7 @@ public class TeamResearchData {
      * @param data the data<br>
      * @param updatePacket the update packet<br>
      */
-    public void deserialize(CompoundNBT data, boolean updatePacket) {
+    public void deserialize(CompoundTag data, boolean updatePacket) {
         clueComplete.clear();
         rdata.clear();
         crafting.clear();
@@ -508,11 +508,11 @@ public class TeamResearchData {
                 FHResearch.effects.runIfPresent(i + 1, e -> e.grant(this, null, true));
         }
         variants = data.getCompound("vars");
-        ListNBT li = data.getList("researches", 10);
+        ListTag li = data.getList("researches", 10);
         activeResearchId = data.getInt("active");
         for (int i = 0; i < li.size(); i++) {
-            INBT e = li.get(i);
-            rdata.add(new ResearchData(FHResearch.getResearch(i + 1), (CompoundNBT) e, this));
+            Tag e = li.get(i);
+            rdata.add(new ResearchData(FHResearch.getResearch(i + 1), (CompoundTag) e, this));
         }
 
         if (!updatePacket) {
@@ -577,7 +577,7 @@ public class TeamResearchData {
             }
             if (t != null&&causeUpdate) {
                 FHResearchDataUpdatePacket packet = new FHResearchDataUpdatePacket(r.getRId());
-                for (ServerPlayerEntity spe : t.getOnlineMembers())
+                for (ServerPlayer spe : t.getOnlineMembers())
                     PacketHandler.send(PacketDistributor.PLAYER.with(() -> spe), packet);
             }
         }

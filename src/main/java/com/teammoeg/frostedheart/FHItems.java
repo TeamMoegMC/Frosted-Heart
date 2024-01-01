@@ -45,12 +45,12 @@ import com.teammoeg.frostedheart.research.machines.FHBasePen;
 import com.teammoeg.frostedheart.research.machines.FHReusablePen;
 import com.teammoeg.frostedheart.research.machines.RubbingTool;
 
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.Food;
-import net.minecraft.item.Foods;
-import net.minecraft.item.Item;
-import net.minecraft.item.Item.Properties;
-import net.minecraft.item.Items;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.food.FoodProperties;
+import net.minecraft.world.food.Foods;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Item.Properties;
+import net.minecraft.world.item.Items;
 
 public class FHItems {
 	public static String[] colors=new String[]{"black","blue","brown","cyan","gray","green","light_blue","light_gray","lime","magenta","orange","pink","purple","red","white","yellow"};
@@ -80,12 +80,12 @@ public class FHItems {
     public static Item rye_sawdust_porridge = new FHSoupItem("rye_sawdust_porridge", createProps().stacksTo(1).food(FHFoods.RYE_SAWDUST_PORRIDGE), true);
     public static Item rye_porridge = new FHSoupItem("rye_porridge", createProps().stacksTo(1).food(FHFoods.RYE_SAWDUST_PORRIDGE), false);
     public static Item vegetable_soup = new FHSoupItem("vegetable_soup", createProps().stacksTo(1).food(FHFoods.VEGETABLE_SAWDUST_SOUP), false);
-    public static Item military_rations = new CannedFoodItem("military_rations", createProps().food(new Food.Builder().nutrition(6).saturationMod(0.6f).build()));
+    public static Item military_rations = new CannedFoodItem("military_rations", createProps().food(new FoodProperties.Builder().nutrition(6).saturationMod(0.6f).build()));
     public static Item compressed_biscuits_pack = new CannedFoodItem("compressed_biscuits_pack", createProps().food(Foods.BREAD));
     public static Item compressed_biscuits = new CannedFoodItem("compressed_biscuits", createProps().food(Foods.BREAD));
-    public static Item packed_nuts=new CannedFoodItem("packed_nuts",createProps().food((new Food.Builder()).nutrition(2).saturationMod(0.8F).build()),false);
-    public static Item dried_vegetables=new CannedFoodItem("dried_vegetables",createProps().food((new Food.Builder()).nutrition(4).saturationMod(0.6F).build()));
-    public static Item chocolate=new FHBaseItem("chocolate",createProps().food((new Food.Builder()).nutrition(4).saturationMod(0.8F).meat().fast().build()));
+    public static Item packed_nuts=new CannedFoodItem("packed_nuts",createProps().food((new FoodProperties.Builder()).nutrition(2).saturationMod(0.8F).build()),false);
+    public static Item dried_vegetables=new CannedFoodItem("dried_vegetables",createProps().food((new FoodProperties.Builder()).nutrition(4).saturationMod(0.6F).build()));
+    public static Item chocolate=new FHBaseItem("chocolate",createProps().food((new FoodProperties.Builder()).nutrition(4).saturationMod(0.8F).meat().fast().build()));
     
     public static Item steam_bottle = new SteamBottleItem("steam_bottle", createProps().stacksTo(1));
     public static Item raw_hide = new FHBaseItem("raw_hide", createProps());
@@ -95,18 +95,18 @@ public class FHItems {
     public static Item gambeson = new FHBaseItem("gambeson", createProps().defaultDurability(384)).setRepairItem(Items.WHITE_WOOL);
     public static Item kelp_lining = new FHBaseItem("kelp_lining", createProps().defaultDurability(256)).setRepairItem(Items.KELP);
     public static Item straw_lining = new FHBaseItem("straw_lining", createProps().defaultDurability(256));
-    public static Item hay_boots = new FHBaseArmorItem("hay_boots", FHArmorMaterial.HAY, EquipmentSlotType.FEET, createProps());
-    public static Item hay_hat = new FHBaseArmorItem("hay_hat", FHArmorMaterial.HAY, EquipmentSlotType.HEAD, createProps());
-    public static Item hay_jacket = new FHBaseArmorItem("hay_jacket", FHArmorMaterial.HAY, EquipmentSlotType.CHEST, createProps());
-    public static Item hay_pants = new FHBaseArmorItem("hay_pants", FHArmorMaterial.HAY, EquipmentSlotType.LEGS, createProps());
-    public static Item wool_boots = new FHBaseArmorItem("wool_boots", FHArmorMaterial.WOOL, EquipmentSlotType.FEET, createProps());
-    public static Item wool_hat = new FHBaseArmorItem("wool_hat", FHArmorMaterial.WOOL, EquipmentSlotType.HEAD, createProps());
-    public static Item wool_jacket = new FHBaseArmorItem("wool_jacket", FHArmorMaterial.WOOL, EquipmentSlotType.CHEST, createProps());
-    public static Item wool_pants = new FHBaseArmorItem("wool_pants", FHArmorMaterial.WOOL, EquipmentSlotType.LEGS, createProps());
-    public static Item hide_boots = new FHBaseArmorItem("hide_boots", FHArmorMaterial.HIDE, EquipmentSlotType.FEET, createProps());
-    public static Item hide_hat = new FHBaseArmorItem("hide_hat", FHArmorMaterial.HIDE, EquipmentSlotType.HEAD, createProps());
-    public static Item hide_jacket = new FHBaseArmorItem("hide_jacket", FHArmorMaterial.HIDE, EquipmentSlotType.CHEST, createProps());
-    public static Item hide_pants = new FHBaseArmorItem("hide_pants", FHArmorMaterial.HIDE, EquipmentSlotType.LEGS, createProps());
+    public static Item hay_boots = new FHBaseArmorItem("hay_boots", FHArmorMaterial.HAY, EquipmentSlot.FEET, createProps());
+    public static Item hay_hat = new FHBaseArmorItem("hay_hat", FHArmorMaterial.HAY, EquipmentSlot.HEAD, createProps());
+    public static Item hay_jacket = new FHBaseArmorItem("hay_jacket", FHArmorMaterial.HAY, EquipmentSlot.CHEST, createProps());
+    public static Item hay_pants = new FHBaseArmorItem("hay_pants", FHArmorMaterial.HAY, EquipmentSlot.LEGS, createProps());
+    public static Item wool_boots = new FHBaseArmorItem("wool_boots", FHArmorMaterial.WOOL, EquipmentSlot.FEET, createProps());
+    public static Item wool_hat = new FHBaseArmorItem("wool_hat", FHArmorMaterial.WOOL, EquipmentSlot.HEAD, createProps());
+    public static Item wool_jacket = new FHBaseArmorItem("wool_jacket", FHArmorMaterial.WOOL, EquipmentSlot.CHEST, createProps());
+    public static Item wool_pants = new FHBaseArmorItem("wool_pants", FHArmorMaterial.WOOL, EquipmentSlot.LEGS, createProps());
+    public static Item hide_boots = new FHBaseArmorItem("hide_boots", FHArmorMaterial.HIDE, EquipmentSlot.FEET, createProps());
+    public static Item hide_hat = new FHBaseArmorItem("hide_hat", FHArmorMaterial.HIDE, EquipmentSlot.HEAD, createProps());
+    public static Item hide_jacket = new FHBaseArmorItem("hide_jacket", FHArmorMaterial.HIDE, EquipmentSlot.CHEST, createProps());
+    public static Item hide_pants = new FHBaseArmorItem("hide_pants", FHArmorMaterial.HIDE, EquipmentSlot.LEGS, createProps());
     public static Item heater_vest = new HeaterVestItem("heater_vest", createProps().stacksTo(1).setNoRepair());
     public static List<Item> allthermos=new ArrayList<>();
     public static List<Item> alladvthermos=new ArrayList<>();
@@ -139,7 +139,7 @@ public class FHItems {
     public static Item ceramic_bucket = new CeramicBucket("ceramic_bucket", createProps().stacksTo(1));
     public static Item charcoal = new FHBasePen("charcoal", createProps().durability(50).setNoRepair());
     public static Item quill_and_ink = new FHReusablePen("quill_and_ink", createProps().durability(101).setNoRepair(), 1);
-    public static Item weatherHelmet = new FHBaseArmorItem("weather_helmet", FHArmorMaterial.WEATHER, EquipmentSlotType.HEAD, createProps());
+    public static Item weatherHelmet = new FHBaseArmorItem("weather_helmet", FHArmorMaterial.WEATHER, EquipmentSlot.HEAD, createProps());
     public static Item weatherRadar = new FHBaseItem("weather_radar", createProps().stacksTo(1));
     public static Item temperatureProbe = new FHBaseItem("temperature_probe", createProps().stacksTo(1));
 }

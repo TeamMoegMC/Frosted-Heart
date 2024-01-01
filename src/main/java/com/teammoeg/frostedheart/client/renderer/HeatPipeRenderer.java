@@ -22,7 +22,7 @@ package com.teammoeg.frostedheart.client.renderer;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.teammoeg.frostedheart.FHBlocks;
 import com.teammoeg.frostedheart.content.steamenergy.HeatPipeBlock;
 import com.teammoeg.frostedheart.content.steamenergy.HeatPipeTileEntity;
@@ -33,29 +33,29 @@ import blusunrize.immersiveengineering.api.IEProperties.VisibilityList;
 import blusunrize.immersiveengineering.api.utils.client.SinglePropertyModelData;
 import blusunrize.immersiveengineering.client.render.tile.DynamicModel;
 import blusunrize.immersiveengineering.client.utils.RenderUtils;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.model.BakedQuad;
-import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
-import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
+import net.minecraft.core.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 
-public class HeatPipeRenderer extends TileEntityRenderer<HeatPipeTileEntity> {
+public class HeatPipeRenderer extends BlockEntityRenderer<HeatPipeTileEntity> {
     public static DynamicModel<Void> RIM;
 
-    public HeatPipeRenderer(TileEntityRendererDispatcher rendererDispatcherIn) {
+    public HeatPipeRenderer(BlockEntityRenderDispatcher rendererDispatcherIn) {
         super(rendererDispatcherIn);
     }
 
     @Override
-    public void render(HeatPipeTileEntity te, float partialTicks, MatrixStack matrixStack,
-                       IRenderTypeBuffer bufferIn, int combinedLightIn, int combinedOverlayIn) {
+    public void render(HeatPipeTileEntity te, float partialTicks, PoseStack matrixStack,
+                       MultiBufferSource bufferIn, int combinedLightIn, int combinedOverlayIn) {
         BlockState state = te.getBlockState();
         BlockPos pos = te.getBlockPos();
-        World w = te.getLevel();
+        Level w = te.getLevel();
         if (state.getBlock() != FHBlocks.heat_pipe)
             return;
         List<String> renderedParts = new ArrayList<>();

@@ -19,15 +19,17 @@
 
 package com.teammoeg.frostedheart.mixin.engdecor;
 
-import net.minecraft.block.AbstractBlock;
-import net.minecraft.block.BlockState;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.block.DirectionalBlock;
-import net.minecraft.util.Rotation;
+import net.minecraft.world.level.block.Rotation;
 import org.spongepowered.asm.mixin.Mixin;
 import wile.engineersdecor.blocks.DecorBlock;
 
+import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
+
 @Mixin(DecorBlock.DirectedWaterLoggable.class)
-public abstract class EdDecorBlockMixin extends AbstractBlock {
+public abstract class EdDecorBlockMixin extends BlockBehaviour {
     public EdDecorBlockMixin(Properties properties) {
         super(properties);
     }

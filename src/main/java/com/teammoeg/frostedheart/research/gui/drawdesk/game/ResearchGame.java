@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -28,7 +28,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.function.Consumer;
 
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.CompoundTag;
 
 public class ResearchGame {
     Card[][] cards = new Card[9][9];
@@ -306,8 +306,8 @@ public class ResearchGame {
         return 0;
     }
 
-    public CompoundNBT serialize() {
-        CompoundNBT cnbt = new CompoundNBT();
+    public CompoundTag serialize() {
+        CompoundTag cnbt = new CompoundTag();
         cnbt.putInt("cur", addcur);
         cnbt.putInt("max", addmax);
         cnbt.putInt("lvl", lvl);
@@ -320,7 +320,7 @@ public class ResearchGame {
         return cnbt;
     }
 
-    public void load(CompoundNBT data) {
+    public void load(CompoundTag data) {
         addcur = data.getInt("cur");
         addmax = data.getInt("max");
 

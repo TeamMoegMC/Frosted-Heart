@@ -33,12 +33,12 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.SnowyDirtBlock;
 import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.ISeedReader;
-import net.minecraft.world.chunk.IChunk;
-import net.minecraft.world.gen.ChunkGenerator;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.WorldGenLevel;
+import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.gen.Heightmap;
-import net.minecraft.world.gen.feature.NoFeatureConfig;
+import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
 
 @Mixin(PostWorldReplacerFeature.class)
 public class MixinPostWorldReplacer {
@@ -47,8 +47,8 @@ public class MixinPostWorldReplacer {
      * @reason
      */
     @Overwrite(remap = false)
-    public boolean generate(ISeedReader reader, ChunkGenerator generator, Random rand, BlockPos pos, NoFeatureConfig config) {
-        IChunk chunk = reader.getChunk(pos);
+    public boolean generate(WorldGenLevel reader, ChunkGenerator generator, Random rand, BlockPos pos, NoneFeatureConfiguration config) {
+        ChunkAccess chunk = reader.getChunk(pos);
         for (int x = chunk.getPos().getXStart(); x <= chunk.getPos().getXEnd(); ++x) {
             for (int z = chunk.getPos().getZStart(); z <= chunk.getPos().getZEnd(); ++z) {
                 int endY = reader.getHeight(Heightmap.Type.OCEAN_FLOOR_WG, x, z);

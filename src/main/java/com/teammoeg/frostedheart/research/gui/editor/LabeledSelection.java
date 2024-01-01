@@ -34,9 +34,9 @@ import dev.ftb.mods.ftblibrary.ui.SimpleTextButton;
 import dev.ftb.mods.ftblibrary.ui.input.MouseButton;
 import dev.ftb.mods.ftblibrary.util.TooltipList;
 import net.minecraft.advancements.Advancement;
-import net.minecraft.client.multiplayer.ClientAdvancementManager;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.client.multiplayer.ClientAdvancements;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.chat.TextComponent;
 
 public class LabeledSelection<R> extends LabeledPane<Button> {
     public static LabeledSelection<Boolean> createBool(Panel p, String lab, boolean val) {
@@ -44,7 +44,7 @@ public class LabeledSelection<R> extends LabeledPane<Button> {
     }
 
     public static LabeledSelection<String> createCriterion(Panel p, String lab, ResourceLocation adv, String val, Consumer<String> cb) {
-        ClientAdvancementManager cam = ClientUtils.mc().player.connection.getAdvancements();
+        ClientAdvancements cam = ClientUtils.mc().player.connection.getAdvancements();
         Advancement advx = cam.getAdvancements().get(adv);
         List<String> cit = new ArrayList<>();
         cit.add("");
@@ -73,7 +73,7 @@ public class LabeledSelection<R> extends LabeledPane<Button> {
         this.objs = aobjs;
         this.tostr = atostr;
         sel = objs.indexOf(val);
-        obj = new SimpleTextButton(this, new StringTextComponent(tostr.apply(val)), Icon.EMPTY) {
+        obj = new SimpleTextButton(this, new TextComponent(tostr.apply(val)), Icon.EMPTY) {
 
             @Override
             public void onClicked(MouseButton arg0) {
@@ -85,7 +85,7 @@ public class LabeledSelection<R> extends LabeledPane<Button> {
                     sel = 0;
                 if (sel < 0)
                     sel = objs.size() - 1;
-                this.setTitle(new StringTextComponent(tostr.apply(objs.get(sel))));
+                this.setTitle(new TextComponent(tostr.apply(objs.get(sel))));
                 refreshWidgets();
                 onChange(objs.get(sel));
             }
@@ -95,9 +95,9 @@ public class LabeledSelection<R> extends LabeledPane<Button> {
                 int i = 0;
                 for (R elm : objs) {
                     if (i == sel)
-                        list.add(new StringTextComponent("->" + tostr.apply(elm)));
+                        list.add(new TextComponent("->" + tostr.apply(elm)));
                     else
-                        list.add(new StringTextComponent(tostr.apply(elm)));
+                        list.add(new TextComponent(tostr.apply(elm)));
                     i++;
                 }
             }

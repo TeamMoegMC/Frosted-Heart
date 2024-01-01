@@ -31,15 +31,15 @@ import com.teammoeg.frostedheart.climate.chunkdata.ChunkData;
 
 import blusunrize.immersiveengineering.common.blocks.plant.EnumHempGrowth;
 import blusunrize.immersiveengineering.common.blocks.plant.HempBlock;
-import net.minecraft.block.BlockState;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.server.ServerWorld;
 
 @Mixin(HempBlock.class)
 public class HempBlockMixin {
 
-    private float fh$getGrowthSpeed(World world, BlockPos pos, BlockState state, int light) {
+    private float fh$getGrowthSpeed(Level world, BlockPos pos, BlockState state, int light) {
         float growth = 0.125f * (light - 11);
         if (world.canBlockSeeSky(pos))
             growth += 2f;

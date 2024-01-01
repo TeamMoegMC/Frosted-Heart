@@ -39,10 +39,10 @@ import dev.ftb.mods.ftbteams.FTBTeamsCommon;
 import dev.ftb.mods.ftbteams.FTBTeamsForge;
 import dev.ftb.mods.ftbteams.data.Team;
 import dev.ftb.mods.ftbteams.data.TeamManager;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
 
 public abstract class AbstractGenerator<T extends AbstractGenerator<T>> extends MultiblockPartTileEntity<T> implements FHBlockInterfaces.IActiveState {
 
@@ -58,7 +58,7 @@ public abstract class AbstractGenerator<T extends AbstractGenerator<T>> extends 
     boolean isLocked = false;
     private int checkInterval = 0;
 
-    public AbstractGenerator(IETemplateMultiblock multiblockInstance, TileEntityType<T> type, boolean hasRSControl) {
+    public AbstractGenerator(IETemplateMultiblock multiblockInstance, BlockEntityType<T> type, boolean hasRSControl) {
         super(multiblockInstance, type, hasRSControl);
     }
 
@@ -66,17 +66,17 @@ public abstract class AbstractGenerator<T extends AbstractGenerator<T>> extends 
         return (int) (8 + (getRangeLevel()) * 4);
     }
     public int getUpperBound() {
-    	return MathHelper.ceil (getRangeLevel()*4);
+    	return Mth.ceil (getRangeLevel()*4);
     }
     public int getLowerBound() {
-    	return MathHelper.ceil(getRangeLevel());
+    	return Mth.ceil(getRangeLevel());
     }
     public int getActualTemp() {
         return (int) (getTemperatureLevel() * 10);
     }
 
     @Override
-    public void readCustomNBT(CompoundNBT nbt, boolean descPacket) {
+    public void readCustomNBT(CompoundTag nbt, boolean descPacket) {
         super.readCustomNBT(nbt, descPacket);
         isWorking = nbt.getBoolean("isWorking");
         isOverdrive = nbt.getBoolean("isOverdrive");
@@ -84,7 +84,7 @@ public abstract class AbstractGenerator<T extends AbstractGenerator<T>> extends 
     }
 
     @Override
-    public void writeCustomNBT(CompoundNBT nbt, boolean descPacket) {
+    public void writeCustomNBT(CompoundTag nbt, boolean descPacket) {
         super.writeCustomNBT(nbt, descPacket);
         nbt.putBoolean("isWorking", isWorking);
         nbt.putBoolean("isOverdrive", isOverdrive);

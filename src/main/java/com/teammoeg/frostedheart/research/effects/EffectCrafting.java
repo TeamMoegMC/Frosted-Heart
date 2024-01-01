@@ -42,23 +42,23 @@ import com.teammoeg.frostedheart.research.gui.TechIcons;
 import com.teammoeg.frostedheart.util.SerializeUtil;
 
 import blusunrize.immersiveengineering.api.multiblocks.MultiblockHandler;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.IItemProvider;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.IFormattableTextComponent;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.level.ItemLike;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.registries.ForgeRegistries;
 
 public class EffectCrafting extends Effect {
-    List<IRecipe<?>> unlocks = new ArrayList<>();
+    List<Recipe<?>> unlocks = new ArrayList<>();
     ItemStack itemStack = null;
     Item item = null;
 
@@ -68,7 +68,7 @@ public class EffectCrafting extends Effect {
         this.itemStack = item;
     }
 
-    public EffectCrafting(IItemProvider item) {
+    public EffectCrafting(ItemLike item) {
         super();
         this.item = item.asItem();
         initItem();
@@ -76,7 +76,7 @@ public class EffectCrafting extends Effect {
 
     private void initItem() {
     	unlocks.clear();
-        for (IRecipe<?> r : FHResearchDataManager.getRecipeManager().getRecipes()) {
+        for (Recipe<?> r : FHResearchDataManager.getRecipeManager().getRecipes()) {
             if (r.getResultItem().getItem().equals(this.item)) {
                 unlocks.add(r);
             }
@@ -85,7 +85,7 @@ public class EffectCrafting extends Effect {
 
     private void initStack() {
     	unlocks.clear();
-        for (IRecipe<?> r : FHResearchDataManager.getRecipeManager().getRecipes()) {
+        for (Recipe<?> r : FHResearchDataManager.getRecipeManager().getRecipes()) {
             if (r.getResultItem().equals(item)) {
                 unlocks.add(r);
             }
@@ -104,7 +104,7 @@ public class EffectCrafting extends Effect {
 	}
     public EffectCrafting(ResourceLocation recipe) {
         super("@gui." + FHMain.MODID + ".effect.crafting", new ArrayList<>());
-        Optional<? extends IRecipe<?>> r = FHResearchDataManager.getRecipeManager().byKey(recipe);
+        Optional<? extends Recipe<?>> r = FHResearchDataManager.getRecipeManager().byKey(recipe);
 
         if (r.isPresent()) {
             unlocks.add(r.get());
@@ -114,7 +114,7 @@ public class EffectCrafting extends Effect {
     public void setList(Collection<String> ls) {
         unlocks.clear();
         for (String s : ls) {
-            Optional<? extends IRecipe<?>> r = FHResearchDataManager.getRecipeManager().byKey(new ResourceLocation(s));
+            Optional<? extends Recipe<?>> r = FHResearchDataManager.getRecipeManager().byKey(new ResourceLocation(s));
 
             if (r.isPresent()) {
                 unlocks.add(r.get());
@@ -139,11 +139,11 @@ public class EffectCrafting extends Effect {
         }
     }
 
-    public EffectCrafting(PacketBuffer pb) {
+    public EffectCrafting(FriendlyByteBuf pb) {
         super(pb);
         item = SerializeUtil.readOptional(pb, p -> p.readRegistryIdUnsafe(ForgeRegistries.ITEMS)).orElse(null);
         if (item == null) {
-            itemStack = SerializeUtil.readOptional(pb, PacketBuffer::readItem).orElse(null);
+            itemStack = SerializeUtil.readOptional(pb, FriendlyByteBuf::readItem).orElse(null);
             if (itemStack == null) {
                 unlocks = SerializeUtil.readList(pb, p -> FHResearchDataManager.getRecipeManager().byKey(p.readResourceLocation()).orElse(null));
                 unlocks.removeIf(Objects::isNull);
@@ -160,7 +160,7 @@ public class EffectCrafting extends Effect {
     }
 
     @Override
-    public boolean grant(TeamResearchData team, PlayerEntity triggerPlayer, boolean isload) {
+    public boolean grant(TeamResearchData team, Player triggerPlayer, boolean isload) {
         team.crafting.addAll(unlocks);
         return true;
     }
@@ -181,16 +181,16 @@ public class EffectCrafting extends Effect {
         else if (unlocks.size() == 1)
             jo.addProperty("recipes", unlocks.get(1).getId().toString());
         else if (unlocks.size() > 1)
-            jo.add("recipes", SerializeUtil.toJsonStringList(unlocks, IRecipe<?>::getId));
+            jo.add("recipes", SerializeUtil.toJsonStringList(unlocks, Recipe<?>::getId));
         return jo;
     }
 
     @Override
-    public void write(PacketBuffer buffer) {
+    public void write(FriendlyByteBuf buffer) {
         super.write(buffer);
         SerializeUtil.writeOptional(buffer, item, (o, b) -> b.writeRegistryIdUnsafe(ForgeRegistries.ITEMS, o));
         if (item == null) {
-            SerializeUtil.writeOptional2(buffer, itemStack, PacketBuffer::writeItem);
+            SerializeUtil.writeOptional2(buffer, itemStack, FriendlyByteBuf::writeItem);
             if (itemStack == null)
                 SerializeUtil.writeList(buffer, unlocks, (o, b) -> b.writeResourceLocation(o.getId()));
         }
@@ -204,7 +204,7 @@ public class EffectCrafting extends Effect {
             return FHIcons.getIcon(FHIcons.getIcon(itemStack), FHIcons.getIcon(Items.CRAFTING_TABLE));
         else {
             Set<ItemStack> stacks = new HashSet<>();
-            for (IRecipe<?> r : unlocks) {
+            for (Recipe<?> r : unlocks) {
                 if (!r.getResultItem().isEmpty()) {
                     stacks.add(r.getResultItem());
                 }
@@ -216,21 +216,21 @@ public class EffectCrafting extends Effect {
     }
 
     @Override
-    public IFormattableTextComponent getDefaultName() {
+    public MutableComponent getDefaultName() {
         return GuiUtils.translateGui("effect.crafting");
     }
 
     @Override
-    public List<ITextComponent> getDefaultTooltip() {
-        List<ITextComponent> tooltip = new ArrayList<>();
+    public List<Component> getDefaultTooltip() {
+        List<Component> tooltip = new ArrayList<>();
 
         if (item != null)
-            tooltip.add(new TranslationTextComponent(item.getDescriptionId()));
+            tooltip.add(new TranslatableComponent(item.getDescriptionId()));
         else if (itemStack != null)
             tooltip.add(itemStack.getHoverName());
         else {
             Set<ItemStack> stacks = new HashSet<>();
-            for (IRecipe<?> r : unlocks) {
+            for (Recipe<?> r : unlocks) {
                 if (!r.getResultItem().isEmpty()) {
                     stacks.add(r.getResultItem());
                 }
@@ -249,7 +249,7 @@ public class EffectCrafting extends Effect {
     @Override
     public String getBrief() {
         if (item != null)
-            return "Craft " + new TranslationTextComponent(item.getDescriptionId()).getString();
+            return "Craft " + new TranslatableComponent(item.getDescriptionId()).getString();
         if (itemStack != null)
             return "Craft " + itemStack.getHoverName().getString();
         if (!unlocks.isEmpty())

@@ -29,13 +29,13 @@ import com.teammoeg.frostedheart.world.FHFeatures;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.gen.Heightmap.Type;
-import net.minecraft.world.server.ServerWorld;
-import net.minecraft.world.storage.IServerWorldInfo;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.storage.ServerLevelData;
 
 @Mixin(MinecraftServer.class)
 public class MinecraftServerMixin {
     @Inject(at = @At("TAIL"), method = "func_240786_a_")
-    private static void spacecraftGenerate(ServerWorld serverWorld, IServerWorldInfo info, boolean hasBonusChest, boolean p_240786_3_, boolean p_240786_4_, CallbackInfo ci) {
+    private static void spacecraftGenerate(ServerLevel serverWorld, ServerLevelData info, boolean hasBonusChest, boolean p_240786_3_, boolean p_240786_4_, CallbackInfo ci) {
         int y = 256, h;
         // store these as temporary variables to reduce procedural calls in loop
         int seaLevel = serverWorld.getSeaLevel();

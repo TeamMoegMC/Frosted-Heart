@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -22,7 +22,7 @@ package com.teammoeg.frostedheart.research.clues;
 import com.google.gson.JsonObject;
 
 import dev.ftb.mods.ftbteams.data.Team;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.FriendlyByteBuf;
 
 /**
  * Very Custom Clue trigger by code or manually.
@@ -36,7 +36,7 @@ public class CustomClue extends Clue {
         super(jo);
     }
 
-    public CustomClue(PacketBuffer pb) {
+    public CustomClue(FriendlyByteBuf pb) {
         super(pb);
     }
 

@@ -1,6 +1,25 @@
+/*
+ * Copyright (c) 2024 TeamMoeg
+ *
+ * This file is part of Frosted Heart.
+ *
+ * Frosted Heart is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3.
+ *
+ * Frosted Heart is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
 package com.teammoeg.frostedheart.content.steamenergy;
 
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.CompoundTag;
 
 /**
  * Class SteamNetworkConsumer.
@@ -33,7 +52,7 @@ public class SteamNetworkConsumer extends SteamNetworkHolder{
 	 *
 	 * @param nbt the nbt<br>
 	 */
-	public void save(CompoundNBT nbt) {
+	public void save(CompoundTag nbt) {
 		nbt.putFloat("power", power);
 	}
 	
@@ -42,7 +61,7 @@ public class SteamNetworkConsumer extends SteamNetworkHolder{
 	 *
 	 * @param nbt the nbt<br>
 	 */
-	public void load(CompoundNBT nbt) {
+	public void load(CompoundTag nbt) {
 		power=nbt.getFloat("power");
 	}
 	

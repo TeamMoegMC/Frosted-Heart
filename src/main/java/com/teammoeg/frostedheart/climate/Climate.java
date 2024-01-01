@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 TeamMoeg
+ * Copyright (c) 2021-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -14,6 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 package com.teammoeg.frostedheart.climate;
@@ -23,9 +24,9 @@ import java.util.Random;
 import com.teammoeg.frostedheart.climate.chunkdata.ChunkData;
 import com.teammoeg.frostedheart.util.noise.INoise1D;
 
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.IWorld;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.LevelAccessor;
 
 /**
  * Central class for all FH climate requirements.
@@ -58,7 +59,7 @@ public final class Climate {
      * Will be valid when used on both logical sides.
      * MUST NOT be used by world generation, it should use {@link Climate#calculateTemperature(BlockPos, float)} instead, with the average temperature obtained through the correct chunk data source
      */
-    public static float getTemperature(IWorld world, BlockPos pos) {
+    public static float getTemperature(LevelAccessor world, BlockPos pos) {
         return calculateTemperature(pos.getZ(), pos.getY(), ChunkData.getTemperature(world, pos));
     }
 
@@ -81,7 +82,7 @@ public final class Climate {
     public static float calculateMonthlyTemperature(int z, int y, float averageTemperature, float monthTemperatureModifier) {
         float temperatureScale = 20000;
         float monthTemperature = monthTemperatureModifier * INoise1D.triangle(LATITUDE_TEMPERATURE_VARIANCE_AMPLITUDE, LATITUDE_TEMPERATURE_VARIANCE_MEAN, 1 / (2 * temperatureScale), 0, z);
-        float elevationTemperature = MathHelper.clamp((y - 63) * 0.16225f, 0, 17.822f);
+        float elevationTemperature = Mth.clamp((y - 63) * 0.16225f, 0, 17.822f);
         return averageTemperature + monthTemperature - elevationTemperature;
     }
 
@@ -92,7 +93,7 @@ public final class Climate {
     public static float calculateTemperature(int z, int y, float averageTemperature) {
         // Finally, add elevation based temperature
         // Internationally accepted average lapse time is 6.49 K / 1000 m, for the first 11 km of the atmosphere. Our temperature is scales the 110 m against 2750 m, so that gives us a change of 1.6225 / 10 blocks.
-        float elevationTemperature = MathHelper.clamp((y - 63) * 0.16225f, 0, 17.822f);
+        float elevationTemperature = Mth.clamp((y - 63) * 0.16225f, 0, 17.822f);
 
         // Sum all different temperature values.
         return averageTemperature - elevationTemperature;

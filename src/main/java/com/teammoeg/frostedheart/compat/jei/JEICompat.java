@@ -85,18 +85,18 @@ import mezz.jei.api.registration.IRecipeRegistration;
 import mezz.jei.api.registration.IVanillaCategoryExtensionRegistration;
 import mezz.jei.api.runtime.IJeiRuntime;
 import mezz.jei.plugins.jei.info.IngredientInfoRecipe;
-import net.minecraft.block.Blocks;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.item.crafting.ICraftingRecipe;
-import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.item.crafting.IRecipeType;
-import net.minecraft.item.crafting.RecipeManager;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.CraftingRecipe;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.item.crafting.RecipeManager;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.chat.Component;
 import net.minecraftforge.registries.ForgeRegistries;
 
 @JeiPlugin
@@ -122,7 +122,7 @@ public class JEICompat implements IModPlugin {
 
 	@Override
 	public void registerRecipes(IRecipeRegistration registration) {
-		ClientWorld world = Minecraft.getInstance().level;
+		ClientLevel world = Minecraft.getInstance().level;
 		checkNotNull(world, "minecraft world");
 		RecipeManager recipeManager = world.getRecipeManager();
 		CuttingCategory.matching = ForgeRegistries.ITEMS.getValues().stream()
@@ -131,7 +131,7 @@ public class JEICompat implements IModPlugin {
 		registration.addRecipes(new ArrayList<>(GeneratorRecipe.recipeList.values()), GeneratorFuelCategory.UID);
 		registration.addRecipes(new ArrayList<>(GeneratorSteamRecipe.recipeList.values()), GeneratorSteamCategory.UID);
 		registration.addRecipes(new ArrayList<>(ChargerRecipe.recipeList.values()), ChargerCategory.UID);
-		registration.addRecipes(recipeManager.getAllRecipesFor(IRecipeType.SMOKING), ChargerCookingCategory.UID);
+		registration.addRecipes(recipeManager.getAllRecipesFor(RecipeType.SMOKING), ChargerCookingCategory.UID);
 		registration.addRecipes(new ArrayList<>(CampfireDefrostRecipe.recipeList.values()),
 				CampfireDefrostCategory.UID);
 		registration.addRecipes(new ArrayList<>(SmokingDefrostRecipe.recipeList.values()), SmokingDefrostCategory.UID);
@@ -195,15 +195,15 @@ public class JEICompat implements IModPlugin {
 
 	}
 
-	static Map<IRecipeType<?>, Set<ResourceLocation>> types = new HashMap<>();
+	static Map<RecipeType<?>, Set<ResourceLocation>> types = new HashMap<>();
 
 	static{
-		types.computeIfAbsent(IRecipeType.CRAFTING, i -> new HashSet<>()).add(VanillaRecipeCategoryUid.CRAFTING);
+		types.computeIfAbsent(RecipeType.CRAFTING, i -> new HashSet<>()).add(VanillaRecipeCategoryUid.CRAFTING);
 		
 		
 	}
 	private static boolean cachedInfoAdd = false;
-	public static Map<ResourceLocation,IRecipe<?>> overrides=new HashMap<>();
+	public static Map<ResourceLocation,Recipe<?>> overrides=new HashMap<>();
 	private static Map<Item, List<IngredientInfoRecipe<ItemStack>>> infos = new HashMap<>();
 
 	public static void addInfo() {
@@ -214,14 +214,14 @@ public class JEICompat implements IModPlugin {
 		FHMain.LOGGER.info("added info");
 		cachedInfoAdd = false;
 		Set<Item> items = new HashSet<>();
-		for (IRecipe<?> i : ResearchListeners.recipe) {
+		for (Recipe<?> i : ResearchListeners.recipe) {
 			ItemStack out = i.getResultItem();
 			if (out != null && !out.isEmpty()) {
 				items.add(out.getItem());
 			}
 		}
 		infos.clear();
-		ITextComponent it = GuiUtils.translate("gui.jei.info.require_research");
+		Component it = GuiUtils.translate("gui.jei.info.require_research");
 		/*List<IngredientInfoRecipe<ItemStack>> rinfos=(List<IngredientInfoRecipe<ItemStack>>) man.getRecipes(man.getRecipeCategory(VanillaRecipeCategoryUid.INFORMATION));
 		for(IngredientInfoRecipe<ItemStack> info:rinfos) {
 			List<ItemStack> iss=info.getIngredients();
@@ -254,24 +254,24 @@ public class JEICompat implements IModPlugin {
 		Map<Class<?>, Set<ResourceLocation>> cates = new HashMap<>();
 		for (IRecipeCategory<?> rg : man.getRecipeCategories()) {
 			//System.out.println(rg.getUid()+" : "+rg.getRecipeClass().getSimpleName());
-			if (rg.getRecipeClass() == ICraftingRecipe.class)
-				types.computeIfAbsent(IRecipeType.CRAFTING, i -> new HashSet<>()).add(rg.getUid());
+			if (rg.getRecipeClass() == CraftingRecipe.class)
+				types.computeIfAbsent(RecipeType.CRAFTING, i -> new HashSet<>()).add(rg.getUid());
 			else
 				cates.computeIfAbsent(rg.getRecipeClass(), i -> new HashSet<>()).add(rg.getUid());
 		}
 		Set<Item> locked=new HashSet<>();
 		Set<Item> unlocked=new HashSet<>();
-		for (IRecipe<?> i : ResearchListeners.recipe) {
+		for (Recipe<?> i : ResearchListeners.recipe) {
 			Set<ResourceLocation> hs = cates.remove(i.getClass());
 			Set<ResourceLocation> all = types.computeIfAbsent(i.getType(), d -> new HashSet<>());
-			if(i instanceof ICraftingRecipe&&i.getType()!=IRecipeType.CRAFTING)
-				all.addAll(types.computeIfAbsent(IRecipeType.CRAFTING, d->new HashSet<>()));
+			if(i instanceof CraftingRecipe&&i.getType()!=RecipeType.CRAFTING)
+				all.addAll(types.computeIfAbsent(RecipeType.CRAFTING, d->new HashSet<>()));
 			if (hs != null) {
 				all.addAll(hs);
 			}
 			//System.out.println(i.getType().toString()+":"+String.join(",",all.stream().map(Object::toString).collect(Collectors.toList())));
 			ItemStack irs=i.getResultItem();
-			IRecipe<?> ovrd=overrides.get(i.getId());
+			Recipe<?> ovrd=overrides.get(i.getId());
 			if (!TeamResearchData.getClientInstance().crafting.has(i)) {
 				for (ResourceLocation rl : all) {
 					man.hideRecipe(i, rl);

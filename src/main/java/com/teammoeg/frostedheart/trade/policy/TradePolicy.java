@@ -34,21 +34,21 @@ import com.teammoeg.frostedheart.util.SerializeUtil;
 import blusunrize.immersiveengineering.api.crafting.IERecipeSerializer;
 import blusunrize.immersiveengineering.api.crafting.IESerializableRecipe;
 import net.minecraft.entity.merchant.villager.VillagerEntity;
-import net.minecraft.entity.merchant.villager.VillagerProfession;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.item.crafting.IRecipeType;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.WeightedRandom;
+import net.minecraft.world.entity.npc.VillagerProfession;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.WeighedRandom;
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.registries.ForgeRegistries;
 
 public class TradePolicy  extends IESerializableRecipe{
-	public static IRecipeType<TradePolicy> TYPE;
+	public static RecipeType<TradePolicy> TYPE;
     public static RegistryObject<IERecipeSerializer<TradePolicy>> SERIALIZER;
     public static Map<ResourceLocation,TradePolicy> policies;
-    public static class Weighted extends WeightedRandom.Item{
+    public static class Weighted extends WeighedRandom.WeighedRandomItem{
     	TradePolicy policy;
 
 		public Weighted(int itemWeightIn, TradePolicy policy) {
@@ -105,7 +105,7 @@ public class TradePolicy  extends IESerializableRecipe{
 		return vp==null?VillagerProfession.NONE:vp;
 	}
 	public static TradePolicy random(Random rnd) {
-		return WeightedRandom.getRandomItem(rnd, items,totalW).policy;
+		return WeighedRandom.getRandomItem(rnd, items,totalW).policy;
 	}
 	public static class Serializer extends IERecipeSerializer<TradePolicy> {
         @Override
@@ -131,8 +131,8 @@ public class TradePolicy  extends IESerializableRecipe{
 
         @Nullable
         @Override
-        public TradePolicy fromNetwork(ResourceLocation recipeId, PacketBuffer buffer) {
-        	ResourceLocation name=SerializeUtil.readOptional(buffer,PacketBuffer::readResourceLocation).orElse(null);
+        public TradePolicy fromNetwork(ResourceLocation recipeId, FriendlyByteBuf buffer) {
+        	ResourceLocation name=SerializeUtil.readOptional(buffer,FriendlyByteBuf::readResourceLocation).orElse(null);
             List<PolicyGroup> groups=SerializeUtil.readList(buffer,PolicyGroup::read);
             int root=buffer.readVarInt();
             VillagerProfession vp=buffer.readRegistryIdUnsafe(ForgeRegistries.PROFESSIONS);
@@ -140,8 +140,8 @@ public class TradePolicy  extends IESerializableRecipe{
         }
 
         @Override
-        public void toNetwork(PacketBuffer buffer, TradePolicy recipe) {
-        	SerializeUtil.writeOptional2(buffer, recipe.name,PacketBuffer::writeResourceLocation);
+        public void toNetwork(FriendlyByteBuf buffer, TradePolicy recipe) {
+        	SerializeUtil.writeOptional2(buffer, recipe.name,FriendlyByteBuf::writeResourceLocation);
         	SerializeUtil.writeList(buffer,recipe.groups,PolicyGroup::write);
         	buffer.writeVarInt(recipe.weight);
         	buffer.writeRegistryIdUnsafe(ForgeRegistries.PROFESSIONS,recipe.vp);

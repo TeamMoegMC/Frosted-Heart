@@ -22,15 +22,15 @@ package com.teammoeg.frostedheart.climate.data;
 import javax.annotation.Nullable;
 
 import com.teammoeg.frostedheart.FHMain;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.ItemStackHelper;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.INBT;
-import net.minecraft.util.Direction;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.core.Direction;
+import net.minecraft.core.NonNullList;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
@@ -39,7 +39,7 @@ import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 
-public class DeathInventoryData implements ICapabilitySerializable<CompoundNBT> {
+public class DeathInventoryData implements ICapabilitySerializable<CompoundTag> {
     @CapabilityInject(DeathInventoryData.class)
     public static Capability<DeathInventoryData> CAPABILITY;
     private final LazyOptional<DeathInventoryData> capability;
@@ -51,7 +51,7 @@ public class DeathInventoryData implements ICapabilitySerializable<CompoundNBT> 
     	NonNullList<ItemStack> armor=NonNullList.withSize(4, ItemStack.EMPTY);
     	ItemStack offhand=ItemStack.EMPTY;
     	
-		public CopyInventory(PlayerInventory othis) {
+		public CopyInventory(Inventory othis) {
             for (int i = 0; i < 9; i++) {
                 ItemStack itemstack = othis.items.get(i);
                 if (!itemstack.isEmpty()) {
@@ -72,15 +72,15 @@ public class DeathInventoryData implements ICapabilitySerializable<CompoundNBT> 
             }
 		}
 		
-		private CopyInventory(CompoundNBT nbt) {
+		private CopyInventory(CompoundTag nbt) {
 			super();
-			ItemStackHelper.loadAllItems(nbt.getCompound("main"), inv);
-			ItemStackHelper.loadAllItems(nbt.getCompound("armor"), armor);
+			ContainerHelper.loadAllItems(nbt.getCompound("main"), inv);
+			ContainerHelper.loadAllItems(nbt.getCompound("armor"), armor);
 			this.offhand=ItemStack.of(nbt.getCompound("off"));
 		
 		}
 
-		public void restoreInventory(PlayerInventory othis) {
+		public void restoreInventory(Inventory othis) {
 			for(int i=0;i<9;i++) {
 				ItemStack ret=inv.get(i);
 				if(!ret.isEmpty())
@@ -95,17 +95,17 @@ public class DeathInventoryData implements ICapabilitySerializable<CompoundNBT> 
 				othis.offhand.set(0, offhand);
 			}
 		}
-		public CompoundNBT serializeNBT() {
-			CompoundNBT cnbto=new CompoundNBT();
+		public CompoundTag serializeNBT() {
+			CompoundTag cnbto=new CompoundTag();
 			
 			
-			cnbto.put("main",ItemStackHelper.saveAllItems(new CompoundNBT(),inv));
-			cnbto.put("armor",ItemStackHelper.saveAllItems(new CompoundNBT(),armor));
+			cnbto.put("main",ContainerHelper.saveAllItems(new CompoundTag(),inv));
+			cnbto.put("armor",ContainerHelper.saveAllItems(new CompoundTag(),armor));
 			cnbto.put("off",offhand.serializeNBT());
 			return cnbto;
 		}
 
-		public static CopyInventory deserializeNBT(CompoundNBT nbt) {
+		public static CopyInventory deserializeNBT(CompoundTag nbt) {
 			
 			return new CopyInventory(nbt);
 		}
@@ -119,12 +119,12 @@ public class DeathInventoryData implements ICapabilitySerializable<CompoundNBT> 
      */
     public static void setup() {
         CapabilityManager.INSTANCE.register(DeathInventoryData.class, new Capability.IStorage<DeathInventoryData>() {
-            public INBT writeNBT(Capability<DeathInventoryData> capability, DeathInventoryData instance, Direction side) {
+            public Tag writeNBT(Capability<DeathInventoryData> capability, DeathInventoryData instance, Direction side) {
                 return instance.serializeNBT();
             }
 
-            public void readNBT(Capability<DeathInventoryData> capability, DeathInventoryData instance, Direction side, INBT nbt) {
-                instance.deserializeNBT((CompoundNBT) nbt);
+            public void readNBT(Capability<DeathInventoryData> capability, DeathInventoryData instance, Direction side, Tag nbt) {
+                instance.deserializeNBT((CompoundTag) nbt);
             }
         }, DeathInventoryData::new);
     }
@@ -135,7 +135,7 @@ public class DeathInventoryData implements ICapabilitySerializable<CompoundNBT> 
      * @param player server or client
      * @return An instance of ClimateData if data exists on the world, otherwise return empty.
      */
-    private static LazyOptional<DeathInventoryData> getCapability(@Nullable PlayerEntity player) {
+    private static LazyOptional<DeathInventoryData> getCapability(@Nullable Player player) {
         if (player != null) {
             return player.getCapability(CAPABILITY);
         }
@@ -148,7 +148,7 @@ public class DeathInventoryData implements ICapabilitySerializable<CompoundNBT> 
      * @param world server or client
      * @return An instance of ClimateData exists on the world, otherwise return a new ClimateData instance.
      */
-    public static DeathInventoryData get(PlayerEntity world) {
+    public static DeathInventoryData get(Player world) {
     	
         return getCapability(world).resolve().orElse(null);
     }
@@ -158,10 +158,10 @@ public class DeathInventoryData implements ICapabilitySerializable<CompoundNBT> 
 			return capability.cast();
 		return LazyOptional.empty();
 	}
-	public void death(PlayerInventory inv) {
+	public void death(Inventory inv) {
 		this.inv=new CopyInventory(inv);
 	}
-	public void alive(PlayerInventory inv) {
+	public void alive(Inventory inv) {
 		if(this.inv!=null) {
 			this.inv.restoreInventory(inv);
 			this.inv=null;
@@ -174,7 +174,7 @@ public class DeathInventoryData implements ICapabilitySerializable<CompoundNBT> 
 		//System.out.println("called clone event");
 		calledClone=true;
 	}
-	public void tryCallClone(PlayerEntity pe) {
+	public void tryCallClone(Player pe) {
 		//System.out.println("Detecting clone event");
 		if(!calledClone) {
 			//System.out.println("calling clone event");
@@ -182,19 +182,19 @@ public class DeathInventoryData implements ICapabilitySerializable<CompoundNBT> 
 		}
 	}
 	@Override
-	public CompoundNBT serializeNBT() {
-		CompoundNBT cnbt=new CompoundNBT();
+	public CompoundTag serializeNBT() {
+		CompoundTag cnbt=new CompoundTag();
 		if(inv!=null)
 			cnbt.put("inv",inv.serializeNBT());
 		cnbt.putBoolean("cloned", calledClone);
 		return cnbt;
 	}
 	@Override
-	public void deserializeNBT(CompoundNBT nbt) {
+	public void deserializeNBT(CompoundTag nbt) {
 		inv=null;
 		calledClone=nbt.getBoolean("cloned");
 		if(nbt.contains("data"))
-			nbt.getList("data", 10).stream().map(t->(CompoundNBT)t).forEach(e->{
+			nbt.getList("data", 10).stream().map(t->(CompoundTag)t).forEach(e->{
 				inv=CopyInventory.deserializeNBT(e.getCompound("inv"));
 			});
 		else if(nbt.contains("inv"))

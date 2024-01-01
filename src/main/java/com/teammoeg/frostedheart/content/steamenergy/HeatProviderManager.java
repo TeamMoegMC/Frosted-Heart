@@ -23,9 +23,9 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import blusunrize.immersiveengineering.common.util.Utils;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.core.Direction;
+import net.minecraft.core.BlockPos;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -35,10 +35,10 @@ import net.minecraft.util.math.BlockPos;
  */
 public class HeatProviderManager {
 	private int interval=0;
-	private TileEntity cur;
+	private BlockEntity cur;
 	private Consumer<BiConsumer<BlockPos,Direction>> onConnect;
 	private BiConsumer<BlockPos,Direction> connect= (pos,d)->{
-		TileEntity te = Utils.getExistingTileEntity(cur.getLevel(), pos);
+		BlockEntity te = Utils.getExistingTileEntity(cur.getLevel(), pos);
         if (te instanceof INetworkConsumer)
                 ((INetworkConsumer) te).tryConnectAt(d, 0);
 	};
@@ -49,7 +49,7 @@ public class HeatProviderManager {
 	 * @param cur the current tile entity<br>
 	 * @param con the function that called when refresh is required. Should provide connect direction and location when called.<br>
 	 */
-	public HeatProviderManager(TileEntity cur,Consumer<BiConsumer<BlockPos,Direction>> con) {
+	public HeatProviderManager(BlockEntity cur,Consumer<BiConsumer<BlockPos,Direction>> con) {
 		this.cur=cur;
 		this.onConnect=con;
 	}

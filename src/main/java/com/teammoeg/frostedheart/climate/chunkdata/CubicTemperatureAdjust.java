@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 TeamMoeg
+ * Copyright (c) 2021-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -14,13 +14,14 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 package com.teammoeg.frostedheart.climate.chunkdata;
 
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.core.BlockPos;
 
 /**
  * Cubic Temperature Adjust, would adjust temperature in a cube
@@ -40,11 +41,11 @@ public class CubicTemperatureAdjust implements ITemperatureAdjust {
         this.value = value;
     }
 
-    public CubicTemperatureAdjust(PacketBuffer buffer) {
+    public CubicTemperatureAdjust(FriendlyByteBuf buffer) {
         deserialize(buffer);
     }
 
-    public CubicTemperatureAdjust(CompoundNBT nc) {
+    public CubicTemperatureAdjust(CompoundTag nc) {
         deserializeNBT(nc);
     }
 
@@ -54,14 +55,14 @@ public class CubicTemperatureAdjust implements ITemperatureAdjust {
 
 
     @Override
-    public CompoundNBT serializeNBT() {
-        CompoundNBT nbt = serializeNBTData();
+    public CompoundTag serializeNBT() {
+        CompoundTag nbt = serializeNBTData();
         nbt.putInt("type", 1);
         return nbt;
     }
 
-    protected CompoundNBT serializeNBTData() {
-        CompoundNBT nbt = new CompoundNBT();
+    protected CompoundTag serializeNBTData() {
+        CompoundTag nbt = new CompoundTag();
         nbt.putIntArray("location", new int[]{cx, cy, cz});
         nbt.putInt("range", r);
         nbt.putInt("value", value);
@@ -89,7 +90,7 @@ public class CubicTemperatureAdjust implements ITemperatureAdjust {
     }
 
     @Override
-    public void deserializeNBT(CompoundNBT nbt) {
+    public void deserializeNBT(CompoundTag nbt) {
         int[] loc = nbt.getIntArray("location");
         cx = loc[0];
         cy = loc[1];
@@ -113,12 +114,12 @@ public class CubicTemperatureAdjust implements ITemperatureAdjust {
     }
 
     @Override
-    public void serialize(PacketBuffer buffer) {
+    public void serialize(FriendlyByteBuf buffer) {
         buffer.writeVarInt(1);//packet id
         serializeData(buffer);
     }
 
-    protected void serializeData(PacketBuffer buffer) {
+    protected void serializeData(FriendlyByteBuf buffer) {
         buffer.writeVarInt(cx);
         buffer.writeVarInt(cy);
         buffer.writeVarInt(cz);
@@ -127,7 +128,7 @@ public class CubicTemperatureAdjust implements ITemperatureAdjust {
     }
 
     @Override
-    public void deserialize(PacketBuffer buffer) {
+    public void deserialize(FriendlyByteBuf buffer) {
         cx = buffer.readVarInt();
         cy = buffer.readVarInt();
         cz = buffer.readVarInt();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 TeamMoeg
+ * Copyright (c) 2021-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -14,19 +14,20 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 package com.teammoeg.frostedheart.climate.chunkdata;
 
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.core.BlockPos;
 import net.minecraftforge.common.util.INBTSerializable;
 
 /**
  * Interface to adjust temperature
  */
-public interface ITemperatureAdjust extends INBTSerializable<CompoundNBT> {
+public interface ITemperatureAdjust extends INBTSerializable<CompoundTag> {
 
     /**
      * Get temperature at location, would check if it is in range.
@@ -75,14 +76,14 @@ public interface ITemperatureAdjust extends INBTSerializable<CompoundNBT> {
      *
      * @param buffer the buffer<br>
      */
-    void serialize(PacketBuffer buffer);
+    void serialize(FriendlyByteBuf buffer);
 
     /**
      * Deserialize.
      *
      * @param buffer the buffer<br>
      */
-    void deserialize(PacketBuffer buffer);
+    void deserialize(FriendlyByteBuf buffer);
 
     /**
      * Factory construct temperature adjust from packet buffer.<br>
@@ -90,7 +91,7 @@ public interface ITemperatureAdjust extends INBTSerializable<CompoundNBT> {
      * @param buffer the buffer<br>
      * @return returns adjust
      */
-    public static ITemperatureAdjust valueOf(PacketBuffer buffer) {
+    public static ITemperatureAdjust valueOf(FriendlyByteBuf buffer) {
         int packetId = buffer.readVarInt();
         switch (packetId) {
             case 1:
@@ -108,7 +109,7 @@ public interface ITemperatureAdjust extends INBTSerializable<CompoundNBT> {
      * @param nc the nbt compound<br>
      * @return returns adjust
      */
-    static ITemperatureAdjust valueOf(CompoundNBT nc) {
+    static ITemperatureAdjust valueOf(CompoundTag nc) {
         switch (nc.getInt("type")) {
             case 1:
                 return new CubicTemperatureAdjust(nc);

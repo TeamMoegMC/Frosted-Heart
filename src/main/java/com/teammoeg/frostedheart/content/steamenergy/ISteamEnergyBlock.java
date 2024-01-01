@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 TeamMoeg
+ * Copyright (c) 2021-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -14,22 +14,23 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 package com.teammoeg.frostedheart.content.steamenergy;
 
 import blusunrize.immersiveengineering.common.util.Utils;
-import net.minecraft.block.BlockState;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.core.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.Level;
 
 public interface ISteamEnergyBlock {
-    public default boolean canConnectFrom(IWorld world, BlockPos pos, BlockState state, Direction dir) {
-        if (world instanceof World) {
-            TileEntity te = Utils.getExistingTileEntity((World) world, pos);
+    public default boolean canConnectFrom(LevelAccessor world, BlockPos pos, BlockState state, Direction dir) {
+        if (world instanceof Level) {
+            BlockEntity te = Utils.getExistingTileEntity((Level) world, pos);
             if (te instanceof INetworkConsumer) {
                 return ((INetworkConsumer) te).canConnectAt(dir.getOpposite());
             }

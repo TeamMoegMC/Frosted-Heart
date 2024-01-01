@@ -38,13 +38,13 @@ import blusunrize.immersiveengineering.common.blocks.multiblocks.IETemplateMulti
 import blusunrize.immersiveengineering.common.items.IEItems;
 import blusunrize.lib.manual.ManualEntry;
 import blusunrize.lib.manual.gui.ManualScreen;
-import net.minecraft.block.Block;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.IFormattableTextComponent;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -72,7 +72,7 @@ public class EffectBuilding extends Effect {
         multiblock = MultiblockHandler.getByUniqueName(new ResourceLocation(jo.get("multiblock").getAsString()));
     }
 
-    public EffectBuilding(PacketBuffer pb) {
+    public EffectBuilding(FriendlyByteBuf pb) {
         super(pb);
         multiblock = MultiblockHandler.getByUniqueName(pb.readResourceLocation());
     }
@@ -87,7 +87,7 @@ public class EffectBuilding extends Effect {
     }
 
     @Override
-    public boolean grant(TeamResearchData team, PlayerEntity triggerPlayer, boolean isload) {
+    public boolean grant(TeamResearchData team, Player triggerPlayer, boolean isload) {
         team.building.add(multiblock);
         return true;
 
@@ -106,7 +106,7 @@ public class EffectBuilding extends Effect {
     }
 
     @Override
-    public void write(PacketBuffer buffer) {
+    public void write(FriendlyByteBuf buffer) {
         super.write(buffer);
         buffer.writeResourceLocation(multiblock.getUniqueName());
     }
@@ -119,18 +119,18 @@ public class EffectBuilding extends Effect {
     }
 
     @Override
-    public IFormattableTextComponent getDefaultName() {
+    public MutableComponent getDefaultName() {
         return GuiUtils.translateGui("effect.building");
     }
 
     @Override
-    public List<ITextComponent> getDefaultTooltip() {
-        ArrayList<ITextComponent> ar = new ArrayList<>();
+    public List<Component> getDefaultTooltip() {
+        ArrayList<Component> ar = new ArrayList<>();
         String raw = multiblock.getUniqueName().toString();
         String namespace = raw.substring(0, raw.indexOf(':'));
         String multiblock = raw.substring(raw.indexOf('/')+1);
         String key = "block." + namespace + "." + multiblock;
-        ar.add(new TranslationTextComponent(key));
+        ar.add(new TranslatableComponent(key));
         return ar;
     }
 

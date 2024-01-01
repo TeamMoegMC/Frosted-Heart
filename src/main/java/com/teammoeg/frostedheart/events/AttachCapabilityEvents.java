@@ -25,11 +25,11 @@ import com.teammoeg.frostedheart.climate.chunkdata.ChunkData;
 import com.teammoeg.frostedheart.climate.chunkdata.ChunkDataCapabilityProvider;
 import com.teammoeg.frostedheart.climate.data.DeathInventoryData;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.World;
-import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -39,7 +39,7 @@ import net.minecraftforge.fml.common.Mod;
 public class AttachCapabilityEvents {
 
     @SubscribeEvent
-    public static void attachToWorld(AttachCapabilitiesEvent<World> event) {
+    public static void attachToWorld(AttachCapabilitiesEvent<Level> event) {
         // only attach to dimension with skylight (i.e. overworld)
         if (!event.getObject().dimensionType().hasFixedTime()) {
             event.addCapability(ClimateData.ID, new ClimateData());
@@ -48,9 +48,9 @@ public class AttachCapabilityEvents {
     }
 
     @SubscribeEvent
-    public static void attachToChunk(AttachCapabilitiesEvent<Chunk> event) {
+    public static void attachToChunk(AttachCapabilitiesEvent<LevelChunk> event) {
         if (!event.getObject().isEmpty()) {
-            World world = event.getObject().getLevel();
+            Level world = event.getObject().getLevel();
             ChunkPos chunkPos = event.getObject().getPos();
             if (!world.isClientSide) {
                 if (!event.getCapabilities().containsKey(ChunkDataCapabilityProvider.KEY))
@@ -61,8 +61,8 @@ public class AttachCapabilityEvents {
 
     @SubscribeEvent
     public static void attachToPlayer(AttachCapabilitiesEvent<Entity> event) {
-    	if(event.getObject() instanceof ServerPlayerEntity) {
-    		ServerPlayerEntity player = (ServerPlayerEntity) event.getObject();
+    	if(event.getObject() instanceof ServerPlayer) {
+    		ServerPlayer player = (ServerPlayer) event.getObject();
             if(!(player instanceof FakePlayer))
                 if (!event.getCapabilities().containsKey(DeathInventoryData.ID))
                     event.addCapability(DeathInventoryData.ID,new DeathInventoryData());

@@ -22,7 +22,7 @@ package com.teammoeg.frostedheart.climate.data;
 import com.google.gson.JsonObject;
 import com.teammoeg.frostedheart.climate.data.FHDataManager.FHDataType;
 
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.FriendlyByteBuf;
 
 public class DataEntry {
     FHDataType type;
@@ -33,12 +33,12 @@ public class DataEntry {
         this.data = data.toString();
     }
 
-    public DataEntry(PacketBuffer buffer) {
+    public DataEntry(FriendlyByteBuf buffer) {
         this.type = FHDataType.values()[buffer.readVarInt()];
         this.data = buffer.readUtf();
     }
 
-    public void encode(PacketBuffer buffer) {
+    public void encode(FriendlyByteBuf buffer) {
         buffer.writeVarInt(type.ordinal());
         buffer.writeUtf(data);
     }

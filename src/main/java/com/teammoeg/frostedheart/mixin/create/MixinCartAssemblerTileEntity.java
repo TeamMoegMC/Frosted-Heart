@@ -28,14 +28,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import com.simibubi.create.content.contraptions.components.structureMovement.mounted.CartAssemblerTileEntity;
 import com.simibubi.create.foundation.tileEntity.SmartTileEntity;
 
-import net.minecraft.entity.item.minecart.AbstractMinecartEntity;
-import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.world.entity.vehicle.AbstractMinecart;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 @Mixin(CartAssemblerTileEntity.class)
 public abstract class MixinCartAssemblerTileEntity extends SmartTileEntity {
-    public MixinCartAssemblerTileEntity(TileEntityType<?> tileEntityTypeIn) {
+    public MixinCartAssemblerTileEntity(BlockEntityType<?> tileEntityTypeIn) {
         super(tileEntityTypeIn);
     }
 
@@ -44,7 +44,7 @@ public abstract class MixinCartAssemblerTileEntity extends SmartTileEntity {
      * @reason config disable cart assembly
      */
     @Inject(at = @At("HEAD"), method = "tryAssemble", remap = false, cancellable = true)
-    public void tryAssemble(AbstractMinecartEntity cart, CallbackInfo cbi) {
+    public void tryAssemble(AbstractMinecart cart, CallbackInfo cbi) {
         if (cart == null)
             return;
         if (!cart.world.isRemote) {

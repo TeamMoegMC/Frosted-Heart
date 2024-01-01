@@ -19,38 +19,38 @@
 
 package com.teammoeg.frostedheart.client.particles;
 
-import com.mojang.blaze3d.vertex.IVertexBuilder;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 
-import net.minecraft.client.particle.IParticleRenderType;
-import net.minecraft.client.particle.SpriteTexturedParticle;
-import net.minecraft.client.renderer.ActiveRenderInfo;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.client.particle.ParticleRenderType;
+import net.minecraft.client.particle.TextureSheetParticle;
+import net.minecraft.client.Camera;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.util.Mth;
 
-public class FHParticle extends SpriteTexturedParticle {
+public class FHParticle extends TextureSheetParticle {
     protected float originalScale = 1.3F;
 
-    protected FHParticle(ClientWorld world, double x, double y, double z) {
+    protected FHParticle(ClientLevel world, double x, double y, double z) {
         super(world, x, y, z);
     }
 
-    public FHParticle(ClientWorld world, double x, double y, double z, double motionX, double motionY, double motionZ) {
+    public FHParticle(ClientLevel world, double x, double y, double z, double motionX, double motionY, double motionZ) {
         super(world, x, y, z, motionX, motionY, motionZ);
         this.xd *= 1.25;
         this.yd *= 1.25;
         this.zd *= 1.25;
     }
 
-    public IParticleRenderType getRenderType() {
-        return IParticleRenderType.PARTICLE_SHEET_TRANSLUCENT;
+    public ParticleRenderType getRenderType() {
+        return ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT;
     }
 
     @Override
-    public void render(IVertexBuilder worldRendererIn, ActiveRenderInfo entityIn, float pt) {
+    public void render(VertexConsumer worldRendererIn, Camera entityIn, float pt) {
         float age = (this.age + pt) / lifetime * 32.0F;
 
-        age = MathHelper.clamp(age, 0.0F, 1.0F);
-        super.alpha = MathHelper.clamp(1 - (this.age + pt) / lifetime, 0.0F, 1.0F);
+        age = Mth.clamp(age, 0.0F, 1.0F);
+        super.alpha = Mth.clamp(1 - (this.age + pt) / lifetime, 0.0F, 1.0F);
         super.quadSize = originalScale * (age + this.age * 0.0375F);
         super.render(worldRendererIn, entityIn, pt);
     }

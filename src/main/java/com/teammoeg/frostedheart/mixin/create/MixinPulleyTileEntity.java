@@ -30,13 +30,13 @@ import com.simibubi.create.content.contraptions.components.structureMovement.Abs
 import com.simibubi.create.content.contraptions.components.structureMovement.piston.LinearActuatorTileEntity;
 import com.teammoeg.frostedheart.util.ContraptionCostUtils;
 
-import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.phys.Vec3;
 
 @Mixin({LinearActuatorTileEntity.class})
 public abstract class MixinPulleyTileEntity extends KineticTileEntity {
 
-    public MixinPulleyTileEntity(TileEntityType<?> typeIn) {
+    public MixinPulleyTileEntity(BlockEntityType<?> typeIn) {
         super(typeIn);
     }
 
@@ -44,7 +44,7 @@ public abstract class MixinPulleyTileEntity extends KineticTileEntity {
     public AbstractContraptionEntity movedContraption;
 
     @Shadow(remap = false)
-    public abstract Vector3d getMotionVector();
+    public abstract Vec3 getMotionVector();
     private int fh$cooldown;
     @Override
     public float calculateStressApplied() {

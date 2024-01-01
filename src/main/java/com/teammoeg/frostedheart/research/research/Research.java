@@ -54,14 +54,14 @@ import com.teammoeg.frostedheart.util.Writeable;
 
 import blusunrize.immersiveengineering.api.crafting.IngredientWithSize;
 import dev.ftb.mods.ftbteams.data.Team;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.IItemProvider;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponent;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.level.ItemLike;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.BaseComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.network.PacketDistributor;
@@ -252,15 +252,15 @@ public class Research extends FHRegisteredItem implements Writeable {
      * Shouldn't call methods provide by these in this method.
      * @param data the packet<br>
      */
-    public Research(PacketBuffer data) {
+    public Research(FriendlyByteBuf data) {
         id = data.readUtf();
         //System.out.println("read "+id);
         name = data.readUtf();
-        desc = SerializeUtil.readList(data, PacketBuffer::readUtf);
-        fdesc = SerializeUtil.readList(data, PacketBuffer::readUtf);
+        desc = SerializeUtil.readList(data, FriendlyByteBuf::readUtf);
+        fdesc = SerializeUtil.readList(data, FriendlyByteBuf::readUtf);
         icon = FHIcons.readIcon(data);
         categoryRL = data.readResourceLocation();
-        parentIds=SerializeUtil.readList(data,PacketBuffer::readVarInt);
+        parentIds=SerializeUtil.readList(data,FriendlyByteBuf::readVarInt);
         //System.out.println("category "+rl.toString());
         
         clues.addAll(SerializeUtil.readList(data, Clues::read));
@@ -291,12 +291,12 @@ public class Research extends FHRegisteredItem implements Writeable {
      * @param buffer the packet<br>
      */
     @Override
-    public void write(PacketBuffer buffer) {
+    public void write(FriendlyByteBuf buffer) {
     	SpecialResearch.writeId(this, buffer);
         buffer.writeUtf(id);
         buffer.writeUtf(name);
-        SerializeUtil.writeList2(buffer, desc, PacketBuffer::writeUtf);
-        SerializeUtil.writeList2(buffer, fdesc, PacketBuffer::writeUtf);
+        SerializeUtil.writeList2(buffer, desc, FriendlyByteBuf::writeUtf);
+        SerializeUtil.writeList2(buffer, fdesc, FriendlyByteBuf::writeUtf);
         icon.write(buffer);
         buffer.writeResourceLocation(category.getId());
         SerializeUtil.writeList2(buffer, parents, FHRegistry::writeSupplier);
@@ -351,7 +351,7 @@ public class Research extends FHRegisteredItem implements Writeable {
      * @param team the team<br>
      * @param spe the spe<br>
      */
-    public void grantEffects(TeamResearchData team,ServerPlayerEntity spe) {
+    public void grantEffects(TeamResearchData team,ServerPlayer spe) {
     	boolean granted=true;
     	for (Effect e : getEffects()) {
             team.grantEffect(e, spe);
@@ -394,7 +394,7 @@ public class Research extends FHRegisteredItem implements Writeable {
      * @param parents the parents<br>
      */
     @SafeVarargs
-    public Research(String id, ResearchCategory category, IItemProvider icon, Supplier<Research>... parents) {
+    public Research(String id, ResearchCategory category, ItemLike icon, Supplier<Research>... parents) {
         this(id, category, new ItemStack(icon), parents);
     }
 
@@ -537,8 +537,8 @@ public class Research extends FHRegisteredItem implements Writeable {
      *
      * @return name<br>
      */
-    public TextComponent getName() {
-        return (TextComponent) FHTextUtil.get(name, "research", () -> id + ".name");
+    public BaseComponent getName() {
+        return (BaseComponent) FHTextUtil.get(name, "research", () -> id + ".name");
     }
 
     /**
@@ -546,7 +546,7 @@ public class Research extends FHRegisteredItem implements Writeable {
      *
      * @return desc<br>
      */
-    public List<ITextComponent> getDesc() {
+    public List<Component> getDesc() {
         if (showfdesc && !isCompleted())
             return getAltDesc();
         return getODesc();
@@ -557,7 +557,7 @@ public class Research extends FHRegisteredItem implements Writeable {
      *
      * @return o desc<br>
      */
-    public List<ITextComponent> getODesc() {
+    public List<Component> getODesc() {
         return FHTextUtil.get(desc, "research", () -> id + ".desc");
     }
 
@@ -566,7 +566,7 @@ public class Research extends FHRegisteredItem implements Writeable {
      *
      * @return alt desc<br>
      */
-    public List<ITextComponent> getAltDesc() {
+    public List<Component> getAltDesc() {
         return FHTextUtil.get(fdesc, "research", () -> id + ".desc_alt");
     }
 
@@ -671,7 +671,7 @@ public class Research extends FHRegisteredItem implements Writeable {
     public void sendProgressPacket(Team team, ResearchData rd) {
         FHResearchDataUpdatePacket packet = new FHResearchDataUpdatePacket(rd);
         if(team!=null)
-        	for (ServerPlayerEntity spe : team.getOnlineMembers())
+        	for (ServerPlayer spe : team.getOnlineMembers())
         		PacketHandler.send(PacketDistributor.PLAYER.with(() -> spe), packet);
     }
 

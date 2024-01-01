@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 TeamMoeg
+ * Copyright (c) 2021-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -14,16 +14,17 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 package com.teammoeg.frostedheart.climate.chunkdata;
 
 import com.teammoeg.frostedheart.FHMain;
 
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.INBT;
-import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.CapabilityManager;
@@ -35,12 +36,12 @@ public final class ChunkDataCapabilityProvider {
 
     public static void setup() {
         CapabilityManager.INSTANCE.register(ChunkData.class, new Capability.IStorage<ChunkData>() {
-            public INBT writeNBT(Capability<ChunkData> capability, ChunkData instance, Direction side) {
+            public Tag writeNBT(Capability<ChunkData> capability, ChunkData instance, Direction side) {
                 return instance.serializeNBT();
             }
 
-            public void readNBT(Capability<ChunkData> capability, ChunkData instance, Direction side, INBT nbt) {
-                instance.deserializeNBT((CompoundNBT) nbt);
+            public void readNBT(Capability<ChunkData> capability, ChunkData instance, Direction side, Tag nbt) {
+                instance.deserializeNBT((CompoundTag) nbt);
             }
         }, () -> {
             return null;

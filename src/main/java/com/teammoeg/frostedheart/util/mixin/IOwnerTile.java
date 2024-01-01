@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -23,27 +23,27 @@ import java.util.UUID;
 
 import com.teammoeg.frostedheart.base.block.ManagedOwnerTile;
 
-import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
 public interface IOwnerTile {
     public UUID getStoredOwner();
 
     public void setStoredOwner(UUID id);
 
-    public static UUID getOwner(TileEntity te) {
+    public static UUID getOwner(BlockEntity te) {
         if (te instanceof IOwnerTile) {
             return ((IOwnerTile) te).getStoredOwner();
         }
         return null;
     }
 
-    public static void setOwner(TileEntity te, UUID id) {
+    public static void setOwner(BlockEntity te, UUID id) {
         if (te instanceof IOwnerTile) {
             ((IOwnerTile) te).setStoredOwner(id);
         }
     }
 
-    public static void trySetOwner(TileEntity te, UUID id) {
+    public static void trySetOwner(BlockEntity te, UUID id) {
         if (te instanceof IOwnerTile&&!(te instanceof ManagedOwnerTile)) {
             if (((IOwnerTile) te).getStoredOwner() == null) {
                 ((IOwnerTile) te).setStoredOwner(id);

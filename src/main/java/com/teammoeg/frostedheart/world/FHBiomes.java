@@ -22,9 +22,9 @@ package com.teammoeg.frostedheart.world;
 import com.teammoeg.frostedheart.FHMain;
 import com.teammoeg.frostedheart.world.biome.VolcanicBiome;
 
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.world.biome.Biome;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.core.Registry;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraftforge.common.BiomeManager;
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;
@@ -37,8 +37,8 @@ public class FHBiomes {
 
 //    public static RegistryObject<Biome> RELIC = BIOME_REGISTER.register("relic", () -> new VolcanicBiome().build());
 
-    public static RegistryKey<Biome> makeKey(Biome biome) {
-        return RegistryKey.create(Registry.BIOME_REGISTRY, biome.getRegistryName());
+    public static ResourceKey<Biome> makeKey(Biome biome) {
+        return ResourceKey.create(Registry.BIOME_REGISTRY, biome.getRegistryName());
     }
 
     public static void Biomes() {

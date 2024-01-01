@@ -25,7 +25,7 @@ import com.teammoeg.frostedheart.trade.FHVillagerData;
 import com.teammoeg.frostedheart.trade.policy.Actions;
 import com.teammoeg.frostedheart.trade.policy.PolicyAction;
 
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.FriendlyByteBuf;
 
 public class SetFlagAction implements PolicyAction {
 	String name;
@@ -33,7 +33,7 @@ public class SetFlagAction implements PolicyAction {
 		name=jo.get("name").getAsString();
 	}
 
-	public SetFlagAction(PacketBuffer buffer) {
+	public SetFlagAction(FriendlyByteBuf buffer) {
 		name=buffer.readUtf();
 	}
 
@@ -49,7 +49,7 @@ public class SetFlagAction implements PolicyAction {
 	}
 
 	@Override
-	public void write(PacketBuffer buffer) {
+	public void write(FriendlyByteBuf buffer) {
 		Actions.writeId(this, buffer);
 		buffer.writeUtf(name);
 	}

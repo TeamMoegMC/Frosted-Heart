@@ -34,17 +34,17 @@ import com.teammoeg.frostedheart.research.FHResearch;
 import com.teammoeg.frostedheart.util.FileUtil;
 
 import dev.ftb.mods.ftbteams.data.TeamManager;
-import net.minecraft.item.crafting.RecipeManager;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.CompressedStreamTools;
+import net.minecraft.world.item.crafting.RecipeManager;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtIo;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.world.storage.FolderName;
+import net.minecraft.world.level.storage.LevelResource;
 
 public class FHResearchDataManager {
 	public static MinecraftServer server;
 	Path local;
 	File regfile;
-	static final FolderName dataFolder = new FolderName("fhresearch");
+	static final LevelResource dataFolder = new LevelResource("fhresearch");
 	public static FHResearchDataManager INSTANCE;
 	private Map<UUID, TeamResearchData> data = new HashMap<>();
 
@@ -77,7 +77,7 @@ public class FHResearchDataManager {
 		FHResearch.clearAll();
 		if (regfile.exists()) {
 			try {
-				FHResearch.load(CompressedStreamTools.readCompressed(regfile));
+				FHResearch.load(NbtIo.readCompressed(regfile));
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -97,7 +97,7 @@ public class FHResearchDataManager {
 					FHMain.LOGGER.error("Unexpected data file " + f.getName() + ", ignoring...");
 					continue;
 				}
-				CompoundNBT nbt = CompressedStreamTools.readCompressed(f);
+				CompoundTag nbt = NbtIo.readCompressed(f);
 				TeamResearchData trd = new TeamResearchData(() -> TeamManager.INSTANCE.getTeamByID(tud));
 				trd.deserialize(nbt, false);
 				data.put(tud, trd);
@@ -133,7 +133,7 @@ public class FHResearchDataManager {
 			e2.printStackTrace();
 		}
 		try {
-			CompressedStreamTools.writeCompressed(FHResearch.save(new CompoundNBT()), regfile);
+			NbtIo.writeCompressed(FHResearch.save(new CompoundTag()), regfile);
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -142,7 +142,7 @@ public class FHResearchDataManager {
 		for (Entry<UUID, TeamResearchData> entry : data.entrySet()) {
 			File f = local.resolve(entry.getKey().toString() + ".nbt").toFile();
 			try {
-				CompressedStreamTools.writeCompressed(entry.getValue().serialize(false), f);
+				NbtIo.writeCompressed(entry.getValue().serialize(false), f);
 
 			} catch (IOException e) {
 				e.printStackTrace();

@@ -31,24 +31,24 @@ import com.teammoeg.frostedheart.climate.WorldClimate;
 import com.teammoeg.frostedheart.climate.chunkdata.ChunkData;
 import com.teammoeg.frostedheart.util.mixin.IFeedStore;
 
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.passive.AnimalEntity;
-import net.minecraft.entity.passive.ChickenEntity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.animal.Animal;
+import net.minecraft.world.entity.animal.Chicken;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.SoundEvents;
-import net.minecraft.world.World;
+import net.minecraft.world.level.Level;
 
-@Mixin(ChickenEntity.class)
-public abstract class ChickenEntityMixin extends AnimalEntity implements IFeedStore {
+@Mixin(Chicken.class)
+public abstract class ChickenEntityMixin extends Animal implements IFeedStore {
 	private final static ResourceLocation chicken_feed = new ResourceLocation(FHMain.MODID, "chicken_feed");
 
-	protected ChickenEntityMixin(EntityType<? extends AnimalEntity> type, World worldIn) {
+	protected ChickenEntityMixin(EntityType<? extends Animal> type, Level worldIn) {
 		super(type, worldIn);
 	}
 

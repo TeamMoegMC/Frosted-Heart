@@ -35,18 +35,18 @@ import blusunrize.immersiveengineering.common.blocks.multiblocks.IETemplateMulti
 import blusunrize.immersiveengineering.common.util.Utils;
 import blusunrize.immersiveengineering.common.util.inventory.IEInventoryHandler;
 import blusunrize.immersiveengineering.common.util.inventory.IIEInventory;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.ItemStackHelper;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.IIntArray;
-import net.minecraft.util.NonNullList;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.core.Direction;
+import net.minecraft.world.inventory.ContainerData;
+import net.minecraft.core.NonNullList;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.shapes.ISelectionContext;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.shapes.VoxelShapes;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.LazyOptional;
@@ -71,7 +71,7 @@ public abstract class BurnerGeneratorTileEntity<T extends BurnerGeneratorTileEnt
     protected NonNullList<ItemStack> inventory = NonNullList.withSize(2, ItemStack.EMPTY);
     protected ItemStack currentItem;
 
-    public class GeneratorData implements IIntArray {
+    public class GeneratorData implements ContainerData {
         public static final int MAX_BURN_TIME = 0;
         public static final int BURN_TIME = 1;
 
@@ -107,7 +107,7 @@ public abstract class BurnerGeneratorTileEntity<T extends BurnerGeneratorTileEnt
         }
     }
 
-    public BurnerGeneratorTileEntity(IETemplateMultiblock multiblockInstance, TileEntityType<T> type, boolean hasRSControl, int temperatureLevelIn, int overdriveBoostIn, int rangeLevelIn) {
+    public BurnerGeneratorTileEntity(IETemplateMultiblock multiblockInstance, BlockEntityType<T> type, boolean hasRSControl, int temperatureLevelIn, int overdriveBoostIn, int rangeLevelIn) {
         super(multiblockInstance, type, hasRSControl);
         temperatureLevel = temperatureLevelIn;
         rangeLevel = rangeLevelIn;
@@ -115,7 +115,7 @@ public abstract class BurnerGeneratorTileEntity<T extends BurnerGeneratorTileEnt
     }
 
     @Override
-    public void readCustomNBT(CompoundNBT nbt, boolean descPacket) {
+    public void readCustomNBT(CompoundTag nbt, boolean descPacket) {
         super.readCustomNBT(nbt, descPacket);
         process = nbt.getInt("process");
         processMax = nbt.getInt("processMax");
@@ -123,13 +123,13 @@ public abstract class BurnerGeneratorTileEntity<T extends BurnerGeneratorTileEnt
         if (!descPacket) {
             
             currentItem = ItemStack.of(nbt.getCompound("currentItem"));
-            ItemStackHelper.loadAllItems(nbt, inventory);
+            ContainerHelper.loadAllItems(nbt, inventory);
         }
         
     }
 
     @Override
-    public void writeCustomNBT(CompoundNBT nbt, boolean descPacket) {
+    public void writeCustomNBT(CompoundTag nbt, boolean descPacket) {
         super.writeCustomNBT(nbt, descPacket);
         nbt.putInt("process", process);
         nbt.putInt("processMax", processMax);
@@ -139,15 +139,15 @@ public abstract class BurnerGeneratorTileEntity<T extends BurnerGeneratorTileEnt
                 nbt.put("current", currentItem.serializeNBT());
             else
                 nbt.remove("current");
-            ItemStackHelper.saveAllItems(nbt, inventory);
+            ContainerHelper.saveAllItems(nbt, inventory);
         }
         
     }
 
     @Nonnull
     @Override
-    public VoxelShape getBlockBounds(@Nullable ISelectionContext ctx) {
-        return VoxelShapes.block();
+    public VoxelShape getBlockBounds(@Nullable CollisionContext ctx) {
+        return Shapes.block();
     }
 
     @Override
@@ -160,7 +160,7 @@ public abstract class BurnerGeneratorTileEntity<T extends BurnerGeneratorTileEnt
     }
 
     @Override
-    public void receiveMessageFromClient(CompoundNBT message) {
+    public void receiveMessageFromClient(CompoundTag message) {
         super.receiveMessageFromClient(message);
         if (message.contains("isWorking", Constants.NBT.TAG_BYTE))
             setWorking(message.getBoolean("isWorking"));
@@ -195,7 +195,7 @@ public abstract class BurnerGeneratorTileEntity<T extends BurnerGeneratorTileEnt
     }
 
     @Override
-    public boolean canUseGui(PlayerEntity player) {
+    public boolean canUseGui(Player player) {
         return formed;
     }
 

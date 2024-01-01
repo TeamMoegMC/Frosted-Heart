@@ -19,10 +19,10 @@
 
 package com.teammoeg.frostedheart.client.util;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 
 public class AtlasUV extends TexturedUV {
     public AtlasUV(ResourceLocation texture, int w, int h) {
@@ -34,13 +34,13 @@ public class AtlasUV extends TexturedUV {
     }
 
     //blit with texture bind and altas set add point
-    public void blit(Minecraft mc, MatrixStack s, int lx, int ly, Point loc, int mx, int my, int p3, int p4) {
+    public void blit(Minecraft mc, PoseStack s, int lx, int ly, Point loc, int mx, int my, int p3, int p4) {
         mc.getTextureManager().bind(texture);
         super.blit(s, lx, ly, loc, mx, my, p3, p4);
     }
 
     //blit with texture bind and altas set
-    public void blit(Minecraft mc, MatrixStack s, int lx, int ly, int mx, int my, int p3, int p4) {
+    public void blit(Minecraft mc, PoseStack s, int lx, int ly, int mx, int my, int p3, int p4) {
         mc.getTextureManager().bind(texture);
         super.blit(s, lx, ly, mx, my, p3, p4);
     }

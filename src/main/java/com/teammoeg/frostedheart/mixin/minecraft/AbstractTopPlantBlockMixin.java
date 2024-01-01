@@ -28,16 +28,18 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.minecraft.block.AbstractPlantBlock;
-import net.minecraft.block.AbstractTopPlantBlock;
-import net.minecraft.block.BlockState;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.level.block.GrowingPlantBlock;
+import net.minecraft.world.level.block.GrowingPlantHeadBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.core.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraft.server.level.ServerLevel;
 
-@Mixin(AbstractTopPlantBlock.class)
-public abstract class AbstractTopPlantBlockMixin extends AbstractPlantBlock {
+import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
+
+@Mixin(GrowingPlantHeadBlock.class)
+public abstract class AbstractTopPlantBlockMixin extends GrowingPlantBlock {
 	@Shadow
 	private double growthChance;
 
@@ -56,7 +58,7 @@ public abstract class AbstractTopPlantBlockMixin extends AbstractPlantBlock {
 	 */
 	@Inject(at=@At("HEAD"),method="randomTick",cancellable=true,remap=true)
 	
-	public void fh$randomTick(BlockState state, ServerWorld worldIn, BlockPos pos, Random random,CallbackInfo cbi) {
+	public void fh$randomTick(BlockState state, ServerLevel worldIn, BlockPos pos, Random random,CallbackInfo cbi) {
 		if (state.get(AbstractTopPlantBlock.AGE) < 25 && net.minecraftforge.common.ForgeHooks.onCropsGrowPre(worldIn,
 				pos.offset(this.growthDirection), state,
 				random.nextDouble() < this.growthChance)) {

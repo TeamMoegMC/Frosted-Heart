@@ -30,12 +30,12 @@ import com.simibubi.create.content.contraptions.components.structureMovement.Con
 import com.simibubi.create.content.contraptions.components.structureMovement.bearing.ClockworkBearingTileEntity;
 import com.teammoeg.frostedheart.util.ContraptionCostUtils;
 
-import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 
 @Mixin(ClockworkBearingTileEntity.class)
 public abstract class MixinClockworkBearingTileEntity extends KineticTileEntity {
 
-    public MixinClockworkBearingTileEntity(TileEntityType<?> typeIn) {
+    public MixinClockworkBearingTileEntity(BlockEntityType<?> typeIn) {
         super(typeIn);
     }
 

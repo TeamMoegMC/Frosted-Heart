@@ -37,7 +37,7 @@ import com.teammoeg.frostedheart.util.mixin.IMilkable;
 
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ai.goal.BreedGoal;
-import net.minecraft.entity.ai.goal.EatGrassGoal;
+import net.minecraft.world.entity.ai.goal.EatBlockGoal;
 import net.minecraft.entity.ai.goal.FollowParentGoal;
 import net.minecraft.entity.ai.goal.LookAtGoal;
 import net.minecraft.entity.ai.goal.LookRandomlyGoal;
@@ -45,8 +45,8 @@ import net.minecraft.entity.ai.goal.PanicGoal;
 import net.minecraft.entity.ai.goal.SwimGoal;
 import net.minecraft.entity.ai.goal.TemptGoal;
 import net.minecraft.entity.ai.goal.WaterAvoidingRandomWalkingGoal;
-import net.minecraft.entity.passive.AnimalEntity;
-import net.minecraft.entity.passive.CowEntity;
+import net.minecraft.world.entity.animal.Animal;
+import net.minecraft.world.entity.animal.Cow;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -55,14 +55,14 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.DrinkHelper;
 import net.minecraft.util.Hand;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.world.World;
 
-@Mixin(CowEntity.class)
-public abstract class CowEntityMixin extends AnimalEntity implements IMilkable, IFeedStore {
+@Mixin(Cow.class)
+public abstract class CowEntityMixin extends Animal implements IMilkable, IFeedStore {
 	private final static ResourceLocation cow_feed = new ResourceLocation(FHMain.MODID, "cow_feed");
-	private EatGrassGoal eatGrassGoal;
+	private EatBlockGoal eatGrassGoal;
 
 	@Override
 	public byte getMilk() {

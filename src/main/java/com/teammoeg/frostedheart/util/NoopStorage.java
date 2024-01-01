@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 TeamMoeg
+ * Copyright (c) 2021-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -14,14 +14,15 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 package com.teammoeg.frostedheart.util;
 
 import javax.annotation.Nullable;
 
-import net.minecraft.nbt.INBT;
-import net.minecraft.util.Direction;
+import net.minecraft.nbt.Tag;
+import net.minecraft.core.Direction;
 import net.minecraftforge.common.capabilities.Capability;
 
 /**
@@ -32,12 +33,12 @@ import net.minecraftforge.common.capabilities.Capability;
 public final class NoopStorage<T> implements Capability.IStorage<T> {
     @Nullable
     @Override
-    public INBT writeNBT(Capability<T> capability, T instance, Direction side) {
+    public Tag writeNBT(Capability<T> capability, T instance, Direction side) {
         throw new UnsupportedOperationException("This storage is non functional. Do not use it.");
     }
 
     @Override
-    public void readNBT(Capability<T> capability, T instance, Direction side, INBT nbt) {
+    public void readNBT(Capability<T> capability, T instance, Direction side, Tag nbt) {
         throw new UnsupportedOperationException("This storage is non functional. Do not use it.");
     }
 }

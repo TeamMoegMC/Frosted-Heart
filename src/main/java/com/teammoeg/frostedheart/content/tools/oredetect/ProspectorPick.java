@@ -30,21 +30,21 @@ import com.teammoeg.frostedheart.client.util.GuiUtils;
 import com.teammoeg.frostedheart.compat.tetra.TetraCompat;
 import com.teammoeg.frostedheart.content.tools.FHLeveledTool;
 
-import net.minecraft.block.Block;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUseContext;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.BlockPos;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.common.util.FakePlayer;
 import se.mickelus.tetra.properties.IToolProvider;
 
-import net.minecraft.item.Item.Properties;
+import net.minecraft.world.item.Item.Properties;
 
 public class ProspectorPick extends FHLeveledTool {
     public static ResourceLocation tag = new ResourceLocation("forge:ores");
@@ -71,11 +71,11 @@ public class ProspectorPick extends FHLeveledTool {
     	
     	return ((IToolProvider)item.getItem()).getToolEfficiency(item,TetraCompat.proPick)+1;
     }
-    public static ActionResultType doProspect(PlayerEntity player,World world,BlockPos blockpos,ItemStack is,Hand h) {
+    public static InteractionResult doProspect(Player player,Level world,BlockPos blockpos,ItemStack is,InteractionHand h) {
           if (player != null && (!(player instanceof FakePlayer))) {//fake players does not deserve XD
               if (world.getBlockState(blockpos).getBlock().getTags().contains(tag)) {//early exit 'cause ore found
-                  player.displayClientMessage(new TranslationTextComponent(world.getBlockState(blockpos).getBlock().getDescriptionId()).withStyle(TextFormatting.GOLD), false);
-                  return ActionResultType.SUCCESS;
+                  player.displayClientMessage(new TranslatableComponent(world.getBlockState(blockpos).getBlock().getDescriptionId()).withStyle(ChatFormatting.GOLD), false);
+                  return InteractionResult.SUCCESS;
               }
               int x = blockpos.getX();
               int y = blockpos.getY();
@@ -86,7 +86,7 @@ public class ProspectorPick extends FHLeveledTool {
                   //This is predictable, but not any big problem. Cheaters can use x-ray or other things rather then hacking in this.
                   float corr=getCorrectness(is);
                   if (rnd.nextInt((int) (10*corr)) != 0) {//mistaken rate 10%
-                      BlockPos.Mutable mutable = new BlockPos.Mutable(x, y, z);
+                      BlockPos.MutableBlockPos mutable = new BlockPos.MutableBlockPos(x, y, z);
                       Block ore;
                       HashMap<String, Integer> founded = new HashMap<>();
                       int rseed = 0;
@@ -120,24 +120,24 @@ public class ProspectorPick extends FHLeveledTool {
                           }
                           if (ore_name != null) {
                               if (count < 20)
-                                  player.displayClientMessage(GuiUtils.translateMessage("vein_size.small").append(new TranslationTextComponent(ore_name)).withStyle(TextFormatting.GOLD), false);
+                                  player.displayClientMessage(GuiUtils.translateMessage("vein_size.small").append(new TranslatableComponent(ore_name)).withStyle(ChatFormatting.GOLD), false);
                               else if (count < 40)
-                                  player.displayClientMessage(GuiUtils.translateMessage("vein_size.medium").append(new TranslationTextComponent(ore_name)).withStyle(TextFormatting.GOLD), false);
+                                  player.displayClientMessage(GuiUtils.translateMessage("vein_size.medium").append(new TranslatableComponent(ore_name)).withStyle(ChatFormatting.GOLD), false);
                               else {
-                                  player.displayClientMessage(GuiUtils.translateMessage("vein_size.large").append(new TranslationTextComponent(ore_name)).withStyle(TextFormatting.GOLD), false);
+                                  player.displayClientMessage(GuiUtils.translateMessage("vein_size.large").append(new TranslatableComponent(ore_name)).withStyle(ChatFormatting.GOLD), false);
                               }
-                              return ActionResultType.SUCCESS;
+                              return InteractionResult.SUCCESS;
                           }
                       }
                   }
-                  player.displayClientMessage(GuiUtils.translateMessage("vein_size.nothing").withStyle(TextFormatting.GOLD), false);
+                  player.displayClientMessage(GuiUtils.translateMessage("vein_size.nothing").withStyle(ChatFormatting.GOLD), false);
               }
           }
-          return ActionResultType.SUCCESS;
+          return InteractionResult.SUCCESS;
     }
     @SuppressWarnings("resource")
     @Override
-    public ActionResultType useOn(ItemUseContext context) {
+    public InteractionResult useOn(UseOnContext context) {
     	return doProspect(context.getPlayer(),context.getLevel(),context.getClickedPos(),context.getItemInHand(),context.getHand());
     }
 }

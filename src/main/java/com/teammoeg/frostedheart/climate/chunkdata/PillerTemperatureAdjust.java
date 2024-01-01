@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 TeamMoeg
+ * Copyright (c) 2021-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -14,13 +14,14 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 package com.teammoeg.frostedheart.climate.chunkdata;
 
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.core.BlockPos;
 
 /**
  * Spheric Temperature Adjust, would adjust temperature in a ball.
@@ -37,14 +38,14 @@ public class PillerTemperatureAdjust extends CubicTemperatureAdjust {
         this.lower=lower;
     }
 
-    public PillerTemperatureAdjust(PacketBuffer buffer) {
+    public PillerTemperatureAdjust(FriendlyByteBuf buffer) {
         super(buffer);
         r2 = r * r;
         this.upper=buffer.readVarInt();
         this.lower=buffer.readVarInt();
     }
 
-    public PillerTemperatureAdjust(CompoundNBT nc) {
+    public PillerTemperatureAdjust(CompoundTag nc) {
         super(nc);
         r2 = r * r;
         this.upper=nc.getInt("upper");
@@ -67,8 +68,8 @@ public class PillerTemperatureAdjust extends CubicTemperatureAdjust {
     }
 
     @Override
-    public CompoundNBT serializeNBT() {
-        CompoundNBT nbt = serializeNBTData();
+    public CompoundTag serializeNBT() {
+        CompoundTag nbt = serializeNBTData();
         nbt.putInt("type", 2);
         nbt.putInt("upper", upper);
         nbt.putInt("lower", lower);
@@ -76,13 +77,13 @@ public class PillerTemperatureAdjust extends CubicTemperatureAdjust {
     }
 
     @Override
-    public void serialize(PacketBuffer buffer) {
+    public void serialize(FriendlyByteBuf buffer) {
         buffer.writeInt(2);
         serializeData(buffer);
     }
 
 	@Override
-	protected void serializeData(PacketBuffer buffer) {
+	protected void serializeData(FriendlyByteBuf buffer) {
 		super.serializeData(buffer);
 		buffer.writeVarInt(upper);
 		buffer.writeVarInt(lower);

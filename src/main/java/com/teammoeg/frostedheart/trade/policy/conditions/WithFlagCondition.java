@@ -25,7 +25,7 @@ import com.teammoeg.frostedheart.trade.FHVillagerData;
 import com.teammoeg.frostedheart.trade.policy.Conditions;
 import com.teammoeg.frostedheart.trade.policy.PolicyCondition;
 
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.FriendlyByteBuf;
 
 public class WithFlagCondition implements PolicyCondition{
 	String name;
@@ -37,7 +37,7 @@ public class WithFlagCondition implements PolicyCondition{
 	public WithFlagCondition(JsonObject jo) {
 		this(jo.get("name").getAsString());
 	}
-	public WithFlagCondition(PacketBuffer buffer) {
+	public WithFlagCondition(FriendlyByteBuf buffer) {
 		this(buffer.readUtf());
 	}
 	@Override
@@ -49,7 +49,7 @@ public class WithFlagCondition implements PolicyCondition{
 	}
 
 	@Override
-	public void write(PacketBuffer buffer) {
+	public void write(FriendlyByteBuf buffer) {
 		Conditions.writeId(this, buffer);
 		buffer.writeUtf(name);
 	}

@@ -27,25 +27,25 @@ import javax.annotation.Nullable;
 import com.teammoeg.frostedheart.FHTileTypes;
 import com.teammoeg.frostedheart.base.block.FluidPipeBlock;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.item.Item;
-import net.minecraft.state.BooleanProperty;
-import net.minecraft.state.StateContainer;
-import net.minecraft.state.properties.BlockStateProperties;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IWorld;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.core.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.LevelAccessor;
 
-import net.minecraft.block.AbstractBlock.Properties;
+import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
 
 public class HeatPipeBlock extends FluidPipeBlock<HeatPipeBlock> implements ISteamEnergyBlock {
     public static final BooleanProperty LIT = BlockStateProperties.LIT;
 
     public HeatPipeBlock(String name, Properties blockProps,
-                         BiFunction<Block, net.minecraft.item.Item.Properties, Item> createItemBlock) {
+                         BiFunction<Block, net.minecraft.world.item.Item.Properties, Item> createItemBlock) {
         super(HeatPipeBlock.class, name, blockProps, createItemBlock);
         this.lightOpacity = 0;
         this.registerDefaultState(this.stateDefinition.any().setValue(LIT, Boolean.FALSE));
@@ -54,12 +54,12 @@ public class HeatPipeBlock extends FluidPipeBlock<HeatPipeBlock> implements ISte
 
     @Nullable
     @Override
-    public TileEntity createTileEntity(@Nonnull BlockState state, @Nonnull IBlockReader world) {
+    public BlockEntity createTileEntity(@Nonnull BlockState state, @Nonnull BlockGetter world) {
         return FHTileTypes.HEATPIPE.get().create();
     }
 
     @Override
-    protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         super.createBlockStateDefinition(builder);
         builder.add(LIT);
     }
@@ -73,7 +73,7 @@ public class HeatPipeBlock extends FluidPipeBlock<HeatPipeBlock> implements ISte
 
 
     @Override
-    public boolean canConnectFrom(IWorld world, BlockPos pos, BlockState state, Direction dir) {
+    public boolean canConnectFrom(LevelAccessor world, BlockPos pos, BlockState state, Direction dir) {
         return true;
     }
 }

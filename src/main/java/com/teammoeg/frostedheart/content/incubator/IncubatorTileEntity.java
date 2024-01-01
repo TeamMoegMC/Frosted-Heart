@@ -34,21 +34,21 @@ import blusunrize.immersiveengineering.common.blocks.IEBlockInterfaces;
 import blusunrize.immersiveengineering.common.blocks.IEBlockInterfaces.IInteractionObjectIE;
 import blusunrize.immersiveengineering.common.util.inventory.IEInventoryHandler;
 import blusunrize.immersiveengineering.common.util.inventory.IIEInventory;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.inventory.ItemStackHelper;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tileentity.ITickableTileEntity;
-import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.block.entity.TickableBlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.core.Direction;
+import net.minecraft.core.NonNullList;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fluids.FluidStack;
@@ -61,7 +61,7 @@ import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.registries.ForgeRegistries;
 
-public class IncubatorTileEntity extends FHBaseTileEntity implements ITickableTileEntity,
+public class IncubatorTileEntity extends FHBaseTileEntity implements TickableBlockEntity,
 		FHBlockInterfaces.IActiveState, IIEInventory, IInteractionObjectIE, IEBlockInterfaces.IProcessTile {
 	protected NonNullList<ItemStack> inventory;
 	protected FluidTank[] fluid = new FluidTank[] { new FluidTank(6000, w -> w.getFluid() == Fluids.WATER),
@@ -85,7 +85,7 @@ public class IncubatorTileEntity extends FHBaseTileEntity implements ITickableTi
 		this.inventory = NonNullList.withSize(4, ItemStack.EMPTY);
 	}
 
-	public IncubatorTileEntity(TileEntityType<?> type) {
+	public IncubatorTileEntity(BlockEntityType<?> type) {
 		super(type);
 		this.inventory = NonNullList.withSize(4, ItemStack.EMPTY);
 	}
@@ -121,7 +121,7 @@ public class IncubatorTileEntity extends FHBaseTileEntity implements ITickableTi
 	}
 
 	@Override
-	public boolean canUseGui(PlayerEntity arg0) {
+	public boolean canUseGui(Player arg0) {
 		return true;
 	}
 
@@ -309,7 +309,7 @@ public class IncubatorTileEntity extends FHBaseTileEntity implements ITickableTi
 	}
 
 	@Override
-	public void readCustomNBT(CompoundNBT compound, boolean client) {
+	public void readCustomNBT(CompoundTag compound, boolean client) {
 		process = compound.getInt("process");
 		lprocess = compound.getInt("lprocess");
 		processMax = compound.getInt("processMax");
@@ -323,29 +323,29 @@ public class IncubatorTileEntity extends FHBaseTileEntity implements ITickableTi
 			if(compound.contains("last"))
 			last=new ResourceLocation(compound.getString("last"));
 			water = compound.getInt("water");
-			ItemStackHelper.loadAllItems(compound, this.inventory);
+			ContainerHelper.loadAllItems(compound, this.inventory);
 			out = ItemStack.of(compound.getCompound("out"));
 			outfluid = FluidStack.loadFluidStackFromNBT(compound.getCompound("outfluid"));
 		}
 	}
 
 	@Override
-	public void writeCustomNBT(CompoundNBT compound, boolean client) {
+	public void writeCustomNBT(CompoundTag compound, boolean client) {
 		compound.putInt("process", process);
 		compound.putInt("lprocess", lprocess);
 		compound.putInt("processMax", processMax);
 		compound.putInt("fuel", fuel);
 		compound.putInt("fuelMax", fuelMax);
 		compound.putFloat("efficiency", efficiency);
-		compound.put("fluid1", fluid[0].writeToNBT(new CompoundNBT()));
-		compound.put("fluid2", fluid[1].writeToNBT(new CompoundNBT()));
+		compound.put("fluid1", fluid[0].writeToNBT(new CompoundTag()));
+		compound.put("fluid2", fluid[1].writeToNBT(new CompoundTag()));
 		if (!client) {
 			if(last!=null)
 			compound.putString("last", last.toString());
 			compound.putInt("water", water);
-			ItemStackHelper.saveAllItems(compound, this.inventory);
+			ContainerHelper.saveAllItems(compound, this.inventory);
 			compound.put("out", out.serializeNBT());
-			compound.put("outfluid", outfluid.writeToNBT(new CompoundNBT()));
+			compound.put("outfluid", outfluid.writeToNBT(new CompoundTag()));
 		}
 	}
 
@@ -356,7 +356,7 @@ public class IncubatorTileEntity extends FHBaseTileEntity implements ITickableTi
 
 	@Override
 	public int[] getCurrentProcessesStep() {
-		return new int[] { processMax-process,MathHelper.ceil(efficiency*100),fuel };
+		return new int[] { processMax-process,Mth.ceil(efficiency*100),fuel };
 	}
 	IFluidHandler handler=new IFluidHandler() {
 

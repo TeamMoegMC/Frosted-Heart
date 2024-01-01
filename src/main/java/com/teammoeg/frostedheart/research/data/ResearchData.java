@@ -36,10 +36,10 @@ import com.teammoeg.frostedheart.util.SerializeUtil.CompoundBuilder;
 import com.teammoeg.frostedheart.util.VariantProvider;
 
 import blusunrize.immersiveengineering.api.crafting.IngredientWithSize;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.common.MinecraftForge;
 
 public class ResearchData implements VariantProvider{
@@ -141,7 +141,7 @@ public class ResearchData implements VariantProvider{
         parent.getTeam().ifPresent(t -> getResearch().sendProgressPacket(t, this));
     }
 
-    public ResearchData(Supplier<Research> r, CompoundNBT nc, TeamResearchData parent) {
+    public ResearchData(Supplier<Research> r, CompoundTag nc, TeamResearchData parent) {
         this(r, parent);
         deserialize(nc);
     }
@@ -153,20 +153,20 @@ public class ResearchData implements VariantProvider{
         return rs.get();
     }
 
-    public void write(PacketBuffer pb) {
+    public void write(FriendlyByteBuf pb) {
         pb.writeVarLong(committed);
         SerializeUtil.writeBooleans(pb, active,finished);
     }
 
-    public void read(PacketBuffer pb) {
+    public void read(FriendlyByteBuf pb) {
         committed = pb.readVarLong();
         boolean[] bs=SerializeUtil.readBooleans(pb);
         active = bs[0];
         finished = bs[1];
     }
 
-    public CompoundNBT serialize() {
-        CompoundNBT cnbt = new CompoundNBT();
+    public CompoundTag serialize() {
+        CompoundTag cnbt = new CompoundTag();
         cnbt.putLong("committed", committed);
         cnbt.putBoolean("active", active);
         cnbt.putBoolean("finished", finished);
@@ -178,14 +178,14 @@ public class ResearchData implements VariantProvider{
 
     }
 
-    public void deserialize(CompoundNBT cn) {
+    public void deserialize(CompoundTag cn) {
         committed = cn.getLong("committed");
         active = cn.getBoolean("active");
         finished = cn.getBoolean("finished");
         if(cn.contains("level"))
         	level=cn.getInt("level");
         data.clear();
-        cn.getList("clues",10).stream().map(t->(CompoundNBT)t).forEach(e->{
+        cn.getList("clues",10).stream().map(t->(CompoundTag)t).forEach(e->{
         	data.put(e.getInt("id"),ClueDatas.serializers.deserialize(e.getCompound("data")));
         });
         // rs=FHResearch.getResearch(cn.getInt("research"));
@@ -224,7 +224,7 @@ public class ResearchData implements VariantProvider{
         return true;
     }
 
-    public boolean commitItem(ServerPlayerEntity player) {
+    public boolean commitItem(ServerPlayer player) {
         Research research = getResearch();
         if(research.isInCompletable())return false;
         for (Research par : research.getParents()) {
@@ -339,22 +339,22 @@ public class ResearchData implements VariantProvider{
 		}
 
 		@Override
-		public void write(PacketBuffer pb) {
+		public void write(FriendlyByteBuf pb) {
 			super.write(pb);
 		}
 
 		@Override
-		public void read(PacketBuffer pb) {
+		public void read(FriendlyByteBuf pb) {
 			super.read(pb);
 		}
 
 		@Override
-		public CompoundNBT serialize() {
+		public CompoundTag serialize() {
 			return super.serialize();
 		}
 
 		@Override
-		public void deserialize(CompoundNBT cn) {
+		public void deserialize(CompoundTag cn) {
 			super.deserialize(cn);
 		}
 
@@ -379,7 +379,7 @@ public class ResearchData implements VariantProvider{
 		}
 
 		@Override
-		public boolean commitItem(ServerPlayerEntity player) {
+		public boolean commitItem(ServerPlayer player) {
 			return false;
 		}
 

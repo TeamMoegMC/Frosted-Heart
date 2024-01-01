@@ -19,11 +19,11 @@
 
 package com.teammoeg.frostedheart.world.feature;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.world.gen.feature.template.BlockMatchRuleTest;
-import net.minecraft.world.gen.feature.template.IRuleTestType;
-import net.minecraft.world.gen.feature.template.RuleTest;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.structure.templatesystem.BlockMatchTest;
+import net.minecraft.world.level.levelgen.structure.templatesystem.RuleTestType;
+import net.minecraft.world.level.levelgen.structure.templatesystem.RuleTest;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +35,7 @@ public class FHRuleTest extends RuleTest {
     public FHRuleTest(Block[] blocks) {
         this.list = new ArrayList();
         for (Block block : blocks) {
-            RuleTest b = new BlockMatchRuleTest(block);
+            RuleTest b = new BlockMatchTest(block);
             list.add(b);
         }
     }
@@ -53,7 +53,7 @@ public class FHRuleTest extends RuleTest {
 
 
     @Override
-    protected IRuleTestType<?> getType() {
-        return IRuleTestType.ALWAYS_TRUE_TEST;
+    protected RuleTestType<?> getType() {
+        return RuleTestType.ALWAYS_TRUE_TEST;
     }
 }

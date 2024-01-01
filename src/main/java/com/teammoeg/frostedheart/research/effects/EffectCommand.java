@@ -34,14 +34,14 @@ import com.teammoeg.frostedheart.research.gui.FHIcons;
 import com.teammoeg.frostedheart.research.gui.FHIcons.FHIcon;
 import com.teammoeg.frostedheart.util.SerializeUtil;
 
-import net.minecraft.block.Blocks;
-import net.minecraft.command.CommandSource;
-import net.minecraft.command.Commands;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.IFormattableTextComponent;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Component;
 
 /**
  * Reward the research team executes command
@@ -64,9 +64,9 @@ public class EffectCommand extends Effect {
 		rewards = SerializeUtil.parseJsonElmList(jo.get("rewards"), JsonElement::getAsString);
 	}
 
-	public EffectCommand(PacketBuffer pb) {
+	public EffectCommand(FriendlyByteBuf pb) {
 		super(pb);
-		rewards = SerializeUtil.readList(pb, PacketBuffer::readUtf);
+		rewards = SerializeUtil.readList(pb, FriendlyByteBuf::readUtf);
 	}
 
 	@Override
@@ -75,7 +75,7 @@ public class EffectCommand extends Effect {
 	}
 
 	@Override
-	public boolean grant(TeamResearchData team, PlayerEntity triggerPlayer, boolean isload) {
+	public boolean grant(TeamResearchData team, Player triggerPlayer, boolean isload) {
 		if (triggerPlayer == null || isload)
 			return false;
 
@@ -89,7 +89,7 @@ public class EffectCommand extends Effect {
 
 		overrides.put("t", team.getTeam().get().getStringID());
 		Commands cmds = FHResearchDataManager.server.getCommands();
-		CommandSource source = FHResearchDataManager.server.createCommandSourceStack();
+		CommandSourceStack source = FHResearchDataManager.server.createCommandSourceStack();
 		for (String s : rewards) {
 
 			for (Map.Entry<String, Object> entry : overrides.entrySet()) {
@@ -118,9 +118,9 @@ public class EffectCommand extends Effect {
 	}
 
 	@Override
-	public void write(PacketBuffer buffer) {
+	public void write(FriendlyByteBuf buffer) {
 		super.write(buffer);
-		SerializeUtil.writeList2(buffer, rewards, PacketBuffer::writeUtf);
+		SerializeUtil.writeList2(buffer, rewards, FriendlyByteBuf::writeUtf);
 	}
 
 	@Override
@@ -129,13 +129,13 @@ public class EffectCommand extends Effect {
 	}
 
 	@Override
-	public IFormattableTextComponent getDefaultName() {
+	public MutableComponent getDefaultName() {
 		return GuiUtils.translateGui("effect.command");
 	}
 
 	@Override
-	public List<ITextComponent> getDefaultTooltip() {
-		List<ITextComponent> tooltip = new ArrayList<>();
+	public List<Component> getDefaultTooltip() {
+		List<Component> tooltip = new ArrayList<>();
 		return tooltip;
 	}
 

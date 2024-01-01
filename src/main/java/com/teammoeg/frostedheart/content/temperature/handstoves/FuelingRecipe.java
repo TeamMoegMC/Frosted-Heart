@@ -26,17 +26,17 @@ import com.teammoeg.frostedheart.FHItems;
 import com.teammoeg.frostedheart.climate.data.JsonHelper;
 
 import blusunrize.immersiveengineering.api.crafting.IERecipeSerializer;
-import net.minecraft.inventory.CraftingInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.item.crafting.SpecialRecipe;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.World;
+import net.minecraft.world.inventory.CraftingContainer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.CustomRecipe;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.fml.RegistryObject;
 
-public class FuelingRecipe extends SpecialRecipe {
+public class FuelingRecipe extends CustomRecipe {
     public static RegistryObject<IERecipeSerializer<FuelingRecipe>> SERIALIZER;
 
     protected FuelingRecipe(ResourceLocation id, Ingredient t, int d) {
@@ -59,7 +59,7 @@ public class FuelingRecipe extends SpecialRecipe {
     /**
      * Used to check if a recipe matches current crafting inventory
      */
-    public boolean matches(CraftingInventory inv, World worldIn) {
+    public boolean matches(CraftingContainer inv, Level worldIn) {
         boolean hasArmor = false;
         boolean hasItem = false;
         for (int i = 0; i < inv.getContainerSize(); ++i) {
@@ -84,7 +84,7 @@ public class FuelingRecipe extends SpecialRecipe {
     /**
      * Returns an Item that is the result of this recipe
      */
-    public ItemStack assemble(CraftingInventory inv) {
+    public ItemStack assemble(CraftingContainer inv) {
         ItemStack buffstack = ItemStack.EMPTY;
         ItemStack armoritem = ItemStack.EMPTY;
         for (int i = 0; i < inv.getContainerSize(); ++i) {
@@ -117,7 +117,7 @@ public class FuelingRecipe extends SpecialRecipe {
     }
 
     @Override
-    public IRecipeSerializer<?> getSerializer() {
+    public RecipeSerializer<?> getSerializer() {
         return SERIALIZER.get();
     }
     public static class Serializer extends IERecipeSerializer<FuelingRecipe> {
@@ -135,14 +135,14 @@ public class FuelingRecipe extends SpecialRecipe {
 
         @Nullable
         @Override
-        public FuelingRecipe fromNetwork(ResourceLocation recipeId, PacketBuffer buffer) {
+        public FuelingRecipe fromNetwork(ResourceLocation recipeId, FriendlyByteBuf buffer) {
             Ingredient input = Ingredient.fromNetwork(buffer);
             int f = buffer.readVarInt();
             return new FuelingRecipe(recipeId, input, f);
         }
 
         @Override
-        public void toNetwork(PacketBuffer buffer, FuelingRecipe recipe) {
+        public void toNetwork(FriendlyByteBuf buffer, FuelingRecipe recipe) {
             recipe.type.toNetwork(buffer);
             buffer.writeVarInt(recipe.fuel);
         }

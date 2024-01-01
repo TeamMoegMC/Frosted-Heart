@@ -34,17 +34,17 @@ import com.teammoeg.frostedheart.research.data.TeamResearchData;
 import com.teammoeg.frostedheart.research.inspire.EnergyCore;
 import com.teammoeg.frostedheart.research.research.Research;
 
-import net.minecraft.command.CommandSource;
-import net.minecraft.command.Commands;
-import net.minecraft.command.arguments.NBTTagArgument;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.INBT;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.commands.arguments.NbtTagArgument;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.ChatFormatting;
 
 public class ResearchCommand {
-    public static void register(CommandDispatcher<CommandSource> dispatcher) {
-        LiteralArgumentBuilder<CommandSource> add = Commands.literal("research")
+    public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
+        LiteralArgumentBuilder<CommandSourceStack> add = Commands.literal("research")
                 .then(Commands.literal("complete").then(Commands.argument("name", StringArgumentType.string()).suggests((ct, s) -> {
                     for (Research r : FHResearch.getAllResearch())
                         if (r.getId().startsWith(s.getRemaining())) 
@@ -55,14 +55,14 @@ public class ResearchCommand {
             
                     Research rs = FHResearch.getResearch(rsn).get();
                     if (rs == null) {
-                        ct.getSource().sendFailure(new StringTextComponent("Research not found").withStyle(TextFormatting.RED));
+                        ct.getSource().sendFailure(new TextComponent("Research not found").withStyle(ChatFormatting.RED));
                         return Command.SINGLE_SUCCESS;
                     }
                     ResearchData rd = ResearchDataAPI.getData(ct.getSource().getPlayerOrException()).getData(rs);
                     rd.setFinished(true);
                     rd.announceCompletion();
                     
-                    ct.getSource().sendSuccess(new StringTextComponent("Succeed!").withStyle(TextFormatting.GREEN), false);
+                    ct.getSource().sendSuccess(new TextComponent("Succeed!").withStyle(ChatFormatting.GREEN), false);
                     return Command.SINGLE_SUCCESS;
                 })).then(Commands.literal("all").executes(ct->{
                 	TeamResearchData trd = ResearchDataAPI.getData(ct.getSource().getPlayerOrException());
@@ -72,12 +72,12 @@ public class ResearchCommand {
                         rd.setFinished(true);
                         rd.announceCompletion();
                     }
-                    ct.getSource().sendSuccess(new StringTextComponent("Succeed!").withStyle(TextFormatting.GREEN), false);
+                    ct.getSource().sendSuccess(new TextComponent("Succeed!").withStyle(ChatFormatting.GREEN), false);
                     return Command.SINGLE_SUCCESS;
                 })))
                 .then(Commands.literal("edit").then(Commands.argument("enable", BoolArgumentType.bool()).executes(ct -> {
                     FHResearch.editor = ct.getArgument("enable", Boolean.class);
-                    ct.getSource().sendSuccess(new StringTextComponent("Editing mode set " + String.valueOf(FHResearch.editor)).withStyle(TextFormatting.GREEN), false);
+                    ct.getSource().sendSuccess(new TextComponent("Editing mode set " + String.valueOf(FHResearch.editor)).withStyle(ChatFormatting.GREEN), false);
                     return Command.SINGLE_SUCCESS;
                 })))
                 .then(Commands.literal("default").executes(ct -> {
@@ -92,35 +92,35 @@ public class ResearchCommand {
                 }))))
                 
                 .then(Commands.literal("attribute").then(Commands.argument("name",StringArgumentType.string()).suggests((ct,s)->{
-                	CompoundNBT cnbt=ResearchDataAPI.getVariants(ct.getSource().getPlayerOrException());
+                	CompoundTag cnbt=ResearchDataAPI.getVariants(ct.getSource().getPlayerOrException());
                 	cnbt.getAllKeys().forEach(st->s.suggest(st));
                     return s.buildFuture();
                 	
                 }).executes(ct -> {
-                	CompoundNBT cnbt=ResearchDataAPI.getVariants(ct.getSource().getPlayerOrException());
+                	CompoundTag cnbt=ResearchDataAPI.getVariants(ct.getSource().getPlayerOrException());
                 	String rsn = ct.getArgument("name", String.class).toString();
                 		ct.getSource().sendSuccess(GuiUtils.str(String.valueOf(cnbt.get(rsn))), false);
                     return Command.SINGLE_SUCCESS;
                 })).then(Commands.literal("all").executes(ct->{
                 	
-                	CompoundNBT cnbt=ResearchDataAPI.getVariants(ct.getSource().getPlayerOrException());
+                	CompoundTag cnbt=ResearchDataAPI.getVariants(ct.getSource().getPlayerOrException());
                 	ct.getSource().sendSuccess(GuiUtils.str(cnbt.toString()), false);
                     return Command.SINGLE_SUCCESS;
                 	
                 }))
                 		
                 		.then(Commands.literal("set").then(Commands.argument("name",StringArgumentType.string()).suggests((ct,s)->{
-                	CompoundNBT cnbt=ResearchDataAPI.getVariants(ct.getSource().getPlayerOrException());
+                	CompoundTag cnbt=ResearchDataAPI.getVariants(ct.getSource().getPlayerOrException());
                 	cnbt.getAllKeys().forEach(st->s.suggest(st));
                 	
                     if("all".startsWith(s.getRemaining()))
                     	s.suggest("all");
                     return s.buildFuture();
                 	
-                }).then(Commands.argument("value",NBTTagArgument.nbtTag()).executes(ct->{
-                	CompoundNBT cnbt=ResearchDataAPI.getVariants(ct.getSource().getPlayerOrException());
+                }).then(Commands.argument("value",NbtTagArgument.nbtTag()).executes(ct->{
+                	CompoundTag cnbt=ResearchDataAPI.getVariants(ct.getSource().getPlayerOrException());
                 	String rsn = ct.getArgument("name", String.class).toString();
-                	INBT nbt=ct.getArgument("value", INBT.class);
+                	Tag nbt=ct.getArgument("value", Tag.class);
                 	cnbt.put(rsn, nbt);
                 	return Command.SINGLE_SUCCESS;
                 })))))

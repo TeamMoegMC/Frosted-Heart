@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import dev.ftb.mods.ftblibrary.icon.Color4I;
@@ -41,10 +41,10 @@ import dev.ftb.mods.ftblibrary.ui.WidgetLayout;
 import dev.ftb.mods.ftblibrary.ui.WidgetType;
 import dev.ftb.mods.ftblibrary.ui.input.MouseButton;
 import dev.ftb.mods.ftblibrary.util.TooltipList;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.TranslatableComponent;
 
 /**
  * @author LatvianModder, khjxiaogu
@@ -64,7 +64,7 @@ public class EditListDialog<T> extends EditDialog {
         }
 
         @Override
-        public void draw(MatrixStack matrixStack, Theme theme, int x, int y, int w, int h) {
+        public void draw(PoseStack matrixStack, Theme theme, int x, int y, int w, int h) {
             boolean mouseOver = getMouseY() >= 20 && isMouseOver();
             int ioffset = 0;
             if (toicon != null) {
@@ -112,7 +112,7 @@ public class EditListDialog<T> extends EditDialog {
             if (getMouseX() >= getX() + width - 19) {
                 l.translate("selectServer.delete");
             } else {
-                l.add(new StringTextComponent(read.apply(list.get(index))));
+                l.add(new TextComponent(read.apply(list.get(index))));
             }
         }
     }
@@ -121,11 +121,11 @@ public class EditListDialog<T> extends EditDialog {
         public ButtonAddValue(Panel panel) {
             super(panel);
             setHeight(12);
-            setTitle(new StringTextComponent("+ ").append(new TranslationTextComponent("gui.add")));
+            setTitle(new TextComponent("+ ").append(new TranslatableComponent("gui.add")));
         }
 
         @Override
-        public void draw(MatrixStack matrixStack, Theme theme, int x, int y, int w, int h) {
+        public void draw(PoseStack matrixStack, Theme theme, int x, int y, int w, int h) {
             boolean mouseOver = getMouseY() >= 20 && isMouseOver();
 
             if (mouseOver) {
@@ -156,7 +156,7 @@ public class EditListDialog<T> extends EditDialog {
 
     private final Consumer<Collection<T>> callback;
 
-    private final ITextComponent title;
+    private final Component title;
     private final Panel configPanel;
     private final Button buttonAccept, buttonCancel;
     private final List<T> list;
@@ -174,7 +174,7 @@ public class EditListDialog<T> extends EditDialog {
             list = new ArrayList<>(vx);
         else
             list = new ArrayList<>();
-        title = new StringTextComponent(label).withStyle(TextFormatting.BOLD);
+        title = new TextComponent(label).withStyle(ChatFormatting.BOLD);
         this.editor = editor;
         this.def = def;
         this.read = toread;
@@ -202,12 +202,12 @@ public class EditListDialog<T> extends EditDialog {
         };
 
         scroll = new PanelScrollBar(this, configPanel);
-        buttonAccept = new SimpleButton(this, new TranslationTextComponent("gui.accept"), Icons.ACCEPT, (widget, button) -> {
+        buttonAccept = new SimpleButton(this, new TranslatableComponent("gui.accept"), Icons.ACCEPT, (widget, button) -> {
             callback.accept(list);
             modified = false;
             close();
         });
-        buttonCancel = new SimpleButton(this, new TranslationTextComponent("gui.cancel"), Icons.CANCEL, (widget, button) -> close());
+        buttonCancel = new SimpleButton(this, new TranslatableComponent("gui.cancel"), Icons.CANCEL, (widget, button) -> close());
     }
 
     public EditListDialog(Widget p, String label, Collection<T> vx, T def, Editor<T> editor, Function<T, String> toread, Consumer<Collection<T>> li) {
@@ -237,14 +237,14 @@ public class EditListDialog<T> extends EditDialog {
     }
 
     @Override
-    public void drawBackground(MatrixStack matrixStack, Theme theme, int x, int y, int w, int h) {
+    public void drawBackground(PoseStack matrixStack, Theme theme, int x, int y, int w, int h) {
         theme.drawGui(matrixStack, x, y, w, h, WidgetType.NORMAL);
 
         theme.drawString(matrixStack, getTitle(), x, y - 10);
     }
 
     @Override
-    public ITextComponent getTitle() {
+    public Component getTitle() {
         return title;
     }
 

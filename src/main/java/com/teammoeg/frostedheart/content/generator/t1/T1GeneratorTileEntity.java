@@ -29,9 +29,9 @@ import com.teammoeg.frostedheart.content.generator.BurnerGeneratorTileEntity;
 import com.teammoeg.frostedheart.research.data.ResearchVariant;
 
 import blusunrize.immersiveengineering.common.util.Utils;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.core.BlockPos;
 
 public final class T1GeneratorTileEntity extends BurnerGeneratorTileEntity<T1GeneratorTileEntity> {
     public T1GeneratorTileEntity.GeneratorData guiData = new T1GeneratorTileEntity.GeneratorData();
@@ -47,7 +47,7 @@ public final class T1GeneratorTileEntity extends BurnerGeneratorTileEntity<T1Gen
             for (int y = 0; y < 4; ++y)
                 for (int z = 0; z < 3; ++z) {
                     BlockPos actualPos = getBlockPosForPos(new BlockPos(x, y, z));
-                    TileEntity te = Utils.getExistingTileEntity(level, actualPos);
+                    BlockEntity te = Utils.getExistingTileEntity(level, actualPos);
                     if (te instanceof T1GeneratorTileEntity)
                         consumer.accept((T1GeneratorTileEntity) te);
                 }
@@ -62,12 +62,12 @@ public final class T1GeneratorTileEntity extends BurnerGeneratorTileEntity<T1Gen
 		super.tickFuel();
 	}
 	@Override
-	public void readCustomNBT(CompoundNBT nbt, boolean descPacket) {
+	public void readCustomNBT(CompoundTag nbt, boolean descPacket) {
 		super.readCustomNBT(nbt, descPacket);
 		hasFuel=nbt.getBoolean("hasFuel");
 	}
 	@Override
-	public void writeCustomNBT(CompoundNBT nbt, boolean descPacket) {
+	public void writeCustomNBT(CompoundTag nbt, boolean descPacket) {
 		super.writeCustomNBT(nbt, descPacket);
 		nbt.putBoolean("hasFuel", hasFuel);
 	}

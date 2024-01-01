@@ -33,17 +33,17 @@ import com.teammoeg.frostedheart.content.steamenergy.SteamNetworkHolder;
 import blusunrize.immersiveengineering.common.blocks.IEBlockInterfaces;
 import blusunrize.immersiveengineering.common.blocks.IEBlockInterfaces.IInteractionObjectIE;
 import blusunrize.immersiveengineering.common.util.Utils;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tileentity.ITickableTileEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.block.entity.TickableBlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.core.Direction;
+import net.minecraft.core.BlockPos;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.IFluidTank;
 
 public class RadiatorTileEntity extends AbstractGenerator<RadiatorTileEntity> implements
-        INetworkConsumer, IEBlockInterfaces.IInteractionObjectIE, IEBlockInterfaces.IProcessTile, FHBlockInterfaces.IActiveState, ITickableTileEntity {
+        INetworkConsumer, IEBlockInterfaces.IInteractionObjectIE, IEBlockInterfaces.IProcessTile, FHBlockInterfaces.IActiveState, TickableBlockEntity {
     public int process = 0;
     public int processMax = 0;
     public float tempLevelLast;
@@ -58,7 +58,7 @@ public class RadiatorTileEntity extends AbstractGenerator<RadiatorTileEntity> im
 
 
     @Override
-    public void readCustomNBT(CompoundNBT nbt, boolean descPacket) {
+    public void readCustomNBT(CompoundTag nbt, boolean descPacket) {
         super.readCustomNBT(nbt, descPacket);
         network.load(nbt);
         process = nbt.getInt("process");
@@ -67,7 +67,7 @@ public class RadiatorTileEntity extends AbstractGenerator<RadiatorTileEntity> im
     }
 
     @Override
-    public void writeCustomNBT(CompoundNBT nbt, boolean descPacket) {
+    public void writeCustomNBT(CompoundTag nbt, boolean descPacket) {
         super.writeCustomNBT(nbt, descPacket);
         network.save(nbt);
         nbt.putInt("process", process);
@@ -87,7 +87,7 @@ public class RadiatorTileEntity extends AbstractGenerator<RadiatorTileEntity> im
     }
 
     @Override
-    public boolean canUseGui(PlayerEntity player) {
+    public boolean canUseGui(Player player) {
         return false;
     }
 
@@ -173,7 +173,7 @@ public class RadiatorTileEntity extends AbstractGenerator<RadiatorTileEntity> im
     public void forEachBlock(Consumer<RadiatorTileEntity> consumer) {
         for (int y = 0; y < 3; ++y) {
             BlockPos actualPos = getBlockPosForPos(new BlockPos(0, y, 0));
-            TileEntity te = Utils.getExistingTileEntity(level, actualPos);
+            BlockEntity te = Utils.getExistingTileEntity(level, actualPos);
             if (te instanceof RadiatorTileEntity)
                 consumer.accept((RadiatorTileEntity) te);
         }

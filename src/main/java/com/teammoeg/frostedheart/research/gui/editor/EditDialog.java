@@ -26,7 +26,7 @@ import com.teammoeg.frostedheart.research.gui.drawdesk.DrawDeskScreen;
 import dev.ftb.mods.ftblibrary.ui.Panel;
 import dev.ftb.mods.ftblibrary.ui.Widget;
 import dev.ftb.mods.ftblibrary.ui.input.Key;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.ChatFormatting;
 
 public abstract class EditDialog extends Panel {
     EditDialog previous;
@@ -64,7 +64,7 @@ public abstract class EditDialog extends Panel {
                 sc.closeDialog(refresh);
         } catch (Exception ex) {
             ex.printStackTrace();
-            ClientUtils.getPlayer().sendMessage(GuiUtils.str("Fatal error on switching dialog! see log for details").withStyle(TextFormatting.RED), null);
+            ClientUtils.getPlayer().sendMessage(GuiUtils.str("Fatal error on switching dialog! see log for details").withStyle(ChatFormatting.RED), null);
             sc.closeGui();
         }
         ;

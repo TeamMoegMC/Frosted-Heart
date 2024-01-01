@@ -23,10 +23,12 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.ModifyConstant;
 
-import net.minecraft.block.DirectionalBlock;
-import net.minecraft.block.PistonBlock;
+import net.minecraft.world.level.block.DirectionalBlock;
+import net.minecraft.world.level.block.piston.PistonBaseBlock;
 
-@Mixin(PistonBlock.class)
+import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
+
+@Mixin(PistonBaseBlock.class)
 public abstract class PistonBlockMixin extends DirectionalBlock {
     protected PistonBlockMixin(Properties builder) {
         super(builder);

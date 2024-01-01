@@ -21,7 +21,7 @@ package com.teammoeg.frostedheart.compat.jei.category;
 
 import java.util.Arrays;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.simibubi.create.compat.jei.EmptyBackground;
 import com.simibubi.create.foundation.gui.AllGuiTextures;
 import com.teammoeg.frostedheart.FHBlocks;
@@ -36,11 +36,11 @@ import mezz.jei.api.gui.ingredient.IGuiItemStackGroup;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.ingredients.IIngredients;
 import mezz.jei.api.recipe.category.IRecipeCategory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.state.properties.BlockStateProperties;
-import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.chat.TranslatableComponent;
 
 public class ChargerCategory implements IRecipeCategory<ChargerRecipe> {
     public static ResourceLocation UID = new ResourceLocation(FHMain.MODID, "charge");
@@ -65,11 +65,11 @@ public class ChargerCategory implements IRecipeCategory<ChargerRecipe> {
 
 
     public String getTitle() {
-        return (new TranslationTextComponent("gui.jei.category." + FHMain.MODID + ".charger").getString());
+        return (new TranslatableComponent("gui.jei.category." + FHMain.MODID + ".charger").getString());
     }
 
     @Override
-    public void draw(ChargerRecipe recipe, MatrixStack transform, double mouseX, double mouseY) {
+    public void draw(ChargerRecipe recipe, PoseStack transform, double mouseX, double mouseY) {
         AllGuiTextures.JEI_SLOT.draw(transform, 43, 4);
         AllGuiTextures.JEI_DOWN_ARROW.draw(transform, 67, 7);
 

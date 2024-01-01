@@ -29,26 +29,26 @@ import com.teammoeg.frostedheart.climate.WorldClimate;
 import com.teammoeg.frostedheart.climate.data.FHDataManager.FHDataType;
 import com.teammoeg.frostedheart.util.StructureUtils;
 
-import net.minecraft.resources.IResource;
-import net.minecraft.resources.IResourceManager;
-import net.minecraft.resources.IResourceManagerReloadListener;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.server.packs.resources.Resource;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
+import net.minecraft.resources.ResourceLocation;
 
 
 @SuppressWarnings("deprecation")
-public class FHDataReloadManager implements IResourceManagerReloadListener {
+public class FHDataReloadManager implements ResourceManagerReloadListener {
     public static final FHDataReloadManager INSTANCE = new FHDataReloadManager();
     private static final JsonParser parser = new JsonParser();
 
     @Override
-    public void onResourceManagerReload(IResourceManager manager) {
+    public void onResourceManagerReload(ResourceManager manager) {
         FHDataManager.reset();
         StructureUtils.addBanedBlocks();
         WorldClimate.clear();
         for (FHDataType dat : FHDataType.values()) {
             for (ResourceLocation rl : manager.listResources(dat.type.getLocation(), (s) -> s.endsWith(".json"))) {
                 try {
-                    try (IResource rc = manager.getResource(rl);
+                    try (Resource rc = manager.getResource(rl);
                          InputStream stream = rc.getInputStream();
                          InputStreamReader reader = new InputStreamReader(stream)) {
                         JsonObject object = parser.parse(reader).getAsJsonObject();

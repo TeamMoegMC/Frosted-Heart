@@ -22,12 +22,12 @@ package com.teammoeg.frostedheart.content.steamenergy;
 import com.teammoeg.frostedheart.FHTileTypes;
 
 import blusunrize.immersiveengineering.common.blocks.IEBaseTileEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.state.properties.BlockStateProperties;
-import net.minecraft.tileentity.ITickableTileEntity;
-import net.minecraft.util.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.entity.TickableBlockEntity;
+import net.minecraft.core.Direction;
 
-public class DebugHeaterTileEntity extends IEBaseTileEntity implements HeatController, INetworkConsumer, ITickableTileEntity {
+public class DebugHeaterTileEntity extends IEBaseTileEntity implements HeatController, INetworkConsumer, TickableBlockEntity {
     public DebugHeaterTileEntity() {
         super(FHTileTypes.DEBUGHEATER.get());
     }
@@ -54,11 +54,11 @@ public class DebugHeaterTileEntity extends IEBaseTileEntity implements HeatContr
     }
 
     @Override
-    public void readCustomNBT(CompoundNBT nbt, boolean descPacket) {
+    public void readCustomNBT(CompoundTag nbt, boolean descPacket) {
     }
 
     @Override
-    public void writeCustomNBT(CompoundNBT nbt, boolean descPacket) {
+    public void writeCustomNBT(CompoundTag nbt, boolean descPacket) {
     }
 
     @Override

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 TeamMoeg
+ * Copyright (c) 2021-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -14,6 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 package com.teammoeg.frostedheart.research.network;
@@ -25,8 +26,8 @@ import com.teammoeg.frostedheart.research.api.ResearchDataAPI;
 import com.teammoeg.frostedheart.research.data.TeamResearchData;
 import com.teammoeg.frostedheart.research.research.Research;
 
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.fml.network.NetworkEvent;
 
 public class FHEffectTriggerPacket {
@@ -36,12 +37,12 @@ public class FHEffectTriggerPacket {
         this.researchID = r.getRId();
     }
 
-    public FHEffectTriggerPacket(PacketBuffer buffer) {
+    public FHEffectTriggerPacket(FriendlyByteBuf buffer) {
         researchID = buffer.readVarInt();
 
     }
 
-    public void encode(PacketBuffer buffer) {
+    public void encode(FriendlyByteBuf buffer) {
         buffer.writeVarInt(researchID);
     }
 
@@ -50,7 +51,7 @@ public class FHEffectTriggerPacket {
         context.get().enqueueWork(() -> {
             Research r = FHResearch.researches.getById(researchID);
             TeamResearchData trd = ResearchDataAPI.getData(context.get().getSender());
-            ServerPlayerEntity spe = context.get().getSender();
+            ServerPlayer spe = context.get().getSender();
             if (trd.getData(r).isCompleted()) {
                 r.grantEffects(trd,spe);
                 r.sendProgressPacket(trd.getTeam().orElse(null));

@@ -22,13 +22,13 @@ package com.teammoeg.frostedheart.data;
 import com.google.gson.JsonObject;
 
 import gloridifice.watersource.registry.RecipeSerializersRegistry;
-import net.minecraft.data.IFinishedRecipe;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.data.recipes.FinishedRecipe;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.resources.ResourceLocation;
 
-public class WaterLevelFluidRecipe implements IFinishedRecipe {
+public class WaterLevelFluidRecipe implements FinishedRecipe {
 	ResourceLocation rid;
 	Ingredient igd;
 	int wl,ws;
@@ -59,7 +59,7 @@ public class WaterLevelFluidRecipe implements IFinishedRecipe {
 	}
 
 	@Override
-	public IRecipeSerializer<?> getType() {
+	public RecipeSerializer<?> getType() {
 		return RecipeSerializersRegistry.WATER_LEVEL_FLUID_RECIPE_SERIALIZER.get();
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -26,31 +26,31 @@ import java.util.function.Function;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.CompoundTag;
 
-public class NBTSerializerRegistry<U> extends SerializerRegistry<U,CompoundNBT> {
+public class NBTSerializerRegistry<U> extends SerializerRegistry<U,CompoundTag> {
 	
-	Map<String, Function<CompoundNBT,U>> fromJson = new HashMap<>();
+	Map<String, Function<CompoundTag,U>> fromJson = new HashMap<>();
 	public NBTSerializerRegistry() {
 		super();
 	}
 	public void writeType(JsonObject jo,U obj) {
 		jo.addProperty("type", typeOf(obj));
 	}
-	public U deserialize(CompoundNBT je) {
-		Function<CompoundNBT, U> func=fromJson.get(je.getString("type"));
+	public U deserialize(CompoundTag je) {
+		Function<CompoundTag, U> func=fromJson.get(je.getString("type"));
 		if(func==null)
 			return null;
 		return func.apply(je);
 	}
-	public U deserializeOrDefault(CompoundNBT je,U def) {
-		Function<CompoundNBT, U> func=fromJson.get(je.getString("type"));
+	public U deserializeOrDefault(CompoundTag je,U def) {
+		Function<CompoundTag, U> func=fromJson.get(je.getString("type"));
 		if(func==null)
 			return def;
 		return func.apply(je);
 	}
 	@Override
-	protected void putSerializer(String type, Function<CompoundNBT,U> s) {
+	protected void putSerializer(String type, Function<CompoundTag,U> s) {
 		fromJson.put(type, s);
 	}
 }

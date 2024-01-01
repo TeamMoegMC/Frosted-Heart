@@ -27,8 +27,8 @@ import com.google.gson.JsonObject;
 import com.teammoeg.frostedheart.trade.policy.snapshot.BuyData;
 import com.teammoeg.frostedheart.trade.policy.snapshot.PolicySnapshot;
 
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.network.FriendlyByteBuf;
 
 public class DemandData extends BaseData {
 	public Ingredient item;
@@ -43,7 +43,7 @@ public class DemandData extends BaseData {
 		item = Ingredient.fromJson(jo.get("demand"));
 	}
 
-	public DemandData(PacketBuffer pb) {
+	public DemandData(FriendlyByteBuf pb) {
 		super(pb);
 		item = Ingredient.fromNetwork(pb);
 	}
@@ -63,7 +63,7 @@ public class DemandData extends BaseData {
 	}
 
 	@Override
-	public void write(PacketBuffer buffer) {
+	public void write(FriendlyByteBuf buffer) {
 		buffer.writeVarInt(2);
 		super.write(buffer);
 		item.toNetwork(buffer);

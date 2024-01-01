@@ -43,13 +43,13 @@ import com.teammoeg.frostedheart.util.SerializeUtil;
 import com.teammoeg.frostedheart.util.Writeable;
 
 import dev.ftb.mods.ftbteams.data.Team;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.IItemProvider;
-import net.minecraft.util.text.IFormattableTextComponent;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.level.ItemLike;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.network.PacketDistributor;
@@ -96,7 +96,7 @@ public abstract class Effect extends AutoIDItem implements Writeable {
      * @param isload true if this is run when loaded from disk<br>
      * @return true, if
      */
-    public abstract boolean grant(TeamResearchData team,@Nullable PlayerEntity triggerPlayer, boolean isload);
+    public abstract boolean grant(TeamResearchData team,@Nullable Player triggerPlayer, boolean isload);
 
     /**
      * This is not necessary to implement as this is just for debugging propose.
@@ -112,7 +112,7 @@ public abstract class Effect extends AutoIDItem implements Writeable {
      */
     public void sendProgressPacket(Team team) {
         FHEffectProgressSyncPacket packet = new FHEffectProgressSyncPacket(team.getId(), this);
-        for (ServerPlayerEntity spe : team.getOnlineMembers())
+        for (ServerPlayer spe : team.getOnlineMembers())
             PacketHandler.send(PacketDistributor.PLAYER.with(() -> spe), packet);
     }
 
@@ -140,9 +140,9 @@ public abstract class Effect extends AutoIDItem implements Writeable {
      *
      * @param pb the pb<br>
      */
-    Effect(PacketBuffer pb) {
+    Effect(FriendlyByteBuf pb) {
         name = pb.readUtf();
-        tooltip = SerializeUtil.readList(pb, PacketBuffer::readUtf);
+        tooltip = SerializeUtil.readList(pb, FriendlyByteBuf::readUtf);
         icon = SerializeUtil.readOptional(pb, FHIcons::readIcon).orElse(null);
         nonce = pb.readUtf();
         hidden = pb.readBoolean();
@@ -181,7 +181,7 @@ public abstract class Effect extends AutoIDItem implements Writeable {
      * @param tooltip the tooltip<br>
      * @param icon the icon<br>
      */
-    public Effect(String name, List<String> tooltip, IItemProvider icon) {
+    public Effect(String name, List<String> tooltip, ItemLike icon) {
         this(name, tooltip, FHIcons.getIcon(icon));
     }
 
@@ -223,10 +223,10 @@ public abstract class Effect extends AutoIDItem implements Writeable {
      *
      * @return name<br>
      */
-    public final IFormattableTextComponent getName() {
+    public final MutableComponent getName() {
         if (name.isEmpty())
             return getDefaultName();
-        return (IFormattableTextComponent) FHTextUtil.get(name, "effect", this::getLId);
+        return (MutableComponent) FHTextUtil.get(name, "effect", this::getLId);
     }
 
     /**
@@ -234,7 +234,7 @@ public abstract class Effect extends AutoIDItem implements Writeable {
      *
      * @return tooltip<br>
      */
-    public final List<ITextComponent> getTooltip() {
+    public final List<Component> getTooltip() {
         if (tooltip.isEmpty())
             return getDefaultTooltip();
         return FHTextUtil.get(tooltip, "effect", this::getLId);
@@ -252,14 +252,14 @@ public abstract class Effect extends AutoIDItem implements Writeable {
      * use this when no name is set.
      * @return default name<br>
      */
-    public abstract IFormattableTextComponent getDefaultName();
+    public abstract MutableComponent getDefaultName();
 
     /**
      * Get default tooltip.
      * use this when no tooltip is set.
      * @return default tooltip<br>
      */
-    public abstract List<ITextComponent> getDefaultTooltip();
+    public abstract List<Component> getDefaultTooltip();
 
     /**
      * Serialize.<br>
@@ -288,10 +288,10 @@ public abstract class Effect extends AutoIDItem implements Writeable {
      * @param buffer the buffer<br>
      */
     @Override
-    public void write(PacketBuffer buffer) {
+    public void write(FriendlyByteBuf buffer) {
         Effects.writeId(this, buffer);
         buffer.writeUtf(name);
-        SerializeUtil.writeList2(buffer, tooltip, PacketBuffer::writeUtf);
+        SerializeUtil.writeList2(buffer, tooltip, FriendlyByteBuf::writeUtf);
         SerializeUtil.writeOptional(buffer, icon, FHIcon::write);
         buffer.writeUtf(nonce);
         buffer.writeBoolean(isHidden());

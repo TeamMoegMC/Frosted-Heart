@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -23,7 +23,7 @@ import java.util.function.Supplier;
 
 import com.teammoeg.frostedheart.research.clues.Clue;
 
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.CompoundTag;
 
 public abstract class IClueData {
 	Supplier<Clue> clue;
@@ -32,7 +32,7 @@ public abstract class IClueData {
 		super();
 		this.clue = clue;
 	}
-	public abstract CompoundNBT serialize() ;
-	public abstract void deserialize(CompoundNBT nbt);
+	public abstract CompoundTag serialize() ;
+	public abstract void deserialize(CompoundTag nbt);
 
 }

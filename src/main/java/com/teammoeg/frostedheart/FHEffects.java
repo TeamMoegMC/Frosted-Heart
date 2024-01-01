@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 TeamMoeg
+ * Copyright (c) 2021-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -14,6 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 package com.teammoeg.frostedheart;
@@ -28,37 +29,37 @@ import com.teammoeg.frostedheart.effects.HypothermiaEffect;
 import com.teammoeg.frostedheart.effects.IonEffect;
 import com.teammoeg.frostedheart.effects.SaunaEffect;
 
-import net.minecraft.potion.Effect;
-import net.minecraft.potion.EffectType;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraftforge.registries.IForgeRegistry;
 
 public class FHEffects {
-    public static List<Effect> EFFECTS = new ArrayList<Effect>();
+    public static List<MobEffect> EFFECTS = new ArrayList<MobEffect>();
 
-    public static final Effect HYPOTHERMIA = register("hypothermia", new HypothermiaEffect(EffectType.HARMFUL,0x57BDE8));
-    public static final Effect HYPERTHERMIA = register("hyperthermia", new HyperthermiaEffect(EffectType.HARMFUL,0xFF9800));
-    public static final Effect NYCTALOPIA = register("nyctalopia", new BaseEffect(EffectType.HARMFUL, 0x787dab) {
+    public static final MobEffect HYPOTHERMIA = register("hypothermia", new HypothermiaEffect(MobEffectCategory.HARMFUL,0x57BDE8));
+    public static final MobEffect HYPERTHERMIA = register("hyperthermia", new HyperthermiaEffect(MobEffectCategory.HARMFUL,0xFF9800));
+    public static final MobEffect NYCTALOPIA = register("nyctalopia", new BaseEffect(MobEffectCategory.HARMFUL, 0x787dab) {
     });
-    public static final Effect SCURVY = register("scurvy", new BaseEffect(EffectType.HARMFUL, 0xc47b34) {
+    public static final MobEffect SCURVY = register("scurvy", new BaseEffect(MobEffectCategory.HARMFUL, 0xc47b34) {
     });
-    public static final Effect ANEMIA = register("anemia", new AnemiaEffect(EffectType.HARMFUL, 0x571b1c) {
+    public static final MobEffect ANEMIA = register("anemia", new AnemiaEffect(MobEffectCategory.HARMFUL, 0x571b1c) {
     });
-    public static final Effect ION = register("ionizing_radiation", new IonEffect(EffectType.NEUTRAL, 0x92cbe5) {
+    public static final MobEffect ION = register("ionizing_radiation", new IonEffect(MobEffectCategory.NEUTRAL, 0x92cbe5) {
     });
-    public static final Effect WET = register("wet", new BaseEffect(EffectType.NEUTRAL, 816760296) {
+    public static final MobEffect WET = register("wet", new BaseEffect(MobEffectCategory.NEUTRAL, 816760296) {
     });
-    public static final Effect SAD = register("lethargic", new BaseEffect(EffectType.NEUTRAL, 816760296) {
+    public static final MobEffect SAD = register("lethargic", new BaseEffect(MobEffectCategory.NEUTRAL, 816760296) {
     });
-    public static final Effect SAUNA = register("sauna", new SaunaEffect(EffectType.BENEFICIAL, 816760296) {
+    public static final MobEffect SAUNA = register("sauna", new SaunaEffect(MobEffectCategory.BENEFICIAL, 816760296) {
     });
 
-    public static void registerAll(IForgeRegistry<Effect> registry) {
-        for (Effect effect : EFFECTS) {
+    public static void registerAll(IForgeRegistry<MobEffect> registry) {
+        for (MobEffect effect : EFFECTS) {
             registry.register(effect);
         }
     }
 
-    public static Effect register(String name, Effect effect) {
+    public static MobEffect register(String name, MobEffect effect) {
         effect.setRegistryName(FHMain.rl(name));
         EFFECTS.add(effect);
         return effect;

@@ -34,47 +34,47 @@ import com.teammoeg.frostedheart.trade.RelationList;
 import com.teammoeg.frostedheart.trade.TradeHandler;
 import com.teammoeg.frostedheart.util.VillagerDataHolder;
 
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.merchant.villager.AbstractVillagerEntity;
-import net.minecraft.entity.merchant.villager.VillagerEntity;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.npc.AbstractVillager;
+import net.minecraft.world.entity.npc.Villager;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.stats.Stats;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
-import net.minecraft.world.World;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.server.ServerWorld;
 
-@Mixin(VillagerEntity.class)
-public abstract class VillagerMixin extends AbstractVillagerEntity implements VillagerDataHolder {
+@Mixin(Villager.class)
+public abstract class VillagerMixin extends AbstractVillager implements VillagerDataHolder {
 	FHVillagerData fh$data=new FHVillagerData(getThis());
-    public VillagerMixin(EntityType<? extends AbstractVillagerEntity> type, World worldIn) {
+    public VillagerMixin(EntityType<? extends AbstractVillager> type, Level worldIn) {
         super(type, worldIn);
     }
 
     @Shadow
     protected abstract void shakeHead();
     @Shadow
-    public abstract void setCustomer(@Nullable PlayerEntity player);
+    public abstract void setCustomer(@Nullable Player player);
     
     @Shadow
-    protected abstract void displayMerchantGui(PlayerEntity pe);
+    protected abstract void displayMerchantGui(Player pe);
 
-    private VillagerEntity getThis() {
-    	return (VillagerEntity)(Object)this;
+    private Villager getThis() {
+    	return (Villager)(Object)this;
     }
 	@Inject(at = @At("HEAD"), method = "writeAdditional")
-	public void fh$writeAdditional(CompoundNBT compound, CallbackInfo cbi) {
-		CompoundNBT cnbt=new CompoundNBT();
+	public void fh$writeAdditional(CompoundTag compound, CallbackInfo cbi) {
+		CompoundTag cnbt=new CompoundTag();
 		fh$data.serialize(cnbt);
 		compound.put("fhdata",cnbt);
 	}
 
 	@Inject(at = @At("HEAD"), method = "readAdditional")
-	public void fh$readAdditional(CompoundNBT compound, CallbackInfo cbi) {
+	public void fh$readAdditional(CompoundTag compound, CallbackInfo cbi) {
 		fh$data.deserialize(compound.getCompound("fhdata"));
 	}
 	@Inject(at=@At(value="INVOKE",target="Lnet/minecraft/entity/merchant/villager/VillagerEntity;resetCustomer()V",remap=true,ordinal=0),method="updateAITasks",cancellable=true,remap=true,require=1)

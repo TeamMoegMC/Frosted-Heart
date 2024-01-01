@@ -1,3 +1,22 @@
+/*
+ * Copyright (c) 2024 TeamMoeg
+ *
+ * This file is part of Frosted Heart.
+ *
+ * Frosted Heart is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3.
+ *
+ * Frosted Heart is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
 package com.teammoeg.frostedheart.trade.policy;
 
 import java.util.List;
@@ -9,8 +28,8 @@ import com.teammoeg.frostedheart.trade.FHVillagerData;
 import com.teammoeg.frostedheart.trade.policy.snapshot.PolicySnapshot;
 
 import net.minecraft.entity.merchant.villager.VillagerEntity;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
 
 public class ExtendPolicyGroup extends PolicyGroup {
 	ResourceLocation ref;
@@ -22,7 +41,7 @@ public class ExtendPolicyGroup extends PolicyGroup {
 		super(jo);
 		ref=new ResourceLocation(jo.get("parent").getAsString());
 	}
-	public ExtendPolicyGroup(PacketBuffer pb) {
+	public ExtendPolicyGroup(FriendlyByteBuf pb) {
 		super(pb);
 		ref=pb.readResourceLocation();
 	}
@@ -37,7 +56,7 @@ public class ExtendPolicyGroup extends PolicyGroup {
 		return jo;
 	}
 	@Override
-	public void write(PacketBuffer buffer) {
+	public void write(FriendlyByteBuf buffer) {
 		buffer.writeBoolean(true);
 		super.write(buffer);
 		buffer.writeResourceLocation(ref);

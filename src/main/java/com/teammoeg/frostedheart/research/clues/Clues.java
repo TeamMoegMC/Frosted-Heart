@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -24,7 +24,7 @@ import java.util.function.Function;
 import com.google.gson.JsonObject;
 import com.teammoeg.frostedheart.research.JsonSerializerRegistry;
 
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.FriendlyByteBuf;
 
 public class Clues {
 	private static JsonSerializerRegistry<Clue> registry=new JsonSerializerRegistry<>();
@@ -32,7 +32,7 @@ public class Clues {
     }
 
 
-    public static void register(Class<? extends Clue> cls,String id, Function<JsonObject, Clue> j, Function<PacketBuffer, Clue> p) {
+    public static void register(Class<? extends Clue> cls,String id, Function<JsonObject, Clue> j, Function<FriendlyByteBuf, Clue> p) {
     	registry.register(cls,id,j,p);
     }
 
@@ -43,10 +43,10 @@ public class Clues {
         register(KillClue.class,"kill", KillClue::new, KillClue::new);
         register(MinigameClue.class,"game", MinigameClue::new, MinigameClue::new);
     }
-    public static void writeId(Clue e,PacketBuffer pb) {
+    public static void writeId(Clue e,FriendlyByteBuf pb) {
     	registry.writeId(pb, e);
     }
-    public static Clue read(PacketBuffer pb) {
+    public static Clue read(FriendlyByteBuf pb) {
     	return registry.read(pb);
     }
     public static Clue read(JsonObject jo) {

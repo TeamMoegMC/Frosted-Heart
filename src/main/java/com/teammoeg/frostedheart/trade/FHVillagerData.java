@@ -32,28 +32,28 @@ import com.teammoeg.frostedheart.trade.gui.TradeContainer;
 import com.teammoeg.frostedheart.trade.policy.TradePolicy;
 import com.teammoeg.frostedheart.trade.policy.snapshot.PolicySnapshot;
 import com.teammoeg.frostedheart.util.FHUtils;
-import net.minecraft.client.entity.player.ClientPlayerEntity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.merchant.villager.VillagerEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.inventory.container.INamedContainerProvider;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.INBT;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.potion.Effects;
-import net.minecraft.stats.StatisticsManager;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.npc.Villager;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.stats.StatsCounter;
 import net.minecraft.stats.Stats;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.village.GossipType;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.ai.gossip.GossipType;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.common.util.Constants.NBT;
 
-public class FHVillagerData implements INamedContainerProvider{
+public class FHVillagerData implements MenuProvider{
 	public ResourceLocation policytype;
 	public Map<String,Float> storage=new HashMap<>();
 	public Map<String,Integer> flags=new HashMap<>();
@@ -62,21 +62,21 @@ public class FHVillagerData implements INamedContainerProvider{
 	public int bargain;
 	public long totaltraded;
 	private int tradelevel;
-	public VillagerEntity parent;
-	public FHVillagerData(VillagerEntity parent) {
+	public Villager parent;
+	public FHVillagerData(Villager parent) {
 		super();
 		this.parent = parent;
 	}
-	public ActionResultType trade(PlayerEntity pe) {
-		return ActionResultType.sidedSuccess(pe.level.isClientSide);
+	public InteractionResult trade(Player pe) {
+		return InteractionResult.sidedSuccess(pe.level.isClientSide);
 	}
-	public void initLegacy(VillagerEntity ve) {
+	public void initLegacy(Villager ve) {
 		if(policytype==null) {
 			policytype=TradePolicy.random(ve.getRandom()).getName();
 			parent.setVillagerData(parent.getVillagerData().setProfession(getPolicyType().getProfession()));
 		}
 	}
-	public void update(ServerWorld w,PlayerEntity trigger) {
+	public void update(ServerLevel w,Player trigger) {
 		initLegacy(parent);
 		long day=ClimateData.getWorldDay(w);
 		FHUtils.ofMap(relations, trigger.getUUID()).ifPresent(t->t.update(day));;
@@ -98,18 +98,18 @@ public class FHVillagerData implements INamedContainerProvider{
 		if(policytype==null)return PolicySnapshot.empty;
 		return TradePolicy.policies.get(policytype).get(this);
 	}
-	public CompoundNBT serialize(CompoundNBT data) {
-		ListNBT list=new ListNBT();
-		CompoundNBT stor=new CompoundNBT();
+	public CompoundTag serialize(CompoundTag data) {
+		ListTag list=new ListTag();
+		CompoundTag stor=new CompoundTag();
 		for(Entry<String, Float> k:storage.entrySet()) {
 			stor.putFloat(k.getKey(),k.getValue());
 		}
-		CompoundNBT flag=new CompoundNBT();
+		CompoundTag flag=new CompoundTag();
 		for(Entry<String, Integer> k:flags.entrySet())
 			flag.putInt(k.getKey(), k.getValue());
 		data.put("flags", flag);
 		for(Entry<UUID, PlayerRelationData> i:relations.entrySet()) {
-			CompoundNBT items=new CompoundNBT();
+			CompoundTag items=new CompoundTag();
 			items.putUUID("id", i.getKey());
 			i.getValue().serialize(items);
 			list.add(items);
@@ -123,8 +123,8 @@ public class FHVillagerData implements INamedContainerProvider{
 		data.putLong("last", lastUpdated);
 		return data;
 	}
-	public void deserialize(CompoundNBT data) {
-		CompoundNBT nbt=data.getCompound("storage");
+	public void deserialize(CompoundTag data) {
+		CompoundTag nbt=data.getCompound("storage");
 		storage.clear();
 		for(String k:nbt.getAllKeys()) 
 			storage.put(k,nbt.getFloat(k));
@@ -134,10 +134,10 @@ public class FHVillagerData implements INamedContainerProvider{
 			flags.put(ks, nbt.getInt(ks));
 		setTradelevel(data.getInt("level"));
 		totaltraded=data.getLong("total");
-		ListNBT rel=data.getList("relations",NBT.TAG_COMPOUND);
+		ListTag rel=data.getList("relations",NBT.TAG_COMPOUND);
 		relations.clear();
-		for(INBT u:rel) {
-			CompoundNBT item = (CompoundNBT) u;
+		for(Tag u:rel) {
+			CompoundTag item = (CompoundTag) u;
 			PlayerRelationData prd=new PlayerRelationData();
 			prd.deserialize(item);
 			relations.put(item.getUUID("id"),prd);
@@ -146,13 +146,13 @@ public class FHVillagerData implements INamedContainerProvider{
 			policytype=new ResourceLocation(data.getString("type"));
 		lastUpdated=data.getLong("last");
 	}
-	public CompoundNBT serializeForSend(CompoundNBT data) {
-		ListNBT list=new ListNBT();
-		CompoundNBT stor=new CompoundNBT();
+	public CompoundTag serializeForSend(CompoundTag data) {
+		ListTag list=new ListTag();
+		CompoundTag stor=new CompoundTag();
 		for(Entry<String, Float> k:storage.entrySet()) {
 			stor.putFloat(k.getKey(),k.getValue());
 		}
-		CompoundNBT flag=new CompoundNBT();
+		CompoundTag flag=new CompoundTag();
 		for(Entry<String, Integer> k:flags.entrySet())
 			flag.putInt(k.getKey(), k.getValue());
 		data.put("flags", flag);
@@ -164,8 +164,8 @@ public class FHVillagerData implements INamedContainerProvider{
 			data.putString("type",policytype.toString());
 		return data;
 	}
-	public void deserializeFromRecv(CompoundNBT data) {
-		CompoundNBT nbt=data.getCompound("storage");
+	public void deserializeFromRecv(CompoundTag data) {
+		CompoundTag nbt=data.getCompound("storage");
 		storage.clear();
 		for(String k:nbt.getAllKeys()) 
 			storage.put(k,nbt.getFloat(k));
@@ -178,7 +178,7 @@ public class FHVillagerData implements INamedContainerProvider{
 		if(data.contains("type"))
 			policytype=new ResourceLocation(data.getString("type"));
 	}
-	public RelationList getRelationShip(PlayerEntity pe) {
+	public RelationList getRelationShip(Player pe) {
 		RelationList list=new RelationList();
 		PlayerRelationData player=relations.getOrDefault(pe.getUUID(),PlayerRelationData.EMPTY);
 		list.put(RelationModifier.FOREIGNER,-10);
@@ -191,26 +191,26 @@ public class FHVillagerData implements INamedContainerProvider{
 		if(parent.getGossips().getReputation(pe.getUUID(),e->e==GossipType.MINOR_NEGATIVE)>0)
 			list.put(RelationModifier.HURT,-10);
 		list.put(RelationModifier.KILLED_SAW,-25*player.sawmurder);
-		if(pe.getEffect(Effects.HERO_OF_THE_VILLAGE)!=null)
+		if(pe.getEffect(MobEffects.HERO_OF_THE_VILLAGE)!=null)
 			list.put(RelationModifier.SAVED_VILLAGE,10);
 		list.put(RelationModifier.RECENT_BARGAIN,-bargain*10);
 		list.put(RelationModifier.TRADE_LEVEL,getTradeLevel()*5);
 		list.put(RelationModifier.RECENT_BENEFIT,player.totalbenefit);
 		return list;
 	}
-	private static StatisticsManager getStats(PlayerEntity pe) {
-		if(pe instanceof ServerPlayerEntity)
-			return ((ServerPlayerEntity) pe).getStats();
-		return ((ClientPlayerEntity)pe).getStats();
+	private static StatsCounter getStats(Player pe) {
+		if(pe instanceof ServerPlayer)
+			return ((ServerPlayer) pe).getStats();
+		return ((LocalPlayer)pe).getStats();
 	}
 	@Override
-	public Container createMenu(int p1, PlayerInventory p2, PlayerEntity p3) {
+	public AbstractContainerMenu createMenu(int p1, Inventory p2, Player p3) {
 		TradeContainer tc=new TradeContainer(p1,p2,parent);
 		tc.setData(this, p3);
 		return tc;
 	}
 	@Override
-	public ITextComponent getDisplayName() {
+	public Component getDisplayName() {
 		return GuiUtils.translateGui("trade.title");
 	}
 	public int getTradeLevel() {
@@ -231,10 +231,10 @@ public class FHVillagerData implements INamedContainerProvider{
 			}
 		}
 	}
-	public PlayerRelationData getRelationDataForRead(PlayerEntity pe) {
+	public PlayerRelationData getRelationDataForRead(Player pe) {
 		return relations.getOrDefault(pe.getUUID(),PlayerRelationData.EMPTY);
 	}
-	public PlayerRelationData getRelationDataForWrite(PlayerEntity pe) {
+	public PlayerRelationData getRelationDataForWrite(Player pe) {
 		return relations.computeIfAbsent(pe.getUUID(),d->new PlayerRelationData());
 	}
 	public void setTradelevel(int tradelevel) {

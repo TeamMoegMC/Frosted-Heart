@@ -33,22 +33,22 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.ItemUseContext;
+import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.play.server.STitlePacket;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
-import net.minecraft.util.ActionResultType;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.server.ServerWorld;
 
 @Mixin(PhilosophersStone.class)
 public class MixinPhilosopherStone {
     @Inject(method = "onItemUse", at = @At(value = "HEAD"), remap = true, cancellable = true)
-    public void hibernation(ItemUseContext ctx, CallbackInfoReturnable<ActionResultType> cir) {
-        World world = ctx.getWorld();
+    public void hibernation(UseOnContext ctx, CallbackInfoReturnable<InteractionResult> cir) {
+        Level world = ctx.getWorld();
         PlayerEntity player = ctx.getPlayer();
         BlockPos pos = ctx.getPos();
         if (!world.isRemote && player != null) {

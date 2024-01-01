@@ -28,11 +28,11 @@ import com.teammoeg.frostedheart.research.data.TeamResearchData;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementProgress;
 import net.minecraft.advancements.CriterionProgress;
-import net.minecraft.client.multiplayer.ClientAdvancementManager;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.client.multiplayer.ClientAdvancements;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.chat.Component;
 
 public class AdvancementClue extends TickListenerClue {
     ResourceLocation advancement = new ResourceLocation("minecraft:story/root");
@@ -53,7 +53,7 @@ public class AdvancementClue extends TickListenerClue {
             criterion = jo.get("criterion").getAsString();
     }
 
-    public AdvancementClue(PacketBuffer pb) {
+    public AdvancementClue(FriendlyByteBuf pb) {
         super(pb);
         advancement = pb.readResourceLocation();
         criterion = pb.readUtf();
@@ -64,17 +64,17 @@ public class AdvancementClue extends TickListenerClue {
     }
 
     @Override
-    public ITextComponent getName() {
+    public Component getName() {
         if (name != null && !name.isEmpty())
             return super.getName();
         return GuiUtils.translate("clue." + FHMain.MODID + ".advancement");
     }
 
     @Override
-    public ITextComponent getDescription() {
-        ITextComponent itc = super.getDescription();
+    public Component getDescription() {
+        Component itc = super.getDescription();
         if (itc != null) return itc;
-        ClientAdvancementManager cam = ClientUtils.getPlayer().connection.getAdvancements();
+        ClientAdvancements cam = ClientUtils.getPlayer().connection.getAdvancements();
         Advancement adv = cam.getAdvancements().get(advancement);
         if (adv != null)
             return adv.getChatComponent();
@@ -84,7 +84,7 @@ public class AdvancementClue extends TickListenerClue {
     }
 
     @Override
-    public boolean isCompleted(TeamResearchData t, ServerPlayerEntity player) {
+    public boolean isCompleted(TeamResearchData t, ServerPlayer player) {
         Advancement a = player.server.getAdvancements().getAdvancement(advancement);
         if (a == null) {
             return false;
@@ -114,7 +114,7 @@ public class AdvancementClue extends TickListenerClue {
     }
 
     @Override
-    public void write(PacketBuffer buffer) {
+    public void write(FriendlyByteBuf buffer) {
         super.write(buffer);
         buffer.writeResourceLocation(advancement);
         buffer.writeUtf(criterion);

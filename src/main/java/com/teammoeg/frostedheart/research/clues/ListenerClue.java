@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -22,7 +22,7 @@ package com.teammoeg.frostedheart.research.clues;
 import com.google.gson.JsonObject;
 
 import dev.ftb.mods.ftbteams.data.Team;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.FriendlyByteBuf;
 
 /**
  * Clue with listener trigger
@@ -43,7 +43,7 @@ public abstract class ListenerClue extends Clue {
         alwaysOn = jo.get("always").getAsBoolean();
     }
 
-    public ListenerClue(PacketBuffer pb) {
+    public ListenerClue(FriendlyByteBuf pb) {
         super(pb);
         alwaysOn = pb.readBoolean();
     }
@@ -60,7 +60,7 @@ public abstract class ListenerClue extends Clue {
     }
 
     @Override
-    public void write(PacketBuffer buffer) {
+    public void write(FriendlyByteBuf buffer) {
         super.write(buffer);
         buffer.writeBoolean(alwaysOn);
     }

@@ -27,13 +27,22 @@ import com.teammoeg.frostedheart.world.feature.FHOreFeature;
 import com.teammoeg.frostedheart.world.feature.FHOreFeatureConfig;
 import com.teammoeg.frostedheart.world.feature.FlowerCoveredDepositFeature;
 import com.teammoeg.frostedheart.world.feature.SpacecraftFeature;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.util.registry.WorldGenRegistries;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.core.Registry;
+import net.minecraft.data.BuiltinRegistries;
 import net.minecraft.world.gen.feature.*;
 
 import java.util.ArrayList;
+
+import net.minecraft.data.worldgen.Features;
+import net.minecraft.util.UniformInt;
+import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
+import net.minecraft.world.level.levelgen.feature.Feature;
+import net.minecraft.world.level.levelgen.feature.configurations.BlockStateConfiguration;
+import net.minecraft.world.level.levelgen.feature.configurations.DiskConfiguration;
+import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
+import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
 
 public class FHFeatures {
 
@@ -114,13 +123,13 @@ public class FHFeatures {
 
     // Features, registered at CommonRegistryEvents#onFeatureRegistry
     public static final Feature<FHOreFeatureConfig> FHORE = new FHOreFeature(FHOreFeatureConfig.CODEC);
-    public static final SpacecraftFeature SPACECRAFT = new SpacecraftFeature(NoFeatureConfig.CODEC);
-    public static final Feature<BlockStateFeatureConfig> FLOWER_COVERED_DEPOSIT_FEATURE = new FlowerCoveredDepositFeature(BlockStateFeatureConfig.CODEC);
+    public static final SpacecraftFeature SPACECRAFT = new SpacecraftFeature(NoneFeatureConfiguration.CODEC);
+    public static final Feature<BlockStateConfiguration> FLOWER_COVERED_DEPOSIT_FEATURE = new FlowerCoveredDepositFeature(BlockStateConfiguration.CODEC);
 
     // Configured features, generate at CommonEvents#addOreGenFeatures
-    public static final ConfiguredFeature<?, ?> spacecraft_feature = Registry.register(WorldGenRegistries.CONFIGURED_FEATURE, "spacecraft", SPACECRAFT.configured(IFeatureConfig.NONE));
-    public static final ConfiguredFeature<?, ?> clay_deposit = Registry.register(WorldGenRegistries.CONFIGURED_FEATURE, "clay_deposit", FLOWER_COVERED_DEPOSIT_FEATURE.configured(new BlockStateFeatureConfig(FHFeatures.CLAY)).decorated(Features.Placements.HEIGHTMAP_SQUARE).chance(12));
-    public static final ConfiguredFeature<?, ?> gravel_deposit = Registry.register(WorldGenRegistries.CONFIGURED_FEATURE, "gravel_deposit", FLOWER_COVERED_DEPOSIT_FEATURE.configured(new BlockStateFeatureConfig(FHFeatures.GRAVEL)).decorated(Features.Placements.HEIGHTMAP_SQUARE).chance(12));
+    public static final ConfiguredFeature<?, ?> spacecraft_feature = Registry.register(BuiltinRegistries.CONFIGURED_FEATURE, "spacecraft", SPACECRAFT.configured(FeatureConfiguration.NONE));
+    public static final ConfiguredFeature<?, ?> clay_deposit = Registry.register(BuiltinRegistries.CONFIGURED_FEATURE, "clay_deposit", FLOWER_COVERED_DEPOSIT_FEATURE.configured(new BlockStateConfiguration(FHFeatures.CLAY)).decorated(Features.Decorators.HEIGHTMAP_SQUARE).chance(12));
+    public static final ConfiguredFeature<?, ?> gravel_deposit = Registry.register(BuiltinRegistries.CONFIGURED_FEATURE, "gravel_deposit", FLOWER_COVERED_DEPOSIT_FEATURE.configured(new BlockStateConfiguration(FHFeatures.GRAVEL)).decorated(Features.Decorators.HEIGHTMAP_SQUARE).chance(12));
 
     public static ArrayList<ConfiguredFeature<?, ?>> FH_ORES = new ArrayList<>();
     public static ArrayList<ConfiguredFeature<?, ?>> FH_DISK = new ArrayList<>();
@@ -149,19 +158,19 @@ public class FHFeatures {
         registerFHOre("ore_graphite", FHORE.configured(new FHOreFeatureConfig(FHOreFeatureConfig.FillerBlockType.graphite, RankineBlocks.PLUMBAGO_ORE.get().defaultBlockState(), 35)).range(50).chance(10));
         registerFHOre("ore_halite", FHORE.configured(new FHOreFeatureConfig(FHOreFeatureConfig.FillerBlockType.bauxite, FHBlocks.halite_ore.defaultBlockState(), 40)).range(65).squared().chance(7));
 
-        registerFHDisk("copper_gravel", Feature.DISK.configured(new SphereReplaceConfig(COPPER_GRAVEL, FeatureSpread.of(1, 2), 1, disk_target)).decorated(Features.Placements.TOP_SOLID_HEIGHTMAP_SQUARE).chance(2));
-        registerFHDisk("fh_disk_clay", Feature.DISK.configured(new SphereReplaceConfig(CLAY, FeatureSpread.of(2, 3), 1, clay_target)).decorated(Features.Placements.TOP_SOLID_HEIGHTMAP_SQUARE).chance(2));
-        registerFHDisk("fh_disk_gravel", Feature.DISK.configured(new SphereReplaceConfig(GRAVEL, FeatureSpread.of(2, 3), 2, disk_target)).decorated(Features.Placements.TOP_SOLID_HEIGHTMAP_SQUARE));
-        registerFHDisk("fh_disk_sand", Feature.DISK.configured(new SphereReplaceConfig(SAND, FeatureSpread.of(2, 4), 2, disk_target)).decorated(Features.Placements.TOP_SOLID_HEIGHTMAP_SQUARE).count(3));
+        registerFHDisk("copper_gravel", Feature.DISK.configured(new DiskConfiguration(COPPER_GRAVEL, UniformInt.of(1, 2), 1, disk_target)).decorated(Features.Decorators.TOP_SOLID_HEIGHTMAP_SQUARE).chance(2));
+        registerFHDisk("fh_disk_clay", Feature.DISK.configured(new DiskConfiguration(CLAY, UniformInt.of(2, 3), 1, clay_target)).decorated(Features.Decorators.TOP_SOLID_HEIGHTMAP_SQUARE).chance(2));
+        registerFHDisk("fh_disk_gravel", Feature.DISK.configured(new DiskConfiguration(GRAVEL, UniformInt.of(2, 3), 2, disk_target)).decorated(Features.Decorators.TOP_SOLID_HEIGHTMAP_SQUARE));
+        registerFHDisk("fh_disk_sand", Feature.DISK.configured(new DiskConfiguration(SAND, UniformInt.of(2, 4), 2, disk_target)).decorated(Features.Decorators.TOP_SOLID_HEIGHTMAP_SQUARE).count(3));
     }
 
-    private static <FC extends IFeatureConfig> ConfiguredFeature<FC, ?> registerFHOre(String key, ConfiguredFeature<FC, ?> configuredFeature) {
+    private static <FC extends FeatureConfiguration> ConfiguredFeature<FC, ?> registerFHOre(String key, ConfiguredFeature<FC, ?> configuredFeature) {
         FH_ORES.add(configuredFeature);
-        return Registry.register(WorldGenRegistries.CONFIGURED_FEATURE, key, configuredFeature);
+        return Registry.register(BuiltinRegistries.CONFIGURED_FEATURE, key, configuredFeature);
     }
 
-    private static <FC extends IFeatureConfig> ConfiguredFeature<FC, ?> registerFHDisk(String key, ConfiguredFeature<FC, ?> configuredFeature) {
+    private static <FC extends FeatureConfiguration> ConfiguredFeature<FC, ?> registerFHDisk(String key, ConfiguredFeature<FC, ?> configuredFeature) {
         FH_DISK.add(configuredFeature);
-        return Registry.register(WorldGenRegistries.CONFIGURED_FEATURE, key, configuredFeature);
+        return Registry.register(BuiltinRegistries.CONFIGURED_FEATURE, key, configuredFeature);
     }
 }

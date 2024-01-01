@@ -41,21 +41,21 @@ import com.teammoeg.thermopolium.data.recipes.FoodValueRecipe;
 import blusunrize.immersiveengineering.api.IETags;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.Advancement.Builder;
-import net.minecraft.block.Block;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.data.CustomRecipeBuilder;
 import net.minecraft.data.DataGenerator;
-import net.minecraft.data.IFinishedRecipe;
-import net.minecraft.data.RecipeProvider;
+import net.minecraft.data.recipes.FinishedRecipe;
+import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.data.ShapelessRecipeBuilder;
-import net.minecraft.item.Food;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
+import net.minecraft.world.food.FoodProperties;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.tags.ItemTags;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.core.NonNullList;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.fml.loading.FMLPaths;
 import net.minecraftforge.registries.ForgeRegistries;
 
@@ -67,7 +67,7 @@ public class FHRecipeProvider extends RecipeProvider {
 	}
 
 	@Override
-	protected void buildShapelessRecipes(@Nonnull Consumer<IFinishedRecipe> out) {
+	protected void buildShapelessRecipes(@Nonnull Consumer<FinishedRecipe> out) {
 		String[] ovride=new String[] {
 				"dilute_soup",
 				"nail_soup"
@@ -102,7 +102,7 @@ public class FHRecipeProvider extends RecipeProvider {
 							System.out.println(item.toString()+" not exist");
 							ps.println(item+","+parts[1]);
 						}else {
-							Food f=it.getFoodProperties();
+							FoodProperties f=it.getFoodProperties();
 							if(f==null)
 								ps.println(item+","+parts[1]);
 							else
@@ -139,7 +139,7 @@ public class FHRecipeProvider extends RecipeProvider {
 		}
 		recipeTrade(out);
 	}
-	private void recipeTrade(@Nonnull Consumer<IFinishedRecipe> out) {
+	private void recipeTrade(@Nonnull Consumer<FinishedRecipe> out) {
 		trade().group().buy(10,10,10,FHItems.rye_bread)
 		.buy(1, 0.1f,20,FHItems.straw_lining)
 		.buy(10,10,10,RankineItems.MALACHITE.get()).useAction().addFlag("copper", 1).finish()
@@ -153,7 +153,7 @@ public class FHRecipeProvider extends RecipeProvider {
 	private TradeBuilder trade() {
 		return new TradeBuilder();
 	}
-	private void recipesGenerator(@Nonnull Consumer<IFinishedRecipe> out) {
+	private void recipesGenerator(@Nonnull Consumer<FinishedRecipe> out) {
 		GeneratorRecipeBuilder.builder(IETags.slag, 1).addInput(ItemTags.COALS).setTime(1000).build(out,
 				toRL("generator/slag"));
 		

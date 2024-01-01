@@ -25,23 +25,23 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.loot.ILootSerializer;
-import net.minecraft.loot.LootConditionType;
-import net.minecraft.loot.LootContext;
-import net.minecraft.loot.LootParameters;
-import net.minecraft.loot.conditions.ILootCondition;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.loot.Serializer;
+import net.minecraft.world.level.storage.loot.predicates.LootItemConditionType;
+import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
+import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.util.JSONUtils;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.World;
+import net.minecraft.util.GsonHelper;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.common.Tags;
 
-public class TagLootCondition implements ILootCondition {
-    public static LootConditionType TYPE;
+public class TagLootCondition implements LootItemCondition {
+    public static LootItemConditionType TYPE;
     private Tags.IOptionalNamedTag<Block> tag;
 
     public TagLootCondition(Tags.IOptionalNamedTag<Block> tag) {
@@ -51,10 +51,10 @@ public class TagLootCondition implements ILootCondition {
     @SuppressWarnings("resource")
     @Override
     public boolean test(LootContext t) {
-        if (t.hasParam(LootParameters.ORIGIN)) {
-            Vector3d v = t.getParamOrNull(LootParameters.ORIGIN);
+        if (t.hasParam(LootContextParams.ORIGIN)) {
+            Vec3 v = t.getParamOrNull(LootContextParams.ORIGIN);
             BlockPos bp = new BlockPos(v.x, v.y, v.z);
-            World w = t.getLevel();
+            Level w = t.getLevel();
             BlockState bs = w.getBlockState(bp);
 
             return bs != null && tag.contains(bs.getBlock());
@@ -63,11 +63,11 @@ public class TagLootCondition implements ILootCondition {
     }
 
     @Override
-    public LootConditionType getType() {
+    public LootItemConditionType getType() {
         return TYPE;
     }
 
-    public static class Serializer implements ILootSerializer<TagLootCondition> {
+    public static class Serializer implements Serializer<TagLootCondition> {
 
         @Override
         public void serialize(JsonObject jsonObject, TagLootCondition matchTagCondition, JsonSerializationContext serializationContext) {
@@ -77,7 +77,7 @@ public class TagLootCondition implements ILootCondition {
         @Nonnull
         @Override
         public TagLootCondition deserialize(JsonObject jsonObject, JsonDeserializationContext context) {
-            Tags.IOptionalNamedTag<Block> optional = BlockTags.createOptional(new ResourceLocation(JSONUtils.getAsString(jsonObject, "tag")));
+            Tags.IOptionalNamedTag<Block> optional = BlockTags.createOptional(new ResourceLocation(GsonHelper.getAsString(jsonObject, "tag")));
             return new TagLootCondition(optional);
         }
     }

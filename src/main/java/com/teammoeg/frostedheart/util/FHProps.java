@@ -21,40 +21,40 @@ package com.teammoeg.frostedheart.util;
 
 import com.teammoeg.frostedheart.FHMain;
 
-import net.minecraft.block.AbstractBlock;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
-import net.minecraft.item.Item;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.item.Item;
 import net.minecraftforge.common.ToolType;
 
 public class FHProps {
     public static void init() {
     }
 
-    public static final AbstractBlock.Properties stoneDecoProps = AbstractBlock.Properties
+    public static final BlockBehaviour.Properties stoneDecoProps = BlockBehaviour.Properties
             .of(Material.STONE)
             .sound(SoundType.STONE)
             .requiresCorrectToolForDrops()
             .harvestTool(ToolType.PICKAXE)
             .strength(2, 10);
-    public static final AbstractBlock.Properties metalDecoProps = AbstractBlock.Properties
+    public static final BlockBehaviour.Properties metalDecoProps = BlockBehaviour.Properties
             .of(Material.METAL)
             .sound(SoundType.METAL)
             .requiresCorrectToolForDrops()
             .harvestTool(ToolType.PICKAXE)
             .strength(2, 10);
-    public static final AbstractBlock.Properties cropProps = AbstractBlock.Properties
+    public static final BlockBehaviour.Properties cropProps = BlockBehaviour.Properties
             .of(Material.PLANT)
             .noCollission()
             .randomTicks()
             .instabreak()
             .sound(SoundType.CROP);
-    public static final AbstractBlock.Properties ore_gravel = AbstractBlock.Properties
+    public static final BlockBehaviour.Properties ore_gravel = BlockBehaviour.Properties
             .of(Material.SAND)
             .sound(SoundType.GRAVEL)
             .requiresCorrectToolForDrops()
             .harvestTool(ToolType.SHOVEL)
             .strength(0.6F);
     public static final Item.Properties itemProps = new Item.Properties().tab(FHMain.itemGroup);
-    public static final AbstractBlock.Properties berryBushBlocks = AbstractBlock.Properties.of(Material.PLANT).randomTicks().noCollission().sound(SoundType.SWEET_BERRY_BUSH);
+    public static final BlockBehaviour.Properties berryBushBlocks = BlockBehaviour.Properties.of(Material.PLANT).randomTicks().noCollission().sound(SoundType.SWEET_BERRY_BUSH);
 }

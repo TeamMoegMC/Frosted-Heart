@@ -28,14 +28,14 @@ import com.teammoeg.frostedheart.research.events.ClientResearchStatusEvent;
 import com.teammoeg.frostedheart.research.research.Research;
 import com.teammoeg.frostedheart.util.SerializeUtil;
 
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.network.NetworkEvent;
 
 // send when data update
 public class FHResearchDataUpdatePacket {
-    private final CompoundNBT data;
+    private final CompoundTag data;
     private final int id;
 
     public FHResearchDataUpdatePacket(ResearchData rd) {
@@ -48,13 +48,13 @@ public class FHResearchDataUpdatePacket {
         this.id = rid;
     }
 
-    public FHResearchDataUpdatePacket(PacketBuffer buffer) {
-        data = SerializeUtil.readOptional(buffer, PacketBuffer::readNbt).orElse(null);
+    public FHResearchDataUpdatePacket(FriendlyByteBuf buffer) {
+        data = SerializeUtil.readOptional(buffer, FriendlyByteBuf::readNbt).orElse(null);
         id = buffer.readVarInt();
     }
 
-    public void encode(PacketBuffer buffer) {
-        SerializeUtil.writeOptional2(buffer, data, PacketBuffer::writeNbt);
+    public void encode(FriendlyByteBuf buffer) {
+        SerializeUtil.writeOptional2(buffer, data, FriendlyByteBuf::writeNbt);
         buffer.writeVarInt(id);
     }
 

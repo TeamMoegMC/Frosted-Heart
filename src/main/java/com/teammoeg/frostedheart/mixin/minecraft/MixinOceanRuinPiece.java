@@ -27,35 +27,35 @@ import org.spongepowered.asm.mixin.Shadow;
 
 import com.teammoeg.frostedheart.util.StructureUtils;
 
-import net.minecraft.block.BlockState;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ILivingEntityData;
 import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.monster.DrownedEntity;
 import net.minecraft.loot.LootTables;
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.tileentity.LockableLootTileEntity;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MutableBoundingBox;
-import net.minecraft.world.IServerWorld;
-import net.minecraft.world.gen.feature.structure.IStructurePieceType;
-import net.minecraft.world.gen.feature.structure.OceanRuinPieces;
-import net.minecraft.world.gen.feature.structure.TemplateStructurePiece;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
+import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraft.world.level.levelgen.feature.StructurePieceType;
+import net.minecraft.world.level.levelgen.structure.OceanRuinPieces;
+import net.minecraft.world.level.levelgen.structure.TemplateStructurePiece;
 
-@Mixin(OceanRuinPieces.Piece.class)
+@Mixin(OceanRuinPieces.OceanRuinPiece.class)
 public abstract class MixinOceanRuinPiece extends TemplateStructurePiece {
     @Shadow
     boolean isLarge;
 
-    public MixinOceanRuinPiece(IStructurePieceType structurePieceTypeIn, int componentTypeIn) {
+    public MixinOceanRuinPiece(StructurePieceType structurePieceTypeIn, int componentTypeIn) {
         super(structurePieceTypeIn, componentTypeIn);
     }
 
-    public MixinOceanRuinPiece(IStructurePieceType structurePieceTypeIn, CompoundNBT nbt) {
+    public MixinOceanRuinPiece(StructurePieceType structurePieceTypeIn, CompoundTag nbt) {
         super(structurePieceTypeIn, nbt);
     }
 
@@ -64,7 +64,7 @@ public abstract class MixinOceanRuinPiece extends TemplateStructurePiece {
      * @reason fix chest type to fit our structure system
      */
     @Overwrite
-    protected void handleDataMarker(String function, BlockPos pos, IServerWorld worldIn, Random rand, MutableBoundingBox sbb) {
+    protected void handleDataMarker(String function, BlockPos pos, ServerLevelAccessor worldIn, Random rand, BoundingBox sbb) {
         if ("chest".equals(function)) {
             BlockState chest = StructureUtils.getChest().getDefaultState();
             if (chest.hasProperty(BlockStateProperties.WATERLOGGED))

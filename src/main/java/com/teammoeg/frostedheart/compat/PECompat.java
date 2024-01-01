@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -26,9 +26,9 @@ import moze_intel.projecte.api.mapper.IEMCMapper;
 import moze_intel.projecte.api.mapper.collector.IMappingCollector;
 import moze_intel.projecte.api.nss.NSSItem;
 import moze_intel.projecte.api.nss.NormalizedSimpleStack;
-import net.minecraft.item.Item;
-import net.minecraft.resources.DataPackRegistries;
-import net.minecraft.resources.IResourceManager;
+import net.minecraft.world.item.Item;
+import net.minecraft.server.ServerResources;
+import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraftforge.registries.ForgeRegistries;
 
 @EMCMapper
@@ -36,7 +36,7 @@ public class PECompat implements IEMCMapper<NormalizedSimpleStack, Long> {
 
     @Override
     public void addMappings(IMappingCollector<NormalizedSimpleStack, Long> arg0, CommentedFileConfig arg1,
-                            DataPackRegistries arg2, IResourceManager arg3) {
+                            ServerResources arg2, ResourceManager arg3) {
         for (Item i : ForgeRegistries.ITEMS.getValues())
             arg0.setValueBefore(NSSItem.createItem(i), 0L);
     }

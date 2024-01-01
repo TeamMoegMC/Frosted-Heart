@@ -20,10 +20,10 @@
 package com.teammoeg.frostedheart.content.steamenergy;
 
 import blusunrize.immersiveengineering.common.util.Utils;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.core.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -57,8 +57,8 @@ public class SteamNetworkHolder {
      * @param dist the distance<br>
      * @return true, if connected
      */
-    public boolean reciveConnection(World w,BlockPos pos,Direction from,int dist) {
-    	TileEntity te = Utils.getExistingTileEntity(w, pos.relative(from));
+    public boolean reciveConnection(Level w,BlockPos pos,Direction from,int dist) {
+    	BlockEntity te = Utils.getExistingTileEntity(w, pos.relative(from));
         if (te instanceof EnergyNetworkProvider) {
             this.connect(((EnergyNetworkProvider) te).getNetwork(), dist);
             return true;

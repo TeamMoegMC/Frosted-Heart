@@ -24,15 +24,15 @@ import java.util.Map;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 
-import net.minecraft.entity.ai.brain.memory.MemoryModuleStatus;
-import net.minecraft.entity.ai.brain.memory.MemoryModuleType;
-import net.minecraft.entity.ai.brain.task.AssignProfessionTask;
-import net.minecraft.entity.ai.brain.task.Task;
-import net.minecraft.entity.merchant.villager.VillagerEntity;
-import net.minecraft.world.server.ServerWorld;
-@Mixin(AssignProfessionTask.class)
-public abstract class AssignProfessionTaskMixin extends Task<VillagerEntity> {
-	public AssignProfessionTaskMixin(Map<MemoryModuleType<?>, MemoryModuleStatus> requiredMemoryStateIn) {
+import net.minecraft.world.entity.ai.memory.MemoryStatus;
+import net.minecraft.world.entity.ai.memory.MemoryModuleType;
+import net.minecraft.world.entity.ai.behavior.AssignProfessionFromJobSite;
+import net.minecraft.world.entity.ai.behavior.Behavior;
+import net.minecraft.world.entity.npc.Villager;
+import net.minecraft.server.level.ServerLevel;
+@Mixin(AssignProfessionFromJobSite.class)
+public abstract class AssignProfessionTaskMixin extends Behavior<Villager> {
+	public AssignProfessionTaskMixin(Map<MemoryModuleType<?>, MemoryStatus> requiredMemoryStateIn) {
 		super(requiredMemoryStateIn);
 	}
 	/**
@@ -40,7 +40,7 @@ public abstract class AssignProfessionTaskMixin extends Task<VillagerEntity> {
 	 * @reason Disable vanilla profession
 	 * */
 	@Overwrite
-	protected boolean shouldExecute(ServerWorld worldIn, VillagerEntity owner) {
+	protected boolean shouldExecute(ServerLevel worldIn, Villager owner) {
 		return false;
 	}
 }

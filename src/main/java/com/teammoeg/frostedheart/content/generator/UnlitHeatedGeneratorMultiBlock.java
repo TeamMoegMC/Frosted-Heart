@@ -21,13 +21,13 @@ package com.teammoeg.frostedheart.content.generator;
 
 import java.util.Random;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.material.Material;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.fml.RegistryObject;
 
-import net.minecraft.block.AbstractBlock.Properties;
+import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
 
 public class UnlitHeatedGeneratorMultiBlock extends HeatedGeneratorMultiBlock {
 
@@ -36,7 +36,7 @@ public class UnlitHeatedGeneratorMultiBlock extends HeatedGeneratorMultiBlock {
     }
 
     @Override
-    public void animateTick(BlockState stateIn, World worldIn, BlockPos pos, Random rand) {
+    public void animateTick(BlockState stateIn, Level worldIn, BlockPos pos, Random rand) {
         super.animateTick(stateIn, worldIn, pos, rand);
     }
 

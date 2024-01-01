@@ -27,7 +27,7 @@ import com.alcatrazescapee.primalwinter.util.WeatherData;
 import com.teammoeg.frostedheart.climate.ClimateData;
 
 import net.minecraft.world.GameRules;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.server.level.ServerLevel;
 
 @Mixin(WeatherData.class)
 public class WeatherDataMixin {
@@ -37,7 +37,7 @@ public class WeatherDataMixin {
      * @reason Disable endless storm
      */
     @Overwrite(remap = false)
-    public static void trySetEndlessStorm(ServerWorld world) {
+    public static void trySetEndlessStorm(ServerLevel world) {
         final WeatherData cap = world.getCapability(WeatherData.CAPABILITY).orElseThrow(() -> new IllegalStateException("Expected WeatherData to exist on World " + world.getDimensionKey() + " / " + world.getDimensionType()));
         WeatherDataAccess dataAccess = (WeatherDataAccess) cap;
         if (!dataAccess.getAlreadySetWorldToWinter()) {

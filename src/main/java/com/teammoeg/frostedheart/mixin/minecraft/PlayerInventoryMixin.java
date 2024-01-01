@@ -28,19 +28,19 @@ import com.teammoeg.frostedheart.FHConfig;
 import com.teammoeg.frostedheart.FHMain;
 import com.teammoeg.frostedheart.climate.data.DeathInventoryData;
 
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.util.INameable;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.Container;
+import net.minecraft.world.Nameable;
 import net.minecraftforge.common.util.FakePlayer;
 
-@Mixin(PlayerInventory.class)
-public abstract class PlayerInventoryMixin implements IInventory, INameable {
+@Mixin(Inventory.class)
+public abstract class PlayerInventoryMixin implements Container, Nameable {
 
 	public PlayerInventoryMixin() {
 	}
 
-	private PlayerInventory getThis() {
-		return (PlayerInventory) (Object) this;
+	private Inventory getThis() {
+		return (Inventory) (Object) this;
 	}
 
 	@Inject(at = @At("HEAD"), method = "dropAllItems", cancellable = true)

@@ -28,18 +28,18 @@ import com.google.gson.JsonObject;
 
 import blusunrize.immersiveengineering.api.crafting.IERecipeSerializer;
 import blusunrize.immersiveengineering.api.crafting.IESerializableRecipe;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.item.crafting.IRecipeType;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.registries.ForgeRegistries;
 import top.theillusivec4.diet.api.IDietGroup;
 
 public class DietValueRecipe extends IESerializableRecipe {
-    public static IRecipeType<DietValueRecipe> TYPE;
+    public static RecipeType<DietValueRecipe> TYPE;
     public static RegistryObject<IERecipeSerializer<DietValueRecipe>> SERIALIZER;
     final Map<String, Float> groups;
     Map<IDietGroup, Float> cache;
@@ -80,12 +80,12 @@ public class DietValueRecipe extends IESerializableRecipe {
     public static class Serializer extends IERecipeSerializer<DietValueRecipe> {
 
         @Override
-        public DietValueRecipe fromNetwork(ResourceLocation recipeId, PacketBuffer buffer) {
+        public DietValueRecipe fromNetwork(ResourceLocation recipeId, FriendlyByteBuf buffer) {
             return new DietValueRecipe(recipeId, DietGroupCodec.read(buffer), buffer.readRegistryId());
         }
 
         @Override
-        public void toNetwork(PacketBuffer buffer, DietValueRecipe recipe) {
+        public void toNetwork(FriendlyByteBuf buffer, DietValueRecipe recipe) {
             DietGroupCodec.write(buffer, recipe.groups);
             buffer.writeRegistryId(recipe.item);
         }

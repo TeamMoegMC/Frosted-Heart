@@ -26,15 +26,15 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.teammoeg.frostedheart.util.FHUtils;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.FungusBlock;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockReader;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.FungusBlock;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.BlockGetter;
 
 @Mixin(FungusBlock.class)
 public class FungisBlockMixin {
 	@Inject(at=@At("HEAD"),method="canGrow",remap=true,cancellable=true)
-	public void canGrow(IBlockReader worldIn, BlockPos pos, BlockState state, boolean isClient,
+	public void canGrow(BlockGetter worldIn, BlockPos pos, BlockState state, boolean isClient,
 			CallbackInfoReturnable<Boolean> cbi) {
 		if(!FHUtils.canNetherTreeGrow(worldIn,pos)) {
 			

@@ -31,12 +31,12 @@ import com.simibubi.create.content.contraptions.components.structureMovement.bea
 import com.simibubi.create.content.contraptions.components.structureMovement.bearing.MechanicalBearingTileEntity;
 import com.teammoeg.frostedheart.util.ContraptionCostUtils;
 
-import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 
 @Mixin(MechanicalBearingTileEntity.class)
 public abstract class MixinMechanicalBearingTileEntity extends GeneratingKineticTileEntity
         implements IBearingTileEntity {
-    public MixinMechanicalBearingTileEntity(TileEntityType<?> typeIn) {
+    public MixinMechanicalBearingTileEntity(BlockEntityType<?> typeIn) {
         super(typeIn);
     }
     

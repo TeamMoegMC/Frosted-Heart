@@ -34,14 +34,14 @@ import com.teammoeg.frostedheart.client.util.GuiUtils;
 import com.teammoeg.frostedheart.research.ResearchListeners;
 import com.teammoeg.frostedheart.util.mixin.ICampfireExtra;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.CampfireBlock;
-import net.minecraft.block.ContainerBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.CampfireBlock;
+import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.InventoryHelper;
-import net.minecraft.item.BlockItemUseContext;
+import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.item.crafting.CampfireCookingRecipe;
@@ -60,8 +60,10 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.items.ItemHandlerHelper;
 
+import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
+
 @Mixin(CampfireBlock.class)
-public abstract class CampfireBlockMixin extends ContainerBlock {
+public abstract class CampfireBlockMixin extends BaseEntityBlock {
     @Shadow
     public static boolean isLit(BlockState state) {
         return false;
@@ -72,7 +74,7 @@ public abstract class CampfireBlockMixin extends ContainerBlock {
     }
 
     @Inject(at = @At("RETURN"), method = "getStateForPlacement", cancellable = true)
-    public void getStateForPlacement(BlockItemUseContext context, CallbackInfoReturnable<BlockState> callbackInfo) {
+    public void getStateForPlacement(BlockPlaceContext context, CallbackInfoReturnable<BlockState> callbackInfo) {
         callbackInfo.setReturnValue(callbackInfo.getReturnValue().with(CampfireBlock.LIT, false));
     }
 

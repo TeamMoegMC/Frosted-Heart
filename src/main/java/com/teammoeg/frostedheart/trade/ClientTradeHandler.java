@@ -24,7 +24,7 @@ import com.teammoeg.frostedheart.trade.gui.TradeScreen;
 import blusunrize.immersiveengineering.client.ClientUtils;
 import dev.ftb.mods.ftblibrary.ui.BaseScreen;
 import dev.ftb.mods.ftblibrary.ui.MenuScreenWrapper;
-import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screens.Screen;
 
 public class ClientTradeHandler {
 	public static void updateBargain() {

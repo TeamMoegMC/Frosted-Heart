@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 TeamMoeg
+ * Copyright (c) 2022-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -24,7 +24,7 @@ import java.util.function.Function;
 import com.google.gson.JsonObject;
 import com.teammoeg.frostedheart.research.JsonSerializerRegistry;
 
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.FriendlyByteBuf;
 
 public class Effects {
     private static JsonSerializerRegistry<Effect> registry=new JsonSerializerRegistry<>();
@@ -39,18 +39,18 @@ public class Effects {
     	registry.register(EffectCommand.class,"command",EffectCommand::new,EffectCommand::new);
     	registry.register(EffectExperience.class,"experience",EffectExperience::new,EffectExperience::new);
     }
-    public static void registerEffectType(Class<? extends Effect> cls,String type,Function<JsonObject, Effect> json,Function<PacketBuffer, Effect> packet) {
+    public static void registerEffectType(Class<? extends Effect> cls,String type,Function<JsonObject, Effect> json,Function<FriendlyByteBuf, Effect> packet) {
     	registry.register(cls, type, json, packet);
     }
     private Effects() {
     }
-    public static void writeId(Effect e,PacketBuffer pb) {
+    public static void writeId(Effect e,FriendlyByteBuf pb) {
     	registry.writeId(pb, e);
     }
     public static Effect deserialize(JsonObject jo) {
         return registry.deserialize(jo);
     }
-    public static Effect deserialize(PacketBuffer data) {
+    public static Effect deserialize(FriendlyByteBuf data) {
         return registry.read(data);
     }
     public static void writeType(Effect e,JsonObject jo) {

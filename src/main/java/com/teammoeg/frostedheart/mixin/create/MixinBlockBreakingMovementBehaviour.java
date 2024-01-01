@@ -31,7 +31,7 @@ import com.teammoeg.frostedheart.util.mixin.ISpeedContraption;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.FallingBlock;
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
@@ -47,7 +47,7 @@ public abstract class MixinBlockBreakingMovementBehaviour extends MovementBehavi
      */
     @Overwrite(remap = false)
     public void tickBreaker(MovementContext context) {
-        CompoundNBT data = context.data;
+        CompoundTag data = context.data;
         if (context.world.isRemote)
             return;
         if (!data.contains("BreakingPos"))

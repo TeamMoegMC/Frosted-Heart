@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 TeamMoeg
+ * Copyright (c) 2021-2024 TeamMoeg
  *
  * This file is part of Frosted Heart.
  *
@@ -14,6 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
 package com.teammoeg.frostedheart.research.network;
@@ -23,9 +24,9 @@ import java.util.function.Supplier;
 import com.teammoeg.frostedheart.client.util.ClientUtils;
 import com.teammoeg.frostedheart.climate.TemperatureCore;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.network.NetworkEvent;
@@ -34,17 +35,17 @@ public class FHEnergyDataSyncPacket {
     private final long energy;
     private final long penergy;
 
-    public FHEnergyDataSyncPacket(CompoundNBT data) {
+    public FHEnergyDataSyncPacket(CompoundTag data) {
         this.energy = data.getLong("energy");
         this.penergy = data.getLong("penergy");
     }
 
-    public FHEnergyDataSyncPacket(PacketBuffer buffer) {
+    public FHEnergyDataSyncPacket(FriendlyByteBuf buffer) {
         energy = buffer.readVarLong();
         penergy = buffer.readVarLong();
     }
 
-    public void encode(PacketBuffer buffer) {
+    public void encode(FriendlyByteBuf buffer) {
         buffer.writeVarLong(energy);
         buffer.writeVarLong(penergy);
     }
@@ -52,9 +53,9 @@ public class FHEnergyDataSyncPacket {
     public void handle(Supplier<NetworkEvent.Context> context) {
         context.get().enqueueWork(() -> {
             // Update client-side nbt
-            PlayerEntity player = DistExecutor.safeCallWhenOn(Dist.CLIENT, () -> ClientUtils::getPlayer);
+            Player player = DistExecutor.safeCallWhenOn(Dist.CLIENT, () -> ClientUtils::getPlayer);
             if (player != null) {
-                CompoundNBT data = TemperatureCore.getFHData(player);
+                CompoundTag data = TemperatureCore.getFHData(player);
                 data.putLong("energy", energy);
                 data.putLong("penergy", penergy);
                 TemperatureCore.setFHData(player, data);
