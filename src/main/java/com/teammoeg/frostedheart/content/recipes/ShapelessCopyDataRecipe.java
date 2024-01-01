@@ -29,10 +29,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.data.IFinishedRecipe;
 import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.item.crafting.ShapedRecipe;
-import net.minecraft.item.crafting.ShapelessRecipe;
+import net.minecraft.item.crafting.*;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.JSONUtils;
 import net.minecraft.util.NonNullList;
@@ -40,7 +37,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.registry.Registry;
 import net.minecraftforge.fml.RegistryObject;
 
-public class ShapelessCopyDataRecipe extends ShapelessRecipe implements IFinishedRecipe {
+public class ShapelessCopyDataRecipe extends ShapelessRecipe {
 	public final Ingredient tool;
 	public static RegistryObject<IERecipeSerializer<ShapelessCopyDataRecipe>> SERIALIZER;
 
@@ -68,7 +65,6 @@ public class ShapelessCopyDataRecipe extends ShapelessRecipe implements IFinishe
 	public IRecipeSerializer<?> getSerializer() {
 		return SERIALIZER.get();
 	}
-
 
 	public static class Serializer extends IERecipeSerializer<ShapelessCopyDataRecipe> {
 		public ShapelessCopyDataRecipe readFromJson(ResourceLocation recipeId, JsonObject json) {
@@ -116,38 +112,38 @@ public class ShapelessCopyDataRecipe extends ShapelessRecipe implements IFinishe
 		}
 	}
 
-	@Override
-	public void serializeRecipeData(JsonObject json) {
-
-		JsonArray jsonarray = new JsonArray();
-
-		for (Ingredient ingredient : this.getIngredients()) {
-			jsonarray.add(ingredient.toJson());
-		}
-
-		json.add("ingredients", jsonarray);
-		JsonObject jsonobject = new JsonObject();
-		jsonobject.addProperty("item", Registry.ITEM.getKey(this.getResultItem().getItem()).toString());
-		if (this.getResultItem().getCount() > 1) {
-			jsonobject.addProperty("count", this.getResultItem().getCount());
-		}
-
-		json.add("result", jsonobject);
-	}
+//	@Override
+//	public void serializeRecipeData(JsonObject json) {
+//
+//		JsonArray jsonarray = new JsonArray();
+//
+//		for (Ingredient ingredient : this.getIngredients()) {
+//			jsonarray.add(ingredient.toJson());
+//		}
+//
+//		json.add("ingredients", jsonarray);
+//		JsonObject jsonobject = new JsonObject();
+//		jsonobject.addProperty("item", Registry.ITEM.getKey(this.getResultItem().getItem()).toString());
+//		if (this.getResultItem().getCount() > 1) {
+//			jsonobject.addProperty("count", this.getResultItem().getCount());
+//		}
+//
+//		json.add("result", jsonobject);
+//	}
 
 	@Override
 	public ResourceLocation getId() {
 		return getId();
 	}
 
-	@Override
-	public JsonObject serializeAdvancement() {
-		return null;
-	}
-
-	@Override
-	public ResourceLocation getAdvancementId() {
-		return null;
-	}
+//	@Override
+//	public JsonObject serializeAdvancement() {
+//		return null;
+//	}
+//
+//	@Override
+//	public ResourceLocation getAdvancementId() {
+//		return null;
+//	}
 
 }
