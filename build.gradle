@@ -12,20 +12,23 @@ buildscript {
 
 plugins {
     id 'com.matthewprenger.cursegradle' version '1.4.0'
-    id 'net.minecrell.licenser' version '0.4.1'
-    id 'idea'
+//    id 'net.minecrell.licenser' version '0.4.1'
+//    id 'idea'
 }
 
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'org.spongepowered.mixin'
 apply plugin: 'maven-publish'
+apply plugin: 'idea'
 
 group = 'com.teammoeg'
 version = "${minecraft_version}-${mod_version}"
 archivesBaseName = 'frostedheart'
+
 compileJava.options.encoding = "UTF-8"
 compileTestJava.options.encoding = "UTF-8"
 java.toolchain.languageVersion = JavaLanguageVersion.of(8)
+
 sourceSets {
     main {
         resources {
@@ -48,6 +51,7 @@ sourceSets {
 }
 minecraft {
     mappings channel: 'snapshot', version: '20210309-1.16.5'
+//    mappings channel: 'official', version: '1.16.5'
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
     runs {
@@ -186,7 +190,7 @@ dependencies {
     compileOnly fg.deobf("dev.ftb.mods:ftb-quests-forge:1605.3.6-build.98")
     implementation fg.deobf("dev.ftb.mods:ftb-chunks-forge:1605.3.2-build.115")
 
-    compile fg.deobf("blusunrize.immersiveengineering:ImmersiveEngineering:1.16.5-5.0.7-143")
+    implementation fg.deobf("blusunrize.immersiveengineering:ImmersiveEngineering:1.16.5-5.0.7-143")
     implementation fg.deobf("blusunrize.immersiveengineering:ImmersiveEngineering:1.16.5-5.0.7-143:datagen")
 
     implementation fg.deobf("curse.maven:create-328085:3499718")
@@ -340,11 +344,11 @@ curseforge {
 }
 
 // Automatically apply a license header when running checkLicense / updateLicense
-license {
-    header = project.file('HEADER.txt')
-    ignoreFailures = true
-    include '**/*.java'
-}
+//license {
+//    header = project.file('HEADER.txt')
+//    ignoreFailures = true
+//    include '**/*.java'
+//}
 
 publishing {
     publications {
