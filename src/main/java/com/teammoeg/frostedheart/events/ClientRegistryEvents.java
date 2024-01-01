@@ -19,7 +19,8 @@
 
 package com.teammoeg.frostedheart.events;
 
-import static net.minecraft.inventory.container.PlayerContainer.LOCATION_BLOCKS_TEXTimport blusunrize.immersiveengineering.common.gui.GuiHandler;
+import static net.minecraft.inventory.container.PlayerContainer.LOCATION_BLOCKS_TEXTURE;
+import blusunrize.immersiveengineering.common.gui.GuiHandler;
 import blusunrize.lib.manual.ManualEntry;
 import blusunrize.lib.manual.Tree;
 import com.teammoeg.frostedheart.FHBlocks;
@@ -73,9 +74,8 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 
-URE;
-
-import java.net.minecraft.world.inventory.InventoryMenuport com.teammoeg.frostedheart.FHBlocks;
+import java.net.minecraft.world.inventory.InventoryMenu;
+import com.teammoeg.frostedheart.FHBlocks;
 import com.teammoeg.frostedheart.FHContent;
 import com.teammoeg.frostedheart.FHMain;
 import com.teammoeg.frostedheart.FHMultiblocks;

@@ -19,7 +19,8 @@
 
 package com.teammoeg.frostedheart.events;
 
-import static net.minecraft.util.text.TextFormattiimport blusunrize.immersiveengineering.common.util.ItemNBTHelper;
+import static net.minecraft.util.text.TextFormatting.GRAY;
+import blusunrize.immersiveengineering.common.util.ItemNBTHelper;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.teammoeg.frostedheart.FHConfig;
 import com.teammoeg.frostedheart.FHEffects;
@@ -87,8 +88,6 @@ import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.server.ServerLifecycleHooks;
-
-ng.GRAY;
 
 import java.net.minecraft.ChatFormattingmatrix.MatrixStack;
 import com.teammoeg.frostedheart.FHConfig;
