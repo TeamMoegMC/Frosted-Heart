@@ -1,3 +1,22 @@
+/*
+ * Copyright (c) 2024 TeamMoeg
+ *
+ * This file is part of Frosted Heart.
+ *
+ * Frosted Heart is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3.
+ *
+ * Frosted Heart is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
 package com.teammoeg.frostedheart.scenario.commands;
 
 import java.util.HashMap;
@@ -14,10 +33,10 @@ import com.teammoeg.frostedheart.scenario.runner.target.OrTrigger;
 import com.teammoeg.frostedheart.scenario.runner.target.VariantTargetTrigger;
 import com.teammoeg.frostedheart.scenario.runner.target.trigger.MovementTrigger;
 import com.teammoeg.frostedheart.util.FHUtils;
+import com.teammoeg.frostedheart.util.RegistryUtils;
 
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -25,11 +44,10 @@ import net.minecraft.nbt.JsonToNBT;
 import net.minecraft.server.management.OpEntry;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.registries.ForgeRegistries;
 
 public class MCCommands {
 	public void giveItem(ScenarioVM runner, @Param("i") String item, @Param("n") String nbt, @Param("c") int count) throws CommandSyntaxException {
-		Item i = ForgeRegistries.ITEMS.getValue(new ResourceLocation(item));
+		Item i = RegistryUtils.getItem(new ResourceLocation(item));
 		if (count == 0) count = 1;
 		ItemStack is = new ItemStack(i, count);
 		if (nbt != null)

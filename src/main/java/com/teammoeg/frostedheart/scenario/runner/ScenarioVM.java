@@ -1,3 +1,22 @@
+/*
+ * Copyright (c) 2024 TeamMoeg
+ *
+ * This file is part of Frosted Heart.
+ *
+ * Frosted Heart is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3.
+ *
+ * Frosted Heart is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
 package com.teammoeg.frostedheart.scenario.runner;
 
 import java.util.ArrayList;
@@ -5,8 +24,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.Map.Entry;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -15,10 +34,10 @@ import com.teammoeg.frostedheart.scenario.FHScenario;
 import com.teammoeg.frostedheart.scenario.ScenarioExecutionException;
 import com.teammoeg.frostedheart.scenario.parser.Node;
 import com.teammoeg.frostedheart.scenario.parser.Scenario;
-import com.teammoeg.frostedheart.scenario.runner.target.TriggerTarget;
 import com.teammoeg.frostedheart.scenario.runner.target.ExecuteStackElement;
 import com.teammoeg.frostedheart.scenario.runner.target.ExecuteTarget;
 import com.teammoeg.frostedheart.scenario.runner.target.IScenarioTarget;
+import com.teammoeg.frostedheart.scenario.runner.target.TriggerTarget;
 import com.teammoeg.frostedheart.util.client.GuiUtils;
 import com.teammoeg.frostedheart.util.evaluator.Evaluator;
 
@@ -42,11 +61,7 @@ public class ScenarioVM implements IScenarioThread{
 	protected Scene scene;
 	protected boolean clearAfterClick;
 
-    public void copy(ScenarioVM another) {
-    	
-    }
 	public ScenarioVM() {
-		// TODO Auto-generated constructor stub
 	}
 	@Override
 	public Scenario getScenario() {
@@ -98,13 +113,14 @@ public class ScenarioVM implements IScenarioThread{
 		macros.put(name.toLowerCase(), getCurrentPosition().next());
 	}
 	public void queue(IScenarioTarget questExecuteTarget) {
-		//getCurrentAct().queue(questExecuteTarget);
+		addToQueue(questExecuteTarget);
+	}
+	public final void addToQueue(IScenarioTarget questExecuteTarget) {
 		toExecute.add(questExecuteTarget);
 	}
 	public void jump(IScenarioTarget nxt) {
 		nxt.accept(this);
 		run();
-
 	}
     public void popCallStack() {
 		if(getCallStack().isEmpty()) {
@@ -116,7 +132,6 @@ public class ScenarioVM implements IScenarioThread{
 		if(!getCallStack().isEmpty()) {
 			jump(getCallStack().pollLast());
 		}
-		
 	}
 	public void addCallStack() {
 		getCallStack().add(getCurrentPosition());
@@ -129,15 +144,13 @@ public class ScenarioVM implements IScenarioThread{
     	return new ExecuteStackElement(sp,nodeNum);
     }
 	public void sendCachedSence() {
-		getScene().sendCurrent();
+		getScene().sendCurrent(this);
 	}
     public void stopWait() {
-		getScene().stopWait();
+		getScene().stopWait(this);
 	}
 	protected void runCode() {
     	clearAfterClick=false;
-    	
-    	
     	while(isRunning()&&getScenario()!=null&&nodeNum<getScenario().pieces.size()) {
     		Node node=getScenario().pieces.get(nodeNum++);
     		try {
@@ -147,14 +160,13 @@ public class ScenarioVM implements IScenarioThread{
     			new ScenarioExecutionException("Unexpected error when executing scenario",t).printStackTrace();
     			this.sendMessage("Execution Exception when executing scenario: "+t.getMessage()+" see logs for more detail");
     			setStatus((RunStatus.STOPPED));
-	    		getScene().clear();
+	    		getScene().clear(this);
 	    		sendCachedSence();
     			break;
     		}
 	    	if(getScenario()==null||nodeNum>=getScenario().pieces.size()) {
-	    		
 	    		setStatus((RunStatus.STOPPED));
-	    		getScene().clear();
+	    		getScene().clear(this);
 	    		sendCachedSence();
 	    		this.tryPopCallStack();
 	    		return;
@@ -162,7 +174,6 @@ public class ScenarioVM implements IScenarioThread{
     	}
     	if(isRunning())
     		setStatus((RunStatus.STOPPED));
-		
     }
 	public boolean isRunning() {
 		return getStatus()==RunStatus.RUNNING;
@@ -172,8 +183,6 @@ public class ScenarioVM implements IScenarioThread{
     	if(getStatus().shouldPause) {
     		IScenarioTarget nxt=toExecute.pollFirst();
     		if(nxt!=null) {
-    			//globalScope();
-    			//paragraph(-1);
     			jump(nxt);
     		}
     	}
@@ -188,7 +197,6 @@ public class ScenarioVM implements IScenarioThread{
     	if(isConducting)return;
     	try {
     		isConducting=true;
-    		
     		while(isRunning()){
 	    		runCode();
 	    		runScheduled();
@@ -219,7 +227,7 @@ public class ScenarioVM implements IScenarioThread{
     		if(t.test(this)) {
     			if(t.use()) {
     				if(t.isAsync())
-    					toExecute.add(t);
+    					addToQueue(t);
 					else
 						jump(t);
     			}
@@ -228,12 +236,10 @@ public class ScenarioVM implements IScenarioThread{
     	triggers.removeIf(t->!t.canUse());
     	if(getStatus()==RunStatus.WAITTIMER) {
     		if(getScene().tickWait()) {
-    			
     			run();
     			return;
     		}
     	}
-    	//Execute Queued actions
     	runScheduled();
     }
 	public void addTrigger(IScenarioTrigger trig,IScenarioTarget targ) {
@@ -241,20 +247,20 @@ public class ScenarioVM implements IScenarioThread{
 	}
 	public Scene getScene() {
 		if(scene==null)
-			scene=new Scene(this);
+			scene=new Scene();
     	return scene;
     }
 	public void newLine() {
-		getScene().sendNewLine();
+		getScene().sendNewLine(this);
 	}
 	protected void doParagraph() {
-		getScene().clear();
+		getScene().clear(this);
 	}
     public void paragraph(int pn) {
     	if(getScene().shouldWaitClient()) {
-    		getScene().waitClientIfNeeded();
+    		getScene().waitClientIfNeeded(this);
     		clearAfterClick=true;
-    		getScene().sendCurrent();
+    		getScene().sendCurrent(this);
     	}else doParagraph();
 	}
 	public int getClientStatus() {

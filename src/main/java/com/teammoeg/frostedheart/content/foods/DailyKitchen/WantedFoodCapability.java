@@ -1,3 +1,22 @@
+/*
+ * Copyright (c) 2024 TeamMoeg
+ *
+ * This file is part of Frosted Heart.
+ *
+ * Frosted Heart is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3.
+ *
+ * Frosted Heart is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Frosted Heart. If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
 package com.teammoeg.frostedheart.content.foods.DailyKitchen;
 
 import java.util.HashSet;
@@ -5,6 +24,7 @@ import java.util.Objects;
 import java.util.Set;
 
 import com.teammoeg.frostedheart.FHMain;
+import com.teammoeg.frostedheart.util.RegistryUtils;
 
 import net.minecraft.item.Item;
 import net.minecraft.nbt.CompoundNBT;
@@ -14,9 +34,9 @@ import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.StringNBT;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.util.Constants;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.common.util.INBTSerializable;
 
-public class WantedFoodCapability implements IWantedFoodCapability{
+public class WantedFoodCapability implements INBTSerializable<CompoundNBT>{
 
     private Set<Item> wantedFoods = new HashSet<>();
     private int eatenTimes = 0;
@@ -33,14 +53,10 @@ public class WantedFoodCapability implements IWantedFoodCapability{
         this.wantedFoods = wantedFoods;
         this.eatenTimes = 0;
     }
-
-    @Override
     public void setWantedFoods(Set<Item> wantedFoods){
         this.wantedFoods = wantedFoods;
         resetEatenTimes();
     }
-
-    @Override
     public Set<Item> getWantedFoods() {
         return this.wantedFoods;
     }
@@ -68,7 +84,7 @@ public class WantedFoodCapability implements IWantedFoodCapability{
     }
 
     private static StringNBT turnItemToStringNBT(Item item){
-        return StringNBT.valueOf(Objects.requireNonNull(ForgeRegistries.ITEMS.getKey(item)).toString());
+        return StringNBT.valueOf(Objects.requireNonNull(RegistryUtils.getRegistryName(item)).toString());
     }
 
     @Override
@@ -88,7 +104,7 @@ public class WantedFoodCapability implements IWantedFoodCapability{
 
     private static Item turnStringNBTToItem(INBT nbt){
         ResourceLocation itemResourceLocation = new ResourceLocation(nbt.getString());
-        return ForgeRegistries.ITEMS.getValue(itemResourceLocation);
+        return RegistryUtils.getItem(itemResourceLocation);
     }
 
     @Override
